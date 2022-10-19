@@ -1,0 +1,15 @@
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\bin\Debug_2019\TotalMEP.dll
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\bin\Debug_2019\TotalMEP.pdb
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\bin\Debug_2019\Newtonsoft.Json.dll
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\bin\Debug_2019\Newtonsoft.Json.xml
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEPProject.csproj.AssemblyReference.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\UI\ProgessBar.baml
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\UI\ProgessBar.g.cs
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEP_MarkupCompile.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEP.g.resources
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\SpeedHangerProject.UI.FrmLogin.resources
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEPProject.csproj.GenerateResource.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEPProject.csproj.CoreCompileInputs.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEPProject.csproj.CopyComplete
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEP.dll
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Debug_2019\TotalMEP.pdb

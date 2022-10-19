@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>TotalMEPTools</Name>
+    <Assembly>TotalMEPTools/TotalMEP.dll</Assembly>
+    <AddInId>CE6C53C7-E207-4ECF-AAF1-5A22C5D17035</AddInId>
+    <FullClassName>TotalMEPProject.App</FullClassName>
+    <VendorId>F98FA98E-C3DB-4966-ADA0-A85B2E1A032E</VendorId>
+    <VendorDescription>TotalMEPTools</VendorDescription>
+  </AddIn>
+</RevitAddIns>

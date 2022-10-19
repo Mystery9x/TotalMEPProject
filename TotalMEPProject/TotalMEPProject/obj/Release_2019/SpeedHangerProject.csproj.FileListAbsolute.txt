@@ -1,0 +1,11 @@
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\Output\2019\SpeedHangerTools\SpeedHangerTools.dll
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerProject.csproj.AssemblyReference.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\UI\ProgessBar.baml
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\UI\ProgessBar.g.cs
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerTools_MarkupCompile.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerTools.g.resources
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerProject.UI.FrmLogin.resources
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerProject.csproj.GenerateResource.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerProject.csproj.CoreCompileInputs.cache
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerProject.csproj.CopyComplete
+D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\SpeedHangerProject\obj\Release_2019\SpeedHangerTools.dll
