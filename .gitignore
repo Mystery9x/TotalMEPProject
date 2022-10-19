@@ -1,0 +1,16 @@
+packages/
+obj/
+bin/
+.vs/
+*.user
+*.pdb
+Debugs/
+error.log
+Thumbs.db
+*.bak
+*.zip
+*.exe
+*.msi
+*.txt
+
+
