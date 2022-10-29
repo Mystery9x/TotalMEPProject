@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D9F405F3A28D2F816E6F3C9C64569C5F"
+        "MsmKey" = "8:_C7898F242D23C398D779AAE9E6E44604"
         "OwnerKey" = "8:_F217115B31E0475B9AC355ABD16F78F9"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -34,13 +34,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D9F405F3A28D2F816E6F3C9C64569C5F"
+        "OwnerKey" = "8:_F217115B31E0475B9AC355ABD16F78F9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F217115B31E0475B9AC355ABD16F78F9"
+        "OwnerKey" = "8:_C7898F242D23C398D779AAE9E6E44604"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -414,14 +414,14 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D9F405F3A28D2F816E6F3C9C64569C5F"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C7898F242D23C398D779AAE9E6E44604"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D9F405F3A28D2F816E6F3C9C64569C5F"
+                    "_C7898F242D23C398D779AAE9E6E44604"
                     {
                     "Name" = "8:Newtonsoft.Json.dll"
                     "Attributes" = "3:512"
@@ -631,9 +631,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TotalMEPInstaller2021"
-        "ProductCode" = "8:{C88EA85E-323D-458A-9EBF-C3AA7C794D43}"
+        "ProductCode" = "8:{65E687FD-185E-4FF5-A3A1-B07CF72F2AEB}"
         "PackageCode" = "8:{EB30D946-48C6-4DCF-99E1-60C38BE2F3EB}"
-        "UpgradeCode" = "8:{B5CB3E17-7097-49ED-8D90-AACD371405DD}"
+        "UpgradeCode" = "8:{70637277-1538-4B0C-8AFE-DB350A437624}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

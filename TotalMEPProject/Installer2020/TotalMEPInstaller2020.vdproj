@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_73EFC2778A380DFD30B341BB0C778249"
+        "MsmKey" = "8:_6CA13111E06004AFFB3FAFBCD8AAD111"
         "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -34,13 +34,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_73EFC2778A380DFD30B341BB0C778249"
+        "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
+        "OwnerKey" = "8:_6CA13111E06004AFFB3FAFBCD8AAD111"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -394,14 +394,14 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_73EFC2778A380DFD30B341BB0C778249"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6CA13111E06004AFFB3FAFBCD8AAD111"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_73EFC2778A380DFD30B341BB0C778249"
+                    "_6CA13111E06004AFFB3FAFBCD8AAD111"
                     {
                     "Name" = "8:Newtonsoft.Json.dll"
                     "Attributes" = "3:512"
@@ -631,9 +631,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TotalMEPInstaller2020"
-        "ProductCode" = "8:{6EC8B683-40BD-4DE8-9E20-6E881D09A814}"
+        "ProductCode" = "8:{704FD4B2-50CB-4B73-8758-3C6C829AD1FA}"
         "PackageCode" = "8:{C1AD4A21-5DE9-44FB-BE60-38D5DB19C613}"
-        "UpgradeCode" = "8:{07A4A5DD-D27E-4E07-890E-EF1094D733C9}"
+        "UpgradeCode" = "8:{A597C705-0F45-40EB-8B39-186FD0360790}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

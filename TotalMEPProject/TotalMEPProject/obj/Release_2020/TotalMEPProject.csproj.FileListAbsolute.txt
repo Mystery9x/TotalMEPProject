@@ -20,3 +20,14 @@ E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\Tota
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.CoreCompileInputs.cache
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.CopyComplete
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEP.dll
+D:\OverTime\Project\TotalMEPProject\Output\2020\TotalMEPTools\TotalMEP.dll
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.AssemblyReference.cache
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\UI\ProgessBar.baml
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\UI\ProgessBar.g.cs
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEP_MarkupCompile.cache
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEP.g.resources
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.UI.FrmLogin.resources
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.GenerateResource.cache
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.CoreCompileInputs.cache
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.CopyComplete
+D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEP.dll

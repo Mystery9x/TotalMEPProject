@@ -251,7 +251,7 @@ namespace TotalMEPProject
             group1.AddPushButton(deleteBySelectionData);
 
             ////Create button
-            PulldownButtonData group2Data = new PulldownButtonData("PulldownGroup1", "Delete\nSleeve");
+            PulldownButtonData group2Data = new PulldownButtonData("PulldownGroup2", "Delete\nSleeve");
             PulldownButton group2 = openingPanel.AddItem(group2Data) as PulldownButton;
 
             PushButtonData deleteAllSleeveData = new PushButtonData("btnDeleteAll", "Delete All", assemblyPath, Define.CmdDeleteAllSleeveClassName);
