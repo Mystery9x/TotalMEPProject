@@ -10,7 +10,6 @@ D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\Tot
 D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\TotalMEPProject\obj\Release_2021\TotalMEPProject.csproj.CopyComplete
 D:\OverTime\Revise Addin\Project\Sample\SPEED_HANGER-main\SpeedHangerProject\TotalMEPProject\obj\Release_2021\TotalMEP.dll
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\Output\2021\TotalMEPTools\TotalMEP.dll
-E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEPProject.csproj.AssemblyReference.cache
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2021\UI\ProgessBar.baml
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2021\UI\ProgessBar.g.cs
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEP_MarkupCompile.cache
@@ -31,3 +30,4 @@ D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEPPro
 D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEPProject.csproj.CoreCompileInputs.cache
 D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEPProject.csproj.CopyComplete
 D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEP.dll
+E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2021\TotalMEPProject.csproj.AssemblyReference.cache

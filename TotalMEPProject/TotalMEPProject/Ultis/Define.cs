@@ -15,6 +15,7 @@
         public const string CmdFastVerticalClassName = "TotalMEPProject.Commands.TotalMEP.CmdFastVertical";
         public const string CmdHolyUpdownClassName = "TotalMEPProject.Commands.TotalMEP.CmdHolyUpdown";
         public const string CmdMEPConnectionClassName = "TotalMEPProject.Commands.TotalMEP.CmdMEPConnection";
+        public const string CmdPickLineClassName = "TotalMEPProject.Commands.TotalMEP.CmdPickLine";
         public const string CmdVerticalMEPClassName = "TotalMEPProject.Commands.TotalMEP.CmdVerticalMEP";
         public const string CmdDeleteUnionClassName = "TotalMEPProject.Commands.Duct.CmdDeleteUnion";
         public const string CmdDiffuserConnectionClassName = "TotalMEPProject.Commands.Duct.CmdDiffuserConnection";
@@ -32,7 +33,8 @@
         public const string CmdSmartSelectionClassName = "TotalMEPProject.Commands.Modify.CmdSmartSelection";
         public const string CmdTapToTeeClassName = "TotalMEPProject.Commands.Modify.CmdTapToTee";
         public const string CmdTeeToTapClassName = "TotalMEPProject.Commands.Modify.CmdTeeToTap";
-        public const string CmdChangeObjectClassName = "TotalMEPProject.Commands.Opening.CmdChangeObject";
+        public const string CmdChangeOpeningClassName = "TotalMEPProject.Commands.Opening.ChangeObject.CmdChangeOpening";
+        public const string CmdChangeSleeveClassName = "TotalMEPProject.Commands.Opening.ChangeObject.CmdChangeSleeve";
         public const string CmdCreateOpeningClassName = "TotalMEPProject.Commands.Opening.CmdCreateOpening";
         public const string CmdCreateSleeveClassName = "TotalMEPProject.Commands.Opening.CmdCreateSleeve";
         public const string CmdDeleteAllOpeningClassName = "TotalMEPProject.Commands.Opening.DeleteOpening.CmdDeleteAll";
