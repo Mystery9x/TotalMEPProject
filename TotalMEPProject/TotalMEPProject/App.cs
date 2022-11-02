@@ -2,9 +2,13 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
+using TotalMEPProject.Request;
+using TotalMEPProject.Services;
 using TotalMEPProject.UI;
 using TotalMEPProject.Ultis;
 
@@ -17,8 +21,8 @@ namespace TotalMEPProject
 
         public static UIApplication uiApp;
         public static UIControlledApplication cachedUiCtrApp;
-        private ExternalEvent exEvent;
 
+        public static WindowHandle hWndRevit = null;
         public static VerticalMEPForm verticalMEPForm = null;
 
         #endregion Variable
@@ -465,6 +469,55 @@ namespace TotalMEPProject
         }
 
         #endregion Create ribbon
+
+        #region Show Dialog
+
+        public static bool ShowVerticalMEPForm()
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (verticalMEPForm == null || verticalMEPForm.IsDisposed)
+                {
+                    // A new handler to handle request posting by the dialog
+                    RequestHandler handler = new RequestHandler();
+
+                    // External Event for the dialog to use (to post requests)
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    // We give the objects to the new dialog;
+                    // The dialog becomes the owner responsible fore disposing them, eventually.
+                    verticalMEPForm = new VerticalMEPForm(exEvent, handler);
+
+                    verticalMEPForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App.verticalMEPForm.Handle));
+
+                //NativeWin32.SetForegroundWindow(m_MyForm.Handle);
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        #endregion Show Dialog
 
         #endregion Method
     }

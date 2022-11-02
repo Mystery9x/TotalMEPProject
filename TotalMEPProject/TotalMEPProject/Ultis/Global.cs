@@ -210,4 +210,25 @@ namespace TotalMEPProject.Ultis
         public int Level = -1;
         public BuiltInCategory BuiltInCategory = BuiltInCategory.INVALID;
     }
+
+    public class WindowHandle : IWin32Window
+    {
+        private IntPtr m_hwnd;
+
+        public WindowHandle(IntPtr h)
+        {
+            Debug.Assert(IntPtr.Zero != h,
+              "EXPECTED NON-NULL WINDOW HANDLE");
+
+            m_hwnd = h;
+        }
+
+        public IntPtr Handle
+        {
+            get
+            {
+                return m_hwnd;
+            }
+        }
+    }
 }
