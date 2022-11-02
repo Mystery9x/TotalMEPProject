@@ -32,3 +32,4 @@ D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPPro
 D:\OverTime\Project\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEP.dll
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.UI.FastVerticalForm.resources
 E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.UI.VerticalMEPForm.resources
+E:\MEP\Git\TotalMEPProject\TotalMEPProject\TotalMEPProject\obj\Release_2020\TotalMEPProject.csproj.AssemblyReference.cache
