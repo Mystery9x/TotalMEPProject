@@ -205,6 +205,7 @@
     <Compile Include="Ultis\IgnoreWarning.cs" />
     <Compile Include="Ultis\IO.cs" />
     <Compile Include="Ultis\LicenseUtils.cs" />
+    <Compile Include="Ultis\MEPCurveFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Revit.ico" />
