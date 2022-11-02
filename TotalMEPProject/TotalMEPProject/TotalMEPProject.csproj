@@ -191,6 +191,7 @@
     <Compile Include="UI\VerticalMEPForm.Designer.cs">
       <DependentUpon>VerticalMEPForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ultis\AppUtils.cs" />
     <Compile Include="Ultis\Common.cs" />
     <Compile Include="Ultis\DataPC.cs" />
     <Compile Include="Ultis\Define.cs" />
