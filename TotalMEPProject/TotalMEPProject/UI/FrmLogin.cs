@@ -52,7 +52,7 @@ namespace TotalMEPProject.UI
 
             if (success)
             {
-                if (App._cachedUiCtrApp != null)
+                if (App.cachedUiCtrApp != null)
                 {
                     IO.ShowInfor("Active successfully!", "TotalMEP");
                 }

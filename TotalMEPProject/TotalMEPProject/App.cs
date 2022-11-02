@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
+using TotalMEPProject.UI;
 using TotalMEPProject.Ultis;
 
 namespace TotalMEPProject
@@ -12,9 +13,19 @@ namespace TotalMEPProject
     [Transaction(TransactionMode.Manual)]
     public class App : IExternalApplication
     {
-        public static UIApplication m_uiApp;
-        public static UIControlledApplication _cachedUiCtrApp;
+        #region Variable
+
+        public static UIApplication uiApp;
+        public static UIControlledApplication cachedUiCtrApp;
         private ExternalEvent exEvent;
+
+        public static VerticalMEPForm verticalMEPForm = null;
+
+        #endregion Variable
+
+        #region Method
+
+        #region Revit Event
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -24,11 +35,15 @@ namespace TotalMEPProject
         public Result OnStartup(UIControlledApplication application)
         {
             // Create ribbon tools
-            _cachedUiCtrApp = application;
+            cachedUiCtrApp = application;
             CreateRibbonButtons(application);
 
             return Result.Succeeded;
         }
+
+        #endregion Revit Event
+
+        #region Create ribbon
 
         /// <summary>
         /// Create ribbon tools
@@ -60,6 +75,13 @@ namespace TotalMEPProject
             bool isHasInternet = LicenseUtils.CheckForInternetConnection();
         }
 
+        /// <summary>
+        /// Create login tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreateLoginTab(UIControlledApplication app,
                                     string tabName,
                                     string assemblyPath,
@@ -74,6 +96,13 @@ namespace TotalMEPProject
             loginHangerPanel.AddItem(loginData);
         }
 
+        /// <summary>
+        /// Create total mep tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreateTotalMEPTab(UIControlledApplication app,
                                                     string tabName,
                                                     string assemblyPath,
@@ -113,6 +142,13 @@ namespace TotalMEPProject
             totalMEPPanel.AddItem(MEPConnectionData);
         }
 
+        /// <summary>
+        /// Create plumbing tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreatePlumbingTab(UIControlledApplication app,
                                                    string tabName,
                                                    string assemblyPath,
@@ -161,6 +197,13 @@ namespace TotalMEPProject
             plumbingPanel.AddItem(createNippleData);
         }
 
+        /// <summary>
+        /// Create fire fighting tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreateFireFightingTab(UIControlledApplication app,
                                                   string tabName,
                                                   string assemblyPath,
@@ -194,6 +237,13 @@ namespace TotalMEPProject
             groupSprinkler.AddPushButton(flexSprinkerData);
         }
 
+        /// <summary>
+        /// Create duct tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreateDuctTab(UIControlledApplication app,
                                                   string tabName,
                                                   string assemblyPath,
@@ -232,6 +282,13 @@ namespace TotalMEPProject
             ductPanel.AddItem(grillOnDuctData);
         }
 
+        /// <summary>
+        /// Create opening tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreateOpeningTab(UIControlledApplication app,
                                                  string tabName,
                                                  string assemblyPath,
@@ -289,6 +346,13 @@ namespace TotalMEPProject
             groupChange.AddPushButton(changeSleeveData);
         }
 
+        /// <summary>
+        /// Create modify tab
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="tabName"></param>
+        /// <param name="assemblyPath"></param>
+        /// <param name="iconFolder"></param>
         private void CreateModifyTab(UIControlledApplication app,
                                                string tabName,
                                                string assemblyPath,
@@ -337,6 +401,13 @@ namespace TotalMEPProject
             modifyPanel.AddItem(moveFittingData);
         }
 
+        /// <summary>
+        /// Add images
+        /// </summary>
+        /// <param name="buttonData"></param>
+        /// <param name="iconFolder"></param>
+        /// <param name="largeImage"></param>
+        /// <param name="smallImage"></param>
         private void AddImages(ButtonData buttonData,
                                string iconFolder,
                                string largeImage,
@@ -392,5 +463,9 @@ namespace TotalMEPProject
 
             return configDir;
         }
+
+        #endregion Create ribbon
+
+        #endregion Method
     }
 }

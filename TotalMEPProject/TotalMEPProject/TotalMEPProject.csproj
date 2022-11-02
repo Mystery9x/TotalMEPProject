@@ -196,6 +196,7 @@
     <Compile Include="Ultis\Define.cs" />
     <Compile Include="Ultis\FamilyLoadOption.cs" />
     <Compile Include="Ultis\GeometryUtils.cs" />
+    <Compile Include="Ultis\Global.cs" />
     <Compile Include="Ultis\IgnoreWarning.cs" />
     <Compile Include="Ultis\IO.cs" />
     <Compile Include="Ultis\LicenseUtils.cs" />

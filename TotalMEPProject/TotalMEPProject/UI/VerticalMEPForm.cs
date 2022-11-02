@@ -16,5 +16,9 @@ namespace TotalMEPProject.UI
         {
             InitializeComponent();
         }
+
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+        }
     }
 }
