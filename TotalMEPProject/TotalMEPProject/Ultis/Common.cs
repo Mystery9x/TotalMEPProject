@@ -10,6 +10,7 @@ namespace TotalMEPProject.Ultis
     public static class Common
     {
         public static double mmToFT = 0.0032808399;
+        private const double _eps = 1.0e-9;
 
         public static bool IsLessThan(double first, double second, double tolerance = 10e-5)
         {
@@ -249,6 +250,16 @@ namespace TotalMEPProject.Ultis
             return targetConnector;
         }
 
+        public static bool IsVertical(XYZ v)
+        {
+            return IsZero(v.X) && IsZero(v.Y);
+        }
+
+        public static bool IsZero(double a)
+        {
+            return IsZero(a, _eps);
+        }
+
         /// <summary>
         /// Return the given element's connector manager,
         /// using either the family instance MEPModel or
@@ -316,6 +327,19 @@ namespace TotalMEPProject.Ultis
             Center,
             Left,
             Right
+        }
+    }
+
+    public class MyUnit
+    {
+        public static double da(double degrees)
+        {
+            return degrees / 180.0 * Math.PI;
+        }
+
+        public static double rd(double radians)
+        {
+            return radians * 180.0 / Math.PI;
         }
     }
 

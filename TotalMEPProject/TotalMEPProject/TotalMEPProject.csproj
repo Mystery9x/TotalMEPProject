@@ -189,6 +189,12 @@
     <Compile Include="UI\FrmLogin.Designer.cs">
       <DependentUpon>FrmLogin.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\HolyUpDownForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\HolyUpDownForm.Designer.cs">
+      <DependentUpon>HolyUpDownForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\ProgessBar.xaml.cs">
       <DependentUpon>ProgessBar.xaml</DependentUpon>
     </Compile>
@@ -205,10 +211,14 @@
     <Compile Include="Ultis\FamilyLoadOption.cs" />
     <Compile Include="Ultis\GeometryUtils.cs" />
     <Compile Include="Ultis\Global.cs" />
+    <Compile Include="Ultis\HolyUltis\HolySplitUpdown.cs" />
+    <Compile Include="Ultis\HolyUltis\HolyUpdown.cs" />
     <Compile Include="Ultis\IgnoreWarning.cs" />
     <Compile Include="Ultis\IO.cs" />
     <Compile Include="Ultis\LicenseUtils.cs" />
     <Compile Include="Ultis\MEPCurveFilter.cs" />
+    <Compile Include="Ultis\MEPUtilscs.cs" />
+    <Compile Include="Ultis\StorageUtility\StorageUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Revit.ico" />
@@ -219,6 +229,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FrmLogin.resx">
       <DependentUpon>FrmLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\HolyUpDownForm.resx">
+      <DependentUpon>HolyUpDownForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\VerticalMEPForm.resx">
       <DependentUpon>VerticalMEPForm.cs</DependentUpon>

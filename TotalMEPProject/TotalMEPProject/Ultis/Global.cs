@@ -232,6 +232,12 @@ namespace TotalMEPProject.Ultis
         }
     }
 
+    public enum UpDownMode
+    {
+        UpAndDown = 0,
+        UpOrDown
+    }
+
     public enum MEPType
     {
         Pipe = 0,
