@@ -636,5 +636,105 @@ namespace TotalMEPProject.UI
         #endregion Process
 
         #endregion Method
+
+        private void cboMEPObjects_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var mepType = cboMEPObjects.SelectedItem.ToString();
+
+            m_MEPCurrent = (MEPType)Enum.Parse(typeof(MEPType), mepType);
+
+            DisplayType();
+
+            AppUtils.ff(txtServiceType, null, m_MEPCurrent.ToString());
+        }
+
+        private void cboFamilyType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cboFamilyType.SelectedItem == null)
+                return;
+
+            var familyTypeId = (cboFamilyType.SelectedItem as ObjectItem).ObjectId;
+
+            var familyType = Global.UIDoc.Document.GetElement(familyTypeId) as MEPCurveType;
+
+            //reset
+            IsShowDiameter = false;
+            IsShowServiceType = false;
+            IsShowWidht_Height = false;
+            IsShowSystemType = false;
+
+            if (familyType is PipeType)
+            {
+                IsShowDiameter = true;
+                IsShowSystemType = true;
+
+                if (familyType.RoutingPreferenceManager != null)
+                {
+                    CurrentSegment = null;
+                    int count = familyType.RoutingPreferenceManager.GetNumberOfRules(RoutingPreferenceRuleGroupType.Segments);
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        var rule = familyType.RoutingPreferenceManager.GetRule(RoutingPreferenceRuleGroupType.Segments, i);
+
+                        CurrentSegment = Global.UIDoc.Document.GetElement(rule.MEPPartId) as PipeSegment;
+                    }
+
+                    if (CurrentSegment != null)
+                        AddDiameter(CurrentSegment);
+                }
+            }
+            else if (familyType is ConduitType)
+            {
+                IsShowDiameter = true;
+                IsShowServiceType = true;
+
+                var setings = ConduitSizeSettings.GetConduitSizeSettings(Global.UIDoc.Document);
+
+                var standardId = familyType.LookupParameter("Standard").AsElementId();
+
+                if (standardId != ElementId.InvalidElementId)
+                {
+                    var standard = Global.UIDoc.Document.GetElement(standardId) as ElementType;
+
+                    AddDiameter(setings, standard.Name);
+                }
+            }
+            else if (familyType is CableTrayType)
+            {
+                IsShowServiceType = true;
+                IsShowWidht_Height = true;
+
+                CableTraySizes sizes = CableTraySizes.GetCableTraySizes(Global.UIDoc.Document);
+
+                AddCableTraySizes(sizes);
+            }
+            else if (familyType is DuctType)
+            {
+                IsShowSystemType = true;
+                IsShowWidht_Height = true;
+
+                var settings = DuctSizeSettings.GetDuctSizeSettings(Global.UIDoc.Document);
+                DuctShape shape = DuctShape.Oval;
+
+                var familyName = familyType.LookupParameter("Family Name").AsString();
+
+                if (familyName.Contains("Rectangular"))
+                {
+                    shape = DuctShape.Rectangular;
+                }
+                else if (familyName.Contains("Round"))
+                {
+                    shape = DuctShape.Round;
+
+                    IsShowDiameter = true;
+                    IsShowWidht_Height = false;
+                }
+
+                AddDuctSize(settings, shape);
+            }
+
+            SetPositionControls();
+        }
     }
 }
