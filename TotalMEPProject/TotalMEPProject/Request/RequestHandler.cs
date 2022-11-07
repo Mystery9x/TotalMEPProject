@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.UI;
+using TotalMEPProject.Commands.TotalMEP;
 
 namespace TotalMEPProject.Request
 {
@@ -19,6 +20,12 @@ namespace TotalMEPProject.Request
                     {
                         return;
                     }
+
+                case RequestId.VerticalMEP:
+                    {
+                        CmdVerticalMEP.o();
+                    }
+                    break;
 
                 default:
                     {

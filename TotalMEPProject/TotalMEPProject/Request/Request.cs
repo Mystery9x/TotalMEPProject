@@ -8,6 +8,7 @@ namespace TotalMEPProject.Request
     public enum RequestId : int
     {
         None = -1,
+        VerticalMEP,
     }
 
     public class Request
