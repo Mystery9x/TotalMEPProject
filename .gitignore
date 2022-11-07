@@ -14,3 +14,5 @@ Thumbs.db
 *.txt
 
 
+/TotalMEPProject/TotalMEPProject/obj
+/TotalMEPProject/TotalMEPProject/bin
