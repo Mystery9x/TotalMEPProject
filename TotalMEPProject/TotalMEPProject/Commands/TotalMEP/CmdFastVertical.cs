@@ -177,18 +177,18 @@ namespace TotalMEPProject.Commands.TotalMEP
                     }
 
                     //Tao mot pipe 45 voi main
-                    var elemIds = ElementTransformUtils.CopyElement(
-                        Global.UIDoc.Document, mepCurve.Id, newPlace);
+                    //var elemIds = ElementTransformUtils.CopyElement(
+                    //    Global.UIDoc.Document, mepCurve.Id, newPlace);
 
-                    var vertical45_1 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+                    //var vertical45_1 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
 
-                    (vertical45_1.Location as LocationCurve).Curve = l2;
+                    //(vertical45_1.Location as LocationCurve).Curve = l2;
 
-                    //Create elbow
-                    var elbow1 = CreateElbow(mepCurve, vertical45_1);
+                    ////Create elbow
+                    //var elbow1 = CreateElbow(mepCurve, vertical45_1);
 
                     //Tao mot pipe 45
-                    elemIds = ElementTransformUtils.CopyElement(
+                    var elemIds = ElementTransformUtils.CopyElement(
                         Global.UIDoc.Document, mepCurve.Id, newPlace);
 
                     var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
@@ -198,11 +198,13 @@ namespace TotalMEPProject.Commands.TotalMEP
                     var l3 = Line.CreateBound(end1, end2);
                     (vertical45_2.Location as LocationCurve).Curve = l3;
 
-                    //Create elbow
-                    var elbow2 = CreateElbow(vertical45_1, vertical45_2);
+                    ////Create elbow
+                    //var elbow2 = CreateElbow(vertical45_1, vertical45_2);
 
-                    List<ElementId> ids = new List<ElementId>() { elbow1.Id, elbow2.Id, vertical45_1.Id, vertical45_2.Id };
-                    MoveToOldPosition(ids, lineTemp, p, end1);
+                    //List<ElementId> ids = new List<ElementId>() { elbow1.Id, elbow2.Id, vertical45_1.Id, vertical45_2.Id };
+                    //MoveToOldPosition(ids, lineTemp, p, end1);
+
+                    Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
                 }
                 else if (form.Siphon)
                 {
