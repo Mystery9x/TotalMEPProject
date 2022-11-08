@@ -140,6 +140,25 @@ namespace TotalMEPProject.Ultis
         }
 
         /// <summary>
+        /// Lấy điểm cách level 1 khoảng cách cho trước
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="point"></param>
+        /// <param name="offsetFromLevel"></param>
+        /// <returns></returns>
+        public static XYZ GetPointOffsetFromLevel(Level level, XYZ point, double offsetFromLevel)
+        {
+            if (level == null || point == null)
+                return null;
+
+            offsetFromLevel = UnitUtils.ConvertToInternalUnits(offsetFromLevel, DisplayUnitType.DUT_MILLIMETERS);
+            if (level == null || point == null)
+                return point;
+
+            return new XYZ(point.X, point.Y, level.Elevation + offsetFromLevel);
+        }
+
+        /// <summary>
         /// Di chuyển 2 ống về cùng tâm
         /// </summary>
         /// <param name="doc"></param>

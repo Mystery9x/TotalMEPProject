@@ -59,6 +59,10 @@ namespace TotalMEPProject.Commands.TotalMEP
             //Filter all slope pipes
             foreach (MEPCurve mepCurve in mepCurves)
             {
+                var con = Common.ToList(mepCurve.ConnectorManager.Connectors);
+                if (con?.Count > 0 && con.All(x => x.IsConnected))
+                    continue;
+
                 var index = GetAt(mepCurve);
                 if (index == -1)
                     continue;
@@ -158,53 +162,31 @@ namespace TotalMEPProject.Commands.TotalMEP
                 }
                 else if (form.Elbow45)
                 {
-                    var lineTemp = Line.CreateBound(p, pOther);
-
-                    var line = Line.CreateUnbound(p, v * 10);
-
-                    double cgv = mepCurve.Diameter * 1.135/*1.2*/ /*0.8*//* 1*//*0.6*/;
-                    var start = p;
-
-                    var pTemp1 = line.Evaluate(cgv, false);
-
-                    var end1 = new XYZ(pTemp1.X, pTemp1.Y, pTemp1.Z + (isUp ? cgv : -cgv));
-
-                    var l2 = Line.CreateBound(start, end1);
-
-                    if (start.DistanceTo(curve.GetEndPoint(0)) > 0.001)
-                    {
-                        l2 = Line.CreateBound(end1, start);
-                    }
-
-                    //Tao mot pipe 45 voi main
-                    //var elemIds = ElementTransformUtils.CopyElement(
-                    //    Global.UIDoc.Document, mepCurve.Id, newPlace);
-
-                    //var vertical45_1 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                    //(vertical45_1.Location as LocationCurve).Curve = l2;
-
-                    ////Create elbow
-                    //var elbow1 = CreateElbow(mepCurve, vertical45_1);
-
                     //Tao mot pipe 45
                     var elemIds = ElementTransformUtils.CopyElement(
                         Global.UIDoc.Document, mepCurve.Id, newPlace);
 
                     var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
 
-                    var end2 = new XYZ(end1.X, end1.Y, maxZ);
+                    Connector conHor1 = Common.GetConnectorValid(mepCurve);
+                    if (conHor1 != null && !conHor1.IsConnected)
+                    {
+                        conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
 
-                    var l3 = Line.CreateBound(end1, end2);
-                    (vertical45_2.Location as LocationCurve).Curve = l3;
+                        var level = Global.UIDoc.Document.GetElement(form.LevelId) as Level;
+                        if (level == null)
+                            continue;
 
-                    ////Create elbow
-                    //var elbow2 = CreateElbow(vertical45_1, vertical45_2);
+                        XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, form.OffSet);
 
-                    //List<ElementId> ids = new List<ElementId>() { elbow1.Id, elbow2.Id, vertical45_1.Id, vertical45_2.Id };
-                    //MoveToOldPosition(ids, lineTemp, p, end1);
+                        if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
+                            continue;
 
-                    Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
+                        Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
+                        (vertical45_2.Location as LocationCurve).Curve = line;
+
+                        Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
+                    }
                 }
                 else if (form.Siphon)
                 {
