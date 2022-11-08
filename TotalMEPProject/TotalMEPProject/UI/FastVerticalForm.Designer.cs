@@ -272,6 +272,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FastVerticalForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Fast Vertical";
             this.Load += new System.EventHandler(this.FastVerticalForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);

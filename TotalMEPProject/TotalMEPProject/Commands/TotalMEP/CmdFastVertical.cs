@@ -162,7 +162,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                     var line = Line.CreateUnbound(p, v * 10);
 
-                    double cgv = mepCurve.Diameter * 1.2 /*0.8*//* 1*//*0.6*/;
+                    double cgv = mepCurve.Diameter * 1.135/*1.2*/ /*0.8*//* 1*//*0.6*/;
                     var start = p;
 
                     var pTemp1 = line.Evaluate(cgv, false);
