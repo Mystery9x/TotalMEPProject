@@ -280,5 +280,27 @@ namespace TotalMEPProject.UI
         }
 
         #endregion Event
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            PressCancel();
+
+            AppUtils.sa(cboLevel);
+            AppUtils.sa(cboMEPType);
+
+            AppUtils.sa(txtOffset);
+
+            AppUtils.sa(radElbow90);
+            AppUtils.sa(radElbow45);
+            AppUtils.sa(radSiPhon);
+
+            AppUtils.sa(cboSiphon);
+
+            AppUtils.sa(this);
+
+            App.fastVerticalForm = null;
+
+            this.Close();
+        }
     }
 }
