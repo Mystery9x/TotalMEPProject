@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_0F2AA99C3778AF2CCDD76CB1339D38C9"
+        "OwnerKey" = "8:_9AAF1C22F7E14A2D88A9E4E0827074C5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6673D5E218D531713C2876AB9F686EB9"
         "OwnerKey" = "8:_9AAF1C22F7E14A2D88A9E4E0827074C5"
         "MsmSig" = "8:_UNDEFINED"
@@ -35,6 +41,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9AAF1C22F7E14A2D88A9E4E0827074C5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_0F2AA99C3778AF2CCDD76CB1339D38C9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -394,6 +406,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0F2AA99C3778AF2CCDD76CB1339D38C9"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:AdWindows, Version=2016.11.4.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_0F2AA99C3778AF2CCDD76CB1339D38C9"
+                    {
+                    "Name" = "8:AdWindows.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:AdWindows.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_7CAC7CF55EC341CD8B1070FCDAEEA5A3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6673D5E218D531713C2876AB9F686EB9"
             {
             "AssemblyRegister" = "3:1"
@@ -632,7 +675,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TotalMEPInstaller2019"
         "ProductCode" = "8:{41D02807-FDF5-4DBC-901D-CBC404036483}"
-        "PackageCode" = "8:{157909E1-40FF-4A00-B36D-6F425170CB57}"
+        "PackageCode" = "8:{BF290639-03C6-43F3-BDD1-3C7E0C8C231F}"
         "UpgradeCode" = "8:{88C0FEA1-094C-45D8-9B93-A663CAF66022}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
