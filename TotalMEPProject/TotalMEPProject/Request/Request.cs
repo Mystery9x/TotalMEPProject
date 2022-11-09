@@ -9,6 +9,7 @@ namespace TotalMEPProject.Request
     {
         None = -1,
         VerticalMEP,
+        FastVertical,
     }
 
     public class Request

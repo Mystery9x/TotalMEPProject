@@ -43,188 +43,208 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
 
             //Show form
-            FastVerticalForm form = new FastVerticalForm(_levels);
-            if (form.ShowDialog() != DialogResult.OK)
+            if (App.ShowFastVerticalForm(_levels) == false)
+            {
                 return Result.Cancelled;
+            }
+
+            return Result.Succeeded;
+        }
+
+        public static Result Process()
+        {
+            var fastVerticalFrm = App.fastVerticalForm;
 
             //Select pipes
-            List<MEPCurve> mepCurves = SelectMEPCurves(form.GetMEPType);
+            List<MEPCurve> mepCurves = SelectMEPCurves(fastVerticalFrm.GetMEPType);
 
             if (mepCurves == null || mepCurves.Count == 0)
                 return Result.Cancelled;
 
             Transaction t = new Transaction(Global.UIDoc.Document, "a");
-            t.Start();
 
-            //Filter all slope pipes
-            foreach (MEPCurve mepCurve in mepCurves)
+            try
             {
-                var con = Common.ToList(mepCurve.ConnectorManager.Connectors);
-                if (con?.Count > 0 && con.All(x => x.IsConnected))
-                    continue;
-
-                var index = GetAt(mepCurve);
-                if (index == -1)
-                    continue;
-
-                var curve = mepCurve.GetCurve();
-
-                var p = curve.GetEndPoint(index);
-                var pOther = curve.GetEndPoint(index == 0 ? 1 : 0);
-
-                var mepLevelPara = mepCurve.get_Parameter(BuiltInParameter.RBS_START_LEVEL_PARAM);
-                if (mepLevelPara == null)
-                    continue;
-
-                var levelMEP = Global.UIDoc.Document.GetElement(mepLevelPara.AsElementId()) as Level;
-                if (levelMEP == null)
-                    continue;
-
-                var offset = form.OffSet * Common.mmToFT;
-
-                //////////////////////////////////////////////////////////////////////////
-                bool isUp = true;
-
-                //////////////////////////////////////////////////////////////////////////
-
-                double maxZ = 0;
-                if (form.ByLevel)
+                t.Start();
+                //Filter all slope pipes
+                foreach (MEPCurve mepCurve in mepCurves)
                 {
-                    var level = Global.UIDoc.Document.GetElement(form.LevelId) as Level;
-                    if (level == null)
+                    var con = Common.ToList(mepCurve.ConnectorManager.Connectors);
+                    if (con?.Count > 0 && con.All(x => x.IsConnected))
                         continue;
 
-                    if (levelMEP.Elevation < level.Elevation)
+                    var index = GetAt(mepCurve);
+                    if (index == -1)
+                        continue;
+
+                    var curve = mepCurve.GetCurve();
+
+                    var p = curve.GetEndPoint(index);
+                    var pOther = curve.GetEndPoint(index == 0 ? 1 : 0);
+
+                    var mepLevelPara = mepCurve.get_Parameter(BuiltInParameter.RBS_START_LEVEL_PARAM);
+                    if (mepLevelPara == null)
+                        continue;
+
+                    var levelMEP = Global.UIDoc.Document.GetElement(mepLevelPara.AsElementId()) as Level;
+                    if (levelMEP == null)
+                        continue;
+
+                    var offset = fastVerticalFrm.OffSet * Common.mmToFT;
+
+                    //////////////////////////////////////////////////////////////////////////
+                    bool isUp = true;
+
+                    //////////////////////////////////////////////////////////////////////////
+
+                    double maxZ = 0;
+                    if (fastVerticalFrm.ByLevel)
                     {
-                        isUp = true;
-                        maxZ = level.Elevation;
-                    }
-                    else if (levelMEP.Elevation == level.Elevation)
-                    {
-                        if (p.Z > levelMEP.Elevation + offset)
-                        {
-                            isUp = false;
-                        }
-                        else
-                        {
-                            isUp = true;
-                        }
-                        maxZ = levelMEP.Elevation;
-                    }
-                    else
-                    {
-                        isUp = false;
-                        maxZ = level.Elevation;
-                    }
-
-                    maxZ += offset;
-                }
-                else
-                {
-                    continue;
-                }
-
-                //                 if (maxZ == 0)
-                //                     continue;
-
-                var newPlace = new XYZ(0, 0, 0);
-
-                var v = (p - pOther).Normalize();
-
-                if (form.Elbow90)
-                {
-                    var end = new XYZ(p.X, p.Y, maxZ);
-
-                    var elemIds = ElementTransformUtils.CopyElement(
-                        Global.UIDoc.Document, mepCurve.Id, newPlace);
-
-                    var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                    (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
-
-                    if (vertical as CableTray != null)
-                    {
-                        SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
-                    }
-                    else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
-                    {
-                        if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
-                        {
-                            //Rotate
-                            var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
-                            var lv = Line.CreateBound(p, end);
-
-                            ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
-                        }
-                    }
-
-                    var elbow = CreateElbow(mepCurve, vertical);
-                }
-                else if (form.Elbow45)
-                {
-                    //Tao mot pipe 45
-                    var elemIds = ElementTransformUtils.CopyElement(
-                        Global.UIDoc.Document, mepCurve.Id, newPlace);
-
-                    var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                    Connector conHor1 = Common.GetConnectorValid(mepCurve);
-                    if (conHor1 != null && !conHor1.IsConnected)
-                    {
-                        conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
-
-                        var level = Global.UIDoc.Document.GetElement(form.LevelId) as Level;
+                        var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
                         if (level == null)
                             continue;
 
-                        XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, form.OffSet);
-
-                        if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
-                            continue;
-
-                        Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
-                        (vertical45_2.Location as LocationCurve).Curve = line;
-
-                        Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
-                    }
-                }
-                else if (form.Siphon)
-                {
-                    var end = new XYZ(p.X, p.Y, maxZ);
-
-                    var elemIds = ElementTransformUtils.CopyElement(
-                        Global.UIDoc.Document, mepCurve.Id, newPlace);
-
-                    var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                    (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
-
-                    if (vertical as CableTray != null)
-                    {
-                        SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
-                    }
-                    else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
-                    {
-                        //Can rotate vertical duct
-                        if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                        if (levelMEP.Elevation < level.Elevation)
                         {
-                            //Rotate
-                            var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
-                            var lv = Line.CreateBound(p, end);
+                            isUp = true;
+                            maxZ = level.Elevation;
+                        }
+                        else if (levelMEP.Elevation == level.Elevation)
+                        {
+                            if (p.Z > levelMEP.Elevation + offset)
+                            {
+                                isUp = false;
+                            }
+                            else
+                            {
+                                isUp = true;
+                            }
+                            maxZ = levelMEP.Elevation;
+                        }
+                        else
+                        {
+                            isUp = false;
+                            maxZ = level.Elevation;
+                        }
 
-                            ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                        maxZ += offset;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    //                 if (maxZ == 0)
+                    //                     continue;
+
+                    var newPlace = new XYZ(0, 0, 0);
+
+                    var v = (p - pOther).Normalize();
+
+                    if (fastVerticalFrm.Elbow90)
+                    {
+                        var end = new XYZ(p.X, p.Y, maxZ);
+
+                        var elemIds = ElementTransformUtils.CopyElement(
+                            Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                        var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                        (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
+
+                        if (vertical as CableTray != null)
+                        {
+                            SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
+                        }
+                        else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                        {
+                            if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                            {
+                                //Rotate
+                                var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
+                                var lv = Line.CreateBound(p, end);
+
+                                ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                            }
+                        }
+
+                        var elbow = CreateElbow(mepCurve, vertical);
+                    }
+                    else if (fastVerticalFrm.Elbow45)
+                    {
+                        //Tao mot pipe 45
+                        var elemIds = ElementTransformUtils.CopyElement(
+                            Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                        var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                        Connector conHor1 = Common.GetConnectorValid(mepCurve);
+                        if (conHor1 != null && !conHor1.IsConnected)
+                        {
+                            conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
+
+                            var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
+                            if (level == null)
+                                continue;
+
+                            XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
+
+                            if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
+                                continue;
+
+                            Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
+                            (vertical45_2.Location as LocationCurve).Curve = line;
+
+                            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
                         }
                     }
+                    else if (fastVerticalFrm.Siphon)
+                    {
+                        var end = new XYZ(p.X, p.Y, maxZ);
 
-                    CreateSiphon(mepCurve, vertical, form.SiphonId);
+                        var elemIds = ElementTransformUtils.CopyElement(
+                            Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                        var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                        (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
+
+                        if (vertical as CableTray != null)
+                        {
+                            SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
+                        }
+                        else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                        {
+                            //Can rotate vertical duct
+                            if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                            {
+                                //Rotate
+                                var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
+                                var lv = Line.CreateBound(p, end);
+
+                                ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                            }
+                        }
+
+                        CreateSiphon(mepCurve, vertical, fastVerticalFrm.SiphonId);
+                    }
                 }
+                t.Commit();
             }
-            t.Commit();
+            catch (Exception ex)
+            {
+                string mess = ex.Message;
+            }
+
+            if (t.HasStarted())
+            {
+                t.RollBack();
+            }
 
             return Result.Succeeded;
         }
 
-        private FamilyInstance CreateSiphon(MEPCurve mepCurve, MEPCurve vertical_pipe, ElementId symbolId)
+        private static FamilyInstance CreateSiphon(MEPCurve mepCurve, MEPCurve vertical_pipe, ElementId symbolId)
         {
             try
             {
@@ -380,7 +400,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
         }
 
-        private void SetCurveNormal(CableTray vertical, CableTray current)
+        private static void SetCurveNormal(CableTray vertical, CableTray current)
         {
             var curve = current.GetCurve() as Line;
             if (curve == null)
@@ -391,7 +411,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             (vertical as CableTray).CurveNormal = v;
         }
 
-        public List<MEPCurve> SelectMEPCurves(Type type)
+        public static List<MEPCurve> SelectMEPCurves(Type type)
         {
             //Pick pipe
             List<MEPCurve> pipes = new List<MEPCurve>();
@@ -424,7 +444,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             ElementTransformUtils.MoveElements(Global.UIDoc.Document, ids, transform);
         }
 
-        private FamilyInstance CreateElbow(MEPCurve pipe1, MEPCurve pipe2)
+        private static FamilyInstance CreateElbow(MEPCurve pipe1, MEPCurve pipe2)
         {
             try
             {
@@ -434,13 +454,6 @@ namespace TotalMEPProject.Commands.TotalMEP
                     var elbow = Global.UIDoc.Document.Create.NewElbowFitting(connectors[0], connectors[1]);
 
                     return elbow;
-
-                    //                             //set
-                    //                             var con = Utils.GetConnectorClosestTo(elbow, end);
-                    //
-                    //                             var d = height - con.Origin.Z;
-                    //                             end = new XYZ(con.Origin.X, con.Origin.Y, con.Origin.Z + d);
-                    //                             (vertical.Location as LocationCurve).Curve = Line.CreateBound(con.Origin, end);
                 }
             }
             catch (System.Exception ex)
@@ -449,7 +462,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             return null;
         }
 
-        private int GetAt(MEPCurve pipe)
+        private static int GetAt(MEPCurve pipe)
         {
             var curve = (pipe.Location as LocationCurve).Curve;
 
@@ -457,18 +470,11 @@ namespace TotalMEPProject.Commands.TotalMEP
             var p1 = curve.GetEndPoint(1);
 
             bool atStart = false;
-            //             var con = Utils.GetConnectorClosestTo(pipe, p0);
-            //             if (con.AllRefs.Size != 0)
-            //                 atStart = true;
-            //             else
+
             atStart = CheckIntersection(p0, pipe);
 
-            //             con = Utils.GetConnectorClosestTo(pipe, p1);
-            //
             bool atEnd = false;
-            //             if (con.AllRefs.Size != 0)
-            //                 atEnd = true;
-            //             else
+
             atEnd = CheckIntersection(p1, pipe);
 
             if (atStart == true && atEnd == false)
@@ -481,7 +487,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             return -1;
         }
 
-        private bool CheckIntersection(XYZ p, MEPCurve pipe)
+        private static bool CheckIntersection(XYZ p, MEPCurve pipe)
         {
             double ft = 0.1;
             var solid = Common.CreateCylindricalVolume(p, ft, ft, false);

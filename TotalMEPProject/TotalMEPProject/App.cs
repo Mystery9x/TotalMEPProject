@@ -25,6 +25,7 @@ namespace TotalMEPProject
 
         public static WindowHandle hWndRevit = null;
         public static VerticalMEPForm verticalMEPForm = null;
+        public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
 
         public static HolySplitUpdown _HolyUpdown = null;
@@ -492,14 +493,10 @@ namespace TotalMEPProject
 
                 if (verticalMEPForm == null || verticalMEPForm.IsDisposed)
                 {
-                    // A new handler to handle request posting by the dialog
                     RequestHandler handler = new RequestHandler();
 
-                    // External Event for the dialog to use (to post requests)
                     ExternalEvent exEvent = ExternalEvent.Create(handler);
 
-                    // We give the objects to the new dialog;
-                    // The dialog becomes the owner responsible fore disposing them, eventually.
                     verticalMEPForm = new VerticalMEPForm(exEvent, handler);
 
                     verticalMEPForm.Show(hWndRevit);
@@ -511,7 +508,44 @@ namespace TotalMEPProject
 
                 DisplayService.SetFocus(new HandleRef(null, App.verticalMEPForm.Handle));
 
-                //NativeWin32.SetForegroundWindow(m_MyForm.Handle);
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static bool ShowFastVerticalForm(System.Collections.Generic.Dictionary<string, ElementId> levelIds)
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (fastVerticalForm == null || fastVerticalForm.IsDisposed)
+                {
+                    RequestHandler handler = new RequestHandler();
+
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    fastVerticalForm = new FastVerticalForm(levelIds, exEvent, handler);
+
+                    fastVerticalForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App.fastVerticalForm.Handle));
 
                 return true;
             }
@@ -521,35 +555,29 @@ namespace TotalMEPProject
             }
         }
 
-        public static WindowHandle _hWndRevit = null;
-
         public static bool ShowHolyUpDownForm()
         {
             try
             {
-                if (null == _hWndRevit)
+                if (null == hWndRevit)
                 {
                     Process process = Process.GetCurrentProcess();
 
                     IntPtr h = process.MainWindowHandle;
-                    _hWndRevit = new WindowHandle(h);
+                    hWndRevit = new WindowHandle(h);
                 }
 
                 bool isShow = false;
 
                 if (m_HolyUpDownForm == null || m_HolyUpDownForm.IsDisposed)
                 {
-                    // A new handler to handle request posting by the dialog
                     RequestHandler handler = new RequestHandler();
 
-                    // External Event for the dialog to use (to post requests)
                     ExternalEvent exEvent = ExternalEvent.Create(handler);
 
-                    // We give the objects to the new dialog;
-                    // The dialog becomes the owner responsible fore disposing them, eventually.
                     m_HolyUpDownForm = new HolyUpDownForm(exEvent, handler);
 
-                    m_HolyUpDownForm.Show(_hWndRevit);
+                    m_HolyUpDownForm.Show(hWndRevit);
                 }
                 else
                 {
@@ -557,8 +585,6 @@ namespace TotalMEPProject
                 }
 
                 DisplayService.SetFocus(new HandleRef(null, App.m_HolyUpDownForm.Handle));
-
-                //NativeWin32.SetForegroundWindow(m_MyForm.Handle);
 
                 return true;
             }

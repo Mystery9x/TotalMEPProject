@@ -2,6 +2,8 @@
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.UI;
+using Autodesk.Windows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,12 +13,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TotalMEPProject.Request;
+using TotalMEPProject.Services;
 using TotalMEPProject.Ultis;
 
 namespace TotalMEPProject.UI
 {
     public partial class FastVerticalForm : System.Windows.Forms.Form
     {
+        private Request.Request m_request = null;
+        private RequestHandler m_handler = null;
+        private ExternalEvent m_exEvent = null;
+
         private Dictionary<string, ElementId> _Levels = new Dictionary<string, ElementId>();
 
         public bool Elbow90
@@ -106,21 +114,42 @@ namespace TotalMEPProject.UI
             }
         }
 
-        public FastVerticalForm(Dictionary<string, ElementId> levels)
+        public FastVerticalForm(Dictionary<string, ElementId> levels, ExternalEvent exEvent, RequestHandler handler)
         {
             InitializeComponent();
 
+            m_exEvent = exEvent;
+            m_handler = handler;
             _Levels = levels;
-
             cboLevel.Enabled = true;
-
             txtOffset.Enabled = true;
-
             radElbow90.Checked = true;
             cboSiphon.Enabled = false;
         }
 
         #region Method
+
+        private void SetFocus()
+        {
+            IntPtr hBefore = DisplayService.GetForegroundWindow();
+            DisplayService.SetForegroundWindow(ComponentManager.ApplicationWindow);
+        }
+
+        public void MakeRequest(RequestId request)
+        {
+            m_handler.Request.Make(request);
+            m_exEvent.Raise();
+        }
+
+        public void PressCancel(int count = 2)
+        {
+            IWin32Window _revit_window = new WindowHandle(ComponentManager.ApplicationWindow);
+
+            for (int i = 0; i < count; i++)
+            {
+                Press.PostMessage(_revit_window.Handle, (uint)Press.KEYBOARD_MSG.WM_KEYDOWN, (uint)Keys.Escape, 0);
+            }
+        }
 
         private void AddMEPType()
         {
@@ -245,7 +274,9 @@ namespace TotalMEPProject.UI
 
             AppUtils.sa(cboSiphon);
 
-            DialogResult = DialogResult.OK;
+            AppUtils.sa(this);
+            SetFocus();
+            MakeRequest(RequestId.FastVertical);
         }
 
         #endregion Event

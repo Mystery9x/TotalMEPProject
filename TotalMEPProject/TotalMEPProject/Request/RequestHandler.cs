@@ -27,6 +27,12 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.FastVertical:
+                    {
+                        CmdFastVertical.Process();
+                    }
+                    break;
+
                 default:
                     {
                         break;
