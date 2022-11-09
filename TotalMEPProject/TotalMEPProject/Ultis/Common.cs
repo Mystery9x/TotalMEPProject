@@ -694,6 +694,84 @@ namespace TotalMEPProject.Ultis
         }
 
         /// <summary>
+        /// Lấy ra connector gần nhất và xa nhất với 1 điểm cho trước
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="pipe"></param>
+        /// <param name="outFarest"></param>
+        /// <returns></returns>
+        public static Connector GetConnectorNearest(XYZ point, ConnectorManager connectorManager)
+        {
+            Connector retval = null;
+
+            if (point != null && connectorManager != null)
+            {
+                double max = double.MaxValue;
+                double min = double.MinValue;
+
+                foreach (Connector item in connectorManager.Connectors)
+                {
+                    double distance = item.Origin.DistanceTo(point);
+
+                    // lấy connector gần nhất
+                    if (distance < max)
+                    {
+                        max = distance;
+                        retval = item;
+                    }
+                }
+            }
+
+            return retval;
+        }
+
+        public static XYZ GetUnBoundIntersection(Line Line1, Line Line2)
+        {
+            if (Line1 != null && Line2 != null)
+            {
+                Curve ExtendedLine1 = Line.CreateUnbound(Line1.Origin, Line1.Direction);
+                Curve ExtendedLine2 = Line.CreateUnbound(Line2.Origin, Line2.Direction);
+                SetComparisonResult setComparisonResult = ExtendedLine1.Intersect(ExtendedLine2, out IntersectionResultArray resultArray);
+                if (resultArray != null &&
+                    resultArray.Size > 0)
+                {
+                    foreach (IntersectionResult result in resultArray)
+                        if (result != null)
+                            return result.XYZPoint;
+                }
+                else
+                {
+                    if (Line1.IsBound && Line2.IsBound)
+                    {
+                        if (Line1.GetEndPoint(0).IsAlmostEqualTo(Line2.GetEndPoint(0)) ||
+                  Line1.GetEndPoint(0).IsAlmostEqualTo(Line2.GetEndPoint(1)))
+                            return Line1.GetEndPoint(0);
+                        else
+                   if (Line1.GetEndPoint(1).IsAlmostEqualTo(Line2.GetEndPoint(0)) ||
+                  Line1.GetEndPoint(1).IsAlmostEqualTo(Line2.GetEndPoint(1)))
+                            return Line1.GetEndPoint(1);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private static void RotateLine(Document doc, FamilyInstance wye, Line axisLine)
+        {
+            Line rotateLine = Line.CreateBound(wye.MEPModel.ConnectorManager.Lookup(1).Origin, (wye.Location as LocationPoint).Point);
+
+            XYZ vector = rotateLine.Direction.CrossProduct(axisLine.Direction);
+            XYZ intersection = GetUnBoundIntersection(rotateLine, axisLine);
+
+            double angle = rotateLine.Direction.AngleTo(axisLine.Direction);
+
+            Line line = Line.CreateUnbound(intersection, vector);
+
+            ElementTransformUtils.RotateElement(doc, wye.Id, line, angle);
+            doc.Regenerate();
+        }
+
+        /// <summary>
         /// Get end length of the eblow to the eblow (dùng sub transaction)
         /// </summary>
         /// <param name="doc"></param>
@@ -734,6 +812,22 @@ namespace TotalMEPProject.Ultis
                         Parameter paraL1 = GetParameterFromListedNames(instance, "L1");
                         if (paraL1 != null && paraL1.StorageType == StorageType.Double)
                             return paraL1.AsDouble();
+
+                        //Line line = Line.CreateUnbound((instance.Location as LocationPoint).Point, XYZ.BasisZ);
+
+                        //RotateLine(doc, instance, line);
+
+                        //doc.Regenerate();
+
+                        //var tranform = instance.GetTransform();
+
+                        //var bbox = instance.get_BoundingBox(null);
+
+                        //var bboxMin = tranform.OfPoint(bbox.Min);
+
+                        //var con = GetConnectorNearest(bboxMin, instance.MEPModel.ConnectorManager);
+
+                        //length = con.Origin.Z - bboxMin.Z;
                     }
                     catch (Exception) { }
                     finally
@@ -801,11 +895,9 @@ namespace TotalMEPProject.Ultis
 
                         double lengthElbow2 = GetEndLengthOfEblowSubTran(doc, pipeHorizontal.Diameter, out double distanceCenterToConnector2, typeElbow);
                         double lenghtPipeJoint = lengthElbow1 + lengthElbow2;
-                        if (!isHubMode)
-                            lenghtPipeJoint = 10 / 304.8;
 
                         if (Common.IsEqual(lenghtPipeJoint, 0))
-                            lenghtPipeJoint = 10 / 304.8;
+                            lenghtPipeJoint = 56.9 / 304.8;
 
                         XYZ newEndPointElbow1 = GetPointOnVector(conVert1.Origin, vectoMoveZ.Negate(), lenghtPipeJoint);
                         newEndPointElbow1 = GetPointOnVector(newEndPointElbow1, vectorMoveX, lenghtPipeJoint);

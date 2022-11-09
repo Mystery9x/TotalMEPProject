@@ -76,5 +76,7 @@
         public const string GUID = "61177B23-0C77-4C7F-B381-55BB4C949A6C";
         public const string SchemaName = "TotalMEP";
         public const string VendorId = "CD50481A-BE7A-4816-A2DE-EA1F50A0812A";
+
+        public const string PIPE_CAST_IRON = "CAST IRON";
     }
 }
