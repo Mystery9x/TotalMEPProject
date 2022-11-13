@@ -647,6 +647,69 @@ namespace TotalMEPProject.Ultis
             }
         }
 
+        public static bool IsFormSameOpen(string nameForm)
+        {
+            bool checkIsOpen = false;
+
+            foreach (System.Windows.Forms.Form openedForm in Application.OpenForms)
+            {
+                if (openedForm.GetType().Name == nameForm)
+                {
+                    openedForm.WindowState = FormWindowState.Normal;
+                    checkIsOpen = true;
+                    break;
+                }
+            }
+
+            return checkIsOpen;
+        }
+
+        /// <summary>
+        /// kiểm tra xem đã set RoutingPreference cho pipe type hay chưa
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pipe"></param>
+        /// <param name="checkType">
+        /// Tee: RoutingPreferenceRuleGroupType.Junctions
+        /// Elbow: RoutingPreferenceRuleGroupType.Elbows
+        /// </param>
+        /// <returns></returns>
+        public static bool IsFamilySymbolSettedForPipeType(Document doc, MEPCurve pipe, RoutingPreferenceRuleGroupType checkType)
+        {
+            try
+            {
+                if (pipe != null && pipe.IsValidObject)
+                {
+                    var pipeType = doc.GetElement(pipe.GetTypeId()) as PipeType;
+
+                    RoutingPreferenceManager rpm = pipeType.RoutingPreferenceManager;
+
+                    if (checkType == RoutingPreferenceRuleGroupType.Junctions &&
+                      rpm.PreferredJunctionType != PreferredJunctionType.Tee)
+                        return false;
+
+                    int numberOfRule = rpm.GetNumberOfRules(checkType);
+
+                    for (int i = 0; i < numberOfRule; i++)
+                    {
+                        RoutingPreferenceRule rule = rpm.GetRule(checkType, i);
+
+                        if (rule.MEPPartId != null &&
+                            rule.MEPPartId != ElementId.InvalidElementId)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Lấy symbol set RoutingPreference cho pipe type hay chưa
         /// </summary>
@@ -813,21 +876,8 @@ namespace TotalMEPProject.Ultis
                         if (paraL1 != null && paraL1.StorageType == StorageType.Double)
                             return paraL1.AsDouble();
 
-                        //Line line = Line.CreateUnbound((instance.Location as LocationPoint).Point, XYZ.BasisZ);
-
-                        //RotateLine(doc, instance, line);
-
-                        //doc.Regenerate();
-
-                        //var tranform = instance.GetTransform();
-
-                        //var bbox = instance.get_BoundingBox(null);
-
-                        //var bboxMin = tranform.OfPoint(bbox.Min);
-
-                        //var con = GetConnectorNearest(bboxMin, instance.MEPModel.ConnectorManager);
-
-                        //length = con.Origin.Z - bboxMin.Z;
+                        if (paraL1 == null)
+                            return length = 10 / 304.8;
                     }
                     catch (Exception) { }
                     finally
@@ -897,7 +947,7 @@ namespace TotalMEPProject.Ultis
                         double lenghtPipeJoint = lengthElbow1 + lengthElbow2;
 
                         if (Common.IsEqual(lenghtPipeJoint, 0))
-                            lenghtPipeJoint = 56.9 / 304.8;
+                            lenghtPipeJoint = 10 / 304.8;
 
                         XYZ newEndPointElbow1 = GetPointOnVector(conVert1.Origin, vectoMoveZ.Negate(), lenghtPipeJoint);
                         newEndPointElbow1 = GetPointOnVector(newEndPointElbow1, vectorMoveX, lenghtPipeJoint);

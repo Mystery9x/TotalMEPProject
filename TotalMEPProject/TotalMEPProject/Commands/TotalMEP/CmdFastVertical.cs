@@ -55,11 +55,18 @@ namespace TotalMEPProject.Commands.TotalMEP
         {
             var fastVerticalFrm = App.fastVerticalForm;
 
+            if (fastVerticalFrm != null && Common.IsFormSameOpen(fastVerticalFrm.Name))
+                fastVerticalFrm.Hide();
+
             //Select pipes
             List<MEPCurve> mepCurves = SelectMEPCurves(fastVerticalFrm.GetMEPType);
 
             if (mepCurves == null || mepCurves.Count == 0)
+            {
+                fastVerticalFrm.TopMost = true;
+                fastVerticalFrm.Show();
                 return Result.Cancelled;
+            }
 
             Transaction t = new Transaction(Global.UIDoc.Document, "a");
 
@@ -172,44 +179,37 @@ namespace TotalMEPProject.Commands.TotalMEP
                     }
                     else if (fastVerticalFrm.Elbow45)
                     {
+                        if (!Common.IsFamilySymbolSettedForPipeType(Global.UIDoc.Document, mepCurve, RoutingPreferenceRuleGroupType.Elbows))
+                            continue;
+
                         var pipeType = Global.UIDoc.Document.GetElement(mepCurve.GetTypeId()) as PipeType;
                         if (pipeType == null)
                             continue;
 
-                        if (pipeType.Name.Contains(Define.PIPE_CAST_IRON))
+                        //Tao mot pipe 45
+                        var elemIds = ElementTransformUtils.CopyElement(
+                            Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                        var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                        Connector conHor1 = Common.GetConnectorValid(mepCurve);
+                        if (conHor1 != null && !conHor1.IsConnected)
                         {
+                            conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
+
                             var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
                             if (level == null)
                                 continue;
-                            CreateElbowPipeIron(mepCurve, level, fastVerticalFrm.OffSet);
-                        }
-                        else
-                        {
-                            //Tao mot pipe 45
-                            var elemIds = ElementTransformUtils.CopyElement(
-                                Global.UIDoc.Document, mepCurve.Id, newPlace);
 
-                            var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+                            XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
 
-                            Connector conHor1 = Common.GetConnectorValid(mepCurve);
-                            if (conHor1 != null && !conHor1.IsConnected)
-                            {
-                                conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
+                            if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
+                                continue;
 
-                                var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
-                                if (level == null)
-                                    continue;
+                            Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
+                            (vertical45_2.Location as LocationCurve).Curve = line;
 
-                                XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
-
-                                if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
-                                    continue;
-
-                                Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
-                                (vertical45_2.Location as LocationCurve).Curve = line;
-
-                                Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
-                            }
+                            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
                         }
                     }
                     else if (fastVerticalFrm.Siphon)
@@ -248,6 +248,16 @@ namespace TotalMEPProject.Commands.TotalMEP
             catch (Exception ex)
             {
                 string mess = ex.Message;
+
+                if (fastVerticalFrm != null && Common.IsFormSameOpen(fastVerticalFrm.Name))
+                    fastVerticalFrm.TopMost = false;
+            }
+
+            if (fastVerticalFrm != null && Common.IsFormSameOpen(fastVerticalFrm.Name))
+            {
+                fastVerticalFrm.TopMost = true;
+                fastVerticalFrm.Show();
+                Global.UIDoc.RefreshActiveView();
             }
 
             if (t.HasStarted())
