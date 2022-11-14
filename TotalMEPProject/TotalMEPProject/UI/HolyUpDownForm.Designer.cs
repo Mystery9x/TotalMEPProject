@@ -51,22 +51,20 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.button6 = new System.Windows.Forms.Button();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.radioButton5 = new System.Windows.Forms.RadioButton();
             this.radioButton6 = new System.Windows.Forms.RadioButton();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -230,8 +228,8 @@
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(20, 3);
-            this.radioButton1.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
+            this.radioButton1.Location = new System.Drawing.Point(5, 3);
+            this.radioButton1.Margin = new System.Windows.Forms.Padding(5, 3, 20, 3);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.radioButton1.Size = new System.Drawing.Size(37, 17);
@@ -243,7 +241,7 @@
             // radCustom
             // 
             this.radCustom.AutoSize = true;
-            this.radCustom.Location = new System.Drawing.Point(97, 3);
+            this.radCustom.Location = new System.Drawing.Point(82, 3);
             this.radCustom.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
             this.radCustom.Name = "radCustom";
             this.radCustom.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -256,7 +254,7 @@
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(174, 3);
+            this.radioButton3.Location = new System.Drawing.Point(159, 3);
             this.radioButton3.Margin = new System.Windows.Forms.Padding(20, 3, 3, 3);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -268,7 +266,7 @@
             // 
             // txtAngle
             // 
-            this.txtAngle.Location = new System.Drawing.Point(240, 3);
+            this.txtAngle.Location = new System.Drawing.Point(225, 3);
             this.txtAngle.Name = "txtAngle";
             this.txtAngle.Size = new System.Drawing.Size(100, 20);
             this.txtAngle.TabIndex = 3;
@@ -277,7 +275,7 @@
             // 
             this.radElbow90.AutoSize = true;
             this.radElbow90.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radElbow90.Location = new System.Drawing.Point(363, 3);
+            this.radElbow90.Location = new System.Drawing.Point(348, 3);
             this.radElbow90.Margin = new System.Windows.Forms.Padding(20, 3, 3, 3);
             this.radElbow90.Name = "radElbow90";
             this.radElbow90.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -289,29 +287,27 @@
             // 
             // txtDistance
             // 
-            this.txtDistance.Location = new System.Drawing.Point(150, 30);
+            this.txtDistance.Location = new System.Drawing.Point(152, 30);
+            this.txtDistance.Margin = new System.Windows.Forms.Padding(5, 3, 3, 3);
             this.txtDistance.Name = "txtDistance";
             this.txtDistance.Size = new System.Drawing.Size(431, 20);
             this.txtDistance.TabIndex = 55;
             // 
             // tableLayoutPanel3
             // 
-            this.tableLayoutPanel3.ColumnCount = 4;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.ColumnCount = 3;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
             this.tableLayoutPanel3.Controls.Add(this.button1, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.button2, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.textBox3, 2, 0);
-            this.tableLayoutPanel3.Controls.Add(this.button3, 3, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(147, 54);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(442, 27);
             this.tableLayoutPanel3.TabIndex = 56;
             // 
@@ -319,8 +315,8 @@
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.ForeColor = System.Drawing.Color.Blue;
-            this.button1.Location = new System.Drawing.Point(40, 3);
-            this.button1.Margin = new System.Windows.Forms.Padding(40, 3, 30, 3);
+            this.button1.Location = new System.Drawing.Point(5, 3);
+            this.button1.Margin = new System.Windows.Forms.Padding(5, 3, 30, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(30, 21);
             this.button1.TabIndex = 0;
@@ -330,8 +326,8 @@
             // button2
             // 
             this.button2.ForeColor = System.Drawing.Color.Red;
-            this.button2.Location = new System.Drawing.Point(150, 3);
-            this.button2.Margin = new System.Windows.Forms.Padding(40, 3, 30, 3);
+            this.button2.Location = new System.Drawing.Point(71, 3);
+            this.button2.Margin = new System.Windows.Forms.Padding(5, 3, 30, 3);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(30, 21);
             this.button2.TabIndex = 1;
@@ -340,79 +336,10 @@
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(223, 3);
+            this.textBox3.Location = new System.Drawing.Point(135, 3);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 20);
+            this.textBox3.Size = new System.Drawing.Size(301, 20);
             this.textBox3.TabIndex = 2;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(333, 3);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 21);
-            this.button3.TabIndex = 3;
-            this.button3.Text = "Enter";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel5
-            // 
-            this.tableLayoutPanel5.ColumnCount = 4;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel5.Controls.Add(this.button4, 0, 0);
-            this.tableLayoutPanel5.Controls.Add(this.button5, 1, 0);
-            this.tableLayoutPanel5.Controls.Add(this.textBox4, 2, 0);
-            this.tableLayoutPanel5.Controls.Add(this.button6, 3, 0);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(147, 81);
-            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 1;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(442, 27);
-            this.tableLayoutPanel5.TabIndex = 57;
-            // 
-            // button4
-            // 
-            this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button4.ForeColor = System.Drawing.Color.Blue;
-            this.button4.Location = new System.Drawing.Point(40, 3);
-            this.button4.Margin = new System.Windows.Forms.Padding(40, 3, 30, 3);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(30, 21);
-            this.button4.TabIndex = 0;
-            this.button4.Text = "+";
-            this.button4.UseVisualStyleBackColor = true;
-            // 
-            // button5
-            // 
-            this.button5.ForeColor = System.Drawing.Color.Red;
-            this.button5.Location = new System.Drawing.Point(150, 3);
-            this.button5.Margin = new System.Windows.Forms.Padding(40, 3, 30, 3);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(30, 21);
-            this.button5.TabIndex = 1;
-            this.button5.Text = "-";
-            this.button5.UseVisualStyleBackColor = true;
-            // 
-            // textBox4
-            // 
-            this.textBox4.Location = new System.Drawing.Point(223, 3);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(100, 20);
-            this.textBox4.TabIndex = 2;
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(333, 3);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(75, 21);
-            this.button6.TabIndex = 3;
-            this.button6.Text = "Enter";
-            this.button6.UseVisualStyleBackColor = true;
             // 
             // flowLayoutPanel2
             // 
@@ -428,8 +355,8 @@
             // radioButton5
             // 
             this.radioButton5.AutoSize = true;
-            this.radioButton5.Location = new System.Drawing.Point(20, 3);
-            this.radioButton5.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
+            this.radioButton5.Location = new System.Drawing.Point(5, 3);
+            this.radioButton5.Margin = new System.Windows.Forms.Padding(5, 3, 20, 3);
             this.radioButton5.Name = "radioButton5";
             this.radioButton5.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.radioButton5.Size = new System.Drawing.Size(107, 17);
@@ -441,7 +368,7 @@
             // radioButton6
             // 
             this.radioButton6.AutoSize = true;
-            this.radioButton6.Location = new System.Drawing.Point(167, 3);
+            this.radioButton6.Location = new System.Drawing.Point(152, 3);
             this.radioButton6.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
             this.radioButton6.Name = "radioButton6";
             this.radioButton6.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -450,6 +377,54 @@
             this.radioButton6.TabStop = true;
             this.radioButton6.Text = "Previous time Elevation";
             this.radioButton6.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel5
+            // 
+            this.tableLayoutPanel5.ColumnCount = 3;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
+            this.tableLayoutPanel5.Controls.Add(this.button3, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.button4, 1, 0);
+            this.tableLayoutPanel5.Controls.Add(this.textBox1, 2, 0);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(147, 81);
+            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 1;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(442, 27);
+            this.tableLayoutPanel5.TabIndex = 59;
+            // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button3.ForeColor = System.Drawing.Color.Blue;
+            this.button3.Location = new System.Drawing.Point(5, 3);
+            this.button3.Margin = new System.Windows.Forms.Padding(5, 3, 30, 3);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(30, 21);
+            this.button3.TabIndex = 0;
+            this.button3.Text = "+";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            this.button4.ForeColor = System.Drawing.Color.Red;
+            this.button4.Location = new System.Drawing.Point(71, 3);
+            this.button4.Margin = new System.Windows.Forms.Padding(5, 3, 30, 3);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(30, 21);
+            this.button4.TabIndex = 1;
+            this.button4.Text = "-";
+            this.button4.UseVisualStyleBackColor = true;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(135, 3);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(301, 20);
+            this.textBox1.TabIndex = 2;
             // 
             // HolyUpDownForm
             // 
@@ -470,10 +445,10 @@
             this.flowLayoutPanel1.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel2.PerformLayout();
+            this.tableLayoutPanel5.ResumeLayout(false);
+            this.tableLayoutPanel5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -486,11 +461,6 @@
         private System.Windows.Forms.Button btnUndo;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
@@ -507,9 +477,12 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
         private System.Windows.Forms.RadioButton radioButton5;
         private System.Windows.Forms.RadioButton radioButton6;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

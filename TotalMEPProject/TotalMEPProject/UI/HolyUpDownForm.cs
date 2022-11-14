@@ -31,6 +31,11 @@ namespace TotalMEPProject.UI
             m_ExEvent = exEvent;
         }
 
+        public HolyUpDownForm()
+        {
+            InitializeComponent();
+        }
+
         public bool Elbow90
         {
             get
