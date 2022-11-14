@@ -43,7 +43,7 @@ namespace TotalMEPProject.UI
         {
             get
             {
-                return radElbow45.Checked;
+                return radCustom.Checked;
             }
         }
 
@@ -77,6 +77,10 @@ namespace TotalMEPProject.UI
                 else
                     return dvalue;
             }
+        }
+
+        private void btnApply_Click(object sender, EventArgs e)
+        {
         }
     }
 
