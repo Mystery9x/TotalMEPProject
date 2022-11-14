@@ -33,7 +33,7 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
-                case RequestId.HolyUpdown:
+                case RequestId.HolyUpDown_PickObjects:
                     {
                         CmdHolyUpdown.Run_PickObjects();
                     }

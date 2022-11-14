@@ -38,26 +38,26 @@
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtEblowControlValue = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radCustom = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.txtAngle = new System.Windows.Forms.TextBox();
             this.radElbow90 = new System.Windows.Forms.RadioButton();
+            this.radElbow45 = new System.Windows.Forms.RadioButton();
+            this.radCustom = new System.Windows.Forms.RadioButton();
+            this.txtAngle = new System.Windows.Forms.TextBox();
+            this.radNotApply = new System.Windows.Forms.RadioButton();
             this.txtDistance = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.txtUpdownStepValue = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.radioButton5 = new System.Windows.Forms.RadioButton();
-            this.radioButton6 = new System.Windows.Forms.RadioButton();
+            this.radOE = new System.Windows.Forms.RadioButton();
+            this.radPTE = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -122,6 +122,7 @@
             this.btnUndo.TabIndex = 0;
             this.btnUndo.Text = "Undo";
             this.btnUndo.UseVisualStyleBackColor = true;
+            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
             // 
             // btnOK
             // 
@@ -132,6 +133,7 @@
             this.btnOK.TabIndex = 1;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
+            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
             // tableLayoutPanel2
             // 
@@ -168,7 +170,7 @@
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.Controls.Add(this.button3, 0, 0);
             this.tableLayoutPanel5.Controls.Add(this.button4, 1, 0);
-            this.tableLayoutPanel5.Controls.Add(this.textBox1, 2, 0);
+            this.tableLayoutPanel5.Controls.Add(this.txtEblowControlValue, 2, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(140, 90);
             this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0);
@@ -201,13 +203,14 @@
             this.button4.Text = "-";
             this.button4.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // txtEblowControlValue
             // 
-            this.textBox1.Location = new System.Drawing.Point(85, 5);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(5);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(239, 20);
-            this.textBox1.TabIndex = 2;
+            this.txtEblowControlValue.Location = new System.Drawing.Point(85, 5);
+            this.txtEblowControlValue.Margin = new System.Windows.Forms.Padding(5);
+            this.txtEblowControlValue.Name = "txtEblowControlValue";
+            this.txtEblowControlValue.Size = new System.Drawing.Size(239, 20);
+            this.txtEblowControlValue.TabIndex = 2;
+            this.txtEblowControlValue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtEblowControlValue_KeyPress);
             // 
             // label5
             // 
@@ -261,11 +264,11 @@
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.Controls.Add(this.radioButton1);
-            this.flowLayoutPanel1.Controls.Add(this.radCustom);
-            this.flowLayoutPanel1.Controls.Add(this.radioButton3);
-            this.flowLayoutPanel1.Controls.Add(this.txtAngle);
             this.flowLayoutPanel1.Controls.Add(this.radElbow90);
+            this.flowLayoutPanel1.Controls.Add(this.radElbow45);
+            this.flowLayoutPanel1.Controls.Add(this.radCustom);
+            this.flowLayoutPanel1.Controls.Add(this.txtAngle);
+            this.flowLayoutPanel1.Controls.Add(this.radNotApply);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(140, 0);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
@@ -273,44 +276,45 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(329, 30);
             this.flowLayoutPanel1.TabIndex = 54;
             // 
-            // radioButton1
+            // radElbow90
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(5, 3);
-            this.radioButton1.Margin = new System.Windows.Forms.Padding(5, 3, 20, 3);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioButton1.Size = new System.Drawing.Size(37, 17);
-            this.radioButton1.TabIndex = 0;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "90";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radElbow90.AutoSize = true;
+            this.radElbow90.Location = new System.Drawing.Point(5, 3);
+            this.radElbow90.Margin = new System.Windows.Forms.Padding(5, 3, 20, 3);
+            this.radElbow90.Name = "radElbow90";
+            this.radElbow90.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.radElbow90.Size = new System.Drawing.Size(37, 17);
+            this.radElbow90.TabIndex = 0;
+            this.radElbow90.TabStop = true;
+            this.radElbow90.Text = "90";
+            this.radElbow90.UseVisualStyleBackColor = true;
+            // 
+            // radElbow45
+            // 
+            this.radElbow45.AutoSize = true;
+            this.radElbow45.Location = new System.Drawing.Point(62, 3);
+            this.radElbow45.Margin = new System.Windows.Forms.Padding(0, 3, 20, 3);
+            this.radElbow45.Name = "radElbow45";
+            this.radElbow45.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.radElbow45.Size = new System.Drawing.Size(37, 17);
+            this.radElbow45.TabIndex = 1;
+            this.radElbow45.TabStop = true;
+            this.radElbow45.Text = "45";
+            this.radElbow45.UseVisualStyleBackColor = true;
             // 
             // radCustom
             // 
             this.radCustom.AutoSize = true;
-            this.radCustom.Location = new System.Drawing.Point(62, 3);
-            this.radCustom.Margin = new System.Windows.Forms.Padding(0, 3, 20, 3);
+            this.radCustom.Location = new System.Drawing.Point(119, 3);
+            this.radCustom.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.radCustom.Name = "radCustom";
             this.radCustom.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radCustom.Size = new System.Drawing.Size(37, 17);
-            this.radCustom.TabIndex = 1;
+            this.radCustom.Size = new System.Drawing.Size(60, 17);
+            this.radCustom.TabIndex = 2;
             this.radCustom.TabStop = true;
-            this.radCustom.Text = "45";
+            this.radCustom.Text = "Custom";
             this.radCustom.UseVisualStyleBackColor = true;
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(119, 3);
-            this.radioButton3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioButton3.Size = new System.Drawing.Size(60, 17);
-            this.radioButton3.TabIndex = 2;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Custom";
-            this.radioButton3.UseVisualStyleBackColor = true;
+            this.radCustom.CheckedChanged += new System.EventHandler(this.radCustom_CheckedChanged);
             // 
             // txtAngle
             // 
@@ -318,20 +322,21 @@
             this.txtAngle.Name = "txtAngle";
             this.txtAngle.Size = new System.Drawing.Size(62, 20);
             this.txtAngle.TabIndex = 3;
+            this.txtAngle.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAngle_KeyPress);
             // 
-            // radElbow90
+            // radNotApply
             // 
-            this.radElbow90.AutoSize = true;
-            this.radElbow90.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radElbow90.Location = new System.Drawing.Point(255, 3);
-            this.radElbow90.Margin = new System.Windows.Forms.Padding(5, 3, 3, 3);
-            this.radElbow90.Name = "radElbow90";
-            this.radElbow90.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radElbow90.Size = new System.Drawing.Size(71, 17);
-            this.radElbow90.TabIndex = 4;
-            this.radElbow90.TabStop = true;
-            this.radElbow90.Text = "Not Apply";
-            this.radElbow90.UseVisualStyleBackColor = true;
+            this.radNotApply.AutoSize = true;
+            this.radNotApply.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radNotApply.Location = new System.Drawing.Point(255, 3);
+            this.radNotApply.Margin = new System.Windows.Forms.Padding(5, 3, 3, 3);
+            this.radNotApply.Name = "radNotApply";
+            this.radNotApply.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.radNotApply.Size = new System.Drawing.Size(71, 17);
+            this.radNotApply.TabIndex = 4;
+            this.radNotApply.TabStop = true;
+            this.radNotApply.Text = "Not Apply";
+            this.radNotApply.UseVisualStyleBackColor = true;
             // 
             // txtDistance
             // 
@@ -340,6 +345,7 @@
             this.txtDistance.Name = "txtDistance";
             this.txtDistance.Size = new System.Drawing.Size(321, 20);
             this.txtDistance.TabIndex = 55;
+            this.txtDistance.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDistance_KeyPress);
             // 
             // tableLayoutPanel3
             // 
@@ -349,7 +355,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.Controls.Add(this.button1, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.button2, 1, 0);
-            this.tableLayoutPanel3.Controls.Add(this.textBox3, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.txtUpdownStepValue, 2, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(140, 60);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
@@ -382,18 +388,19 @@
             this.button2.Text = "-";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // textBox3
+            // txtUpdownStepValue
             // 
-            this.textBox3.Location = new System.Drawing.Point(85, 5);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(5);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(239, 20);
-            this.textBox3.TabIndex = 2;
+            this.txtUpdownStepValue.Location = new System.Drawing.Point(85, 5);
+            this.txtUpdownStepValue.Margin = new System.Windows.Forms.Padding(5);
+            this.txtUpdownStepValue.Name = "txtUpdownStepValue";
+            this.txtUpdownStepValue.Size = new System.Drawing.Size(239, 20);
+            this.txtUpdownStepValue.TabIndex = 2;
+            this.txtUpdownStepValue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtUpdownStepValue_KeyPress);
             // 
             // flowLayoutPanel2
             // 
-            this.flowLayoutPanel2.Controls.Add(this.radioButton5);
-            this.flowLayoutPanel2.Controls.Add(this.radioButton6);
+            this.flowLayoutPanel2.Controls.Add(this.radOE);
+            this.flowLayoutPanel2.Controls.Add(this.radPTE);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(140, 120);
             this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
@@ -401,31 +408,31 @@
             this.flowLayoutPanel2.Size = new System.Drawing.Size(329, 30);
             this.flowLayoutPanel2.TabIndex = 58;
             // 
-            // radioButton5
+            // radOE
             // 
-            this.radioButton5.AutoSize = true;
-            this.radioButton5.Location = new System.Drawing.Point(0, 3);
-            this.radioButton5.Margin = new System.Windows.Forms.Padding(0, 3, 20, 3);
-            this.radioButton5.Name = "radioButton5";
-            this.radioButton5.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioButton5.Size = new System.Drawing.Size(107, 17);
-            this.radioButton5.TabIndex = 2;
-            this.radioButton5.TabStop = true;
-            this.radioButton5.Text = "Original Elevation";
-            this.radioButton5.UseVisualStyleBackColor = true;
+            this.radOE.AutoSize = true;
+            this.radOE.Location = new System.Drawing.Point(0, 3);
+            this.radOE.Margin = new System.Windows.Forms.Padding(0, 3, 20, 3);
+            this.radOE.Name = "radOE";
+            this.radOE.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.radOE.Size = new System.Drawing.Size(107, 17);
+            this.radOE.TabIndex = 2;
+            this.radOE.TabStop = true;
+            this.radOE.Text = "Original Elevation";
+            this.radOE.UseVisualStyleBackColor = true;
             // 
-            // radioButton6
+            // radPTE
             // 
-            this.radioButton6.AutoSize = true;
-            this.radioButton6.Location = new System.Drawing.Point(147, 3);
-            this.radioButton6.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
-            this.radioButton6.Name = "radioButton6";
-            this.radioButton6.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioButton6.Size = new System.Drawing.Size(135, 17);
-            this.radioButton6.TabIndex = 3;
-            this.radioButton6.TabStop = true;
-            this.radioButton6.Text = "Previous time Elevation";
-            this.radioButton6.UseVisualStyleBackColor = true;
+            this.radPTE.AutoSize = true;
+            this.radPTE.Location = new System.Drawing.Point(147, 3);
+            this.radPTE.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
+            this.radPTE.Name = "radPTE";
+            this.radPTE.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.radPTE.Size = new System.Drawing.Size(135, 17);
+            this.radPTE.TabIndex = 3;
+            this.radPTE.TabStop = true;
+            this.radPTE.Text = "Previous time Elevation";
+            this.radPTE.UseVisualStyleBackColor = true;
             // 
             // HolyUpDownForm
             // 
@@ -438,6 +445,7 @@
             this.MinimizeBox = false;
             this.Name = "HolyUpDownForm";
             this.Text = "Holy Up/Down";
+            this.Load += new System.EventHandler(this.HolyUpDownForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -468,22 +476,22 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.RadioButton radioButton1;
-        private System.Windows.Forms.RadioButton radCustom;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.TextBox txtAngle;
         private System.Windows.Forms.RadioButton radElbow90;
+        private System.Windows.Forms.RadioButton radElbow45;
+        private System.Windows.Forms.RadioButton radCustom;
+        private System.Windows.Forms.TextBox txtAngle;
+        private System.Windows.Forms.RadioButton radNotApply;
         private System.Windows.Forms.TextBox txtDistance;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox txtUpdownStepValue;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
-        private System.Windows.Forms.RadioButton radioButton5;
-        private System.Windows.Forms.RadioButton radioButton6;
+        private System.Windows.Forms.RadioButton radOE;
+        private System.Windows.Forms.RadioButton radPTE;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtEblowControlValue;
     }
 }

@@ -11,6 +11,8 @@ namespace TotalMEPProject.Request
         VerticalMEP,
         FastVertical,
         HolyUpdown,
+        HolyUpDown_PickObjects,
+        HolyUpDown_OK,
     }
 
     public class Request
