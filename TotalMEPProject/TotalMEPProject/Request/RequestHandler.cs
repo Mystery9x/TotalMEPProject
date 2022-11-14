@@ -33,6 +33,12 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.HolyUpdown:
+                    {
+                        CmdHolyUpdown.Run_PickObjects();
+                    }
+                    break;
+
                 default:
                     {
                         break;
