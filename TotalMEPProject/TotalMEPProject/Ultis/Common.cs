@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Plumbing;
 using System;
 using System.Collections.Generic;
@@ -451,11 +452,16 @@ namespace TotalMEPProject.Ultis
         /// </summary>
         /// <param name="pipe"></param>
         /// <returns></returns>
-        public static Connector GetConnectorValid(MEPCurve pipe)
+        public static Connector GetConnectorValid(MEPCurve pipe, Level level)
         {
             if (pipe != null && pipe.Location is LocationCurve locationCurve)
             {
-                double slope = Math.Round((double)GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE), 5);
+                double slope = 0;
+
+                if (pipe is Pipe)
+                    slope = Math.Round((double)GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE), 5);
+                else if (pipe is Autodesk.Revit.DB.Mechanical.Duct)
+                    slope = Math.Round((double)GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_DUCT_SLOPE), 5);
 
                 XYZ pointSt = locationCurve.Curve.GetEndPoint(0);
 
@@ -470,15 +476,288 @@ namespace TotalMEPProject.Ultis
                 }
                 else
                 {
-                    Connector retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conSt : conEnd;
-                    if (retval.IsConnected)
-                        return (conSt.Origin.Z < conEnd.Origin.Z) ? conSt : conEnd;
+                    var levelPipe = pipe.ReferenceLevel;
+                    if (levelPipe.Elevation < level.Elevation)
+                    {
+                        Connector retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conSt : conEnd;
+                        if (retval.IsConnected)
+                            return (conSt.Origin.Z < conEnd.Origin.Z) ? conSt : conEnd;
 
-                    return retval;
+                        return retval;
+                    }
+                    else
+                    {
+                        Connector retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conEnd : conSt;
+                        if (retval.IsConnected)
+                            return (conSt.Origin.Z < conEnd.Origin.Z) ? conSt : conEnd;
+
+                        return retval;
+                    }
                 }
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Check family siphon vertical or horizontal
+        /// </summary>
+        /// <param name="fittingSiphon"></param>
+        /// <returns></returns>
+        public static bool IsSiphonVertical(FamilyInstance fittingSiphon)
+        {
+            if (fittingSiphon != null && fittingSiphon.MEPModel != null)
+            {
+                Connector con1 = fittingSiphon.MEPModel.ConnectorManager.Lookup(1);
+
+                Connector con2 = fittingSiphon.MEPModel.ConnectorManager.Lookup(2);
+
+                if (con1 != null && con2 != null)
+                {
+                    if (IsEqual(con1.Origin.Z, con2.Origin.Z))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///  Tính góc giữa siphon và pipe nằm ngang
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <param name="siphon"></param>
+        /// <returns></returns>
+        public static double GetAngleBetweenPipeAndSiphon(MEPCurve pipe, FamilyInstance siphon)
+        {
+            if (pipe != null && pipe.Location is LocationCurve location && siphon != null && siphon.MEPModel != null)
+            {
+                XYZ st1 = location.Curve.GetEndPoint(0);
+                st1 = new XYZ(st1.X, st1.Y, 0);
+
+                XYZ end1 = location.Curve.GetEndPoint(1);
+                end1 = new XYZ(end1.X, end1.Y, 0);
+
+                if (st1.IsAlmostEqualTo(end1))
+                    return 0;
+
+                ConnectorManager connectorManager = siphon.MEPModel.ConnectorManager;
+
+                if (connectorManager == null)
+                    return 0;
+
+                Connector connectorS = null;
+                Connector connectorE = null;
+
+                if (pipe.Name.Equals(Define.PIPE_CAST_IRON))
+                {
+                    connectorS = connectorManager.Lookup(1);
+                    connectorE = connectorManager.Lookup(2);
+                }
+                else
+                {
+                    connectorS = connectorManager.Lookup(2);
+                    connectorE = connectorManager.Lookup(1);
+                }
+
+                if (connectorS != null && connectorE != null)
+
+                {
+                    XYZ conSt = new XYZ(connectorS.Origin.X, connectorS.Origin.Y, 0);
+
+                    XYZ conEnd = new XYZ(connectorE.Origin.X, connectorE.Origin.Y, 0);
+
+                    if (conSt.IsAlmostEqualTo(conEnd))
+                        return 0;
+
+                    XYZ poin1 = GetPointFarther(conSt, st1, end1, out XYZ poin2);
+
+                    XYZ vec1 = (poin1 - poin2).Normalize();
+                    XYZ vec2 = (conEnd - conSt).Normalize();
+
+                    if (vec1 != null && vec2 != null)
+                        return vec1.AngleOnPlaneTo(vec2, XYZ.BasisZ);
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Lấy điểm xa hơn trong 2 điểm và trả ra điểm gần
+        /// </summary>
+        /// <param name="pointOrigin"></param>
+        /// <param name="point1"></param>
+        /// <param name="point2"></param>
+        /// <returns></returns>
+        private static XYZ GetPointFarther(XYZ pointOrigin, XYZ point1, XYZ point2, out XYZ pointNear)
+        {
+            XYZ retval = null;
+            pointNear = null;
+            if (pointOrigin != null && point1 != null && point2 != null)
+            {
+                double distance1 = pointOrigin.DistanceTo(point1);
+
+                double distance2 = pointOrigin.DistanceTo(point2);
+
+                if (distance1 > distance2)
+                {
+                    retval = point1;
+                    pointNear = point2;
+                }
+                else
+                {
+                    retval = point2;
+                    pointNear = point1;
+                }
+            }
+
+            return retval;
+        }
+
+        /// <summary>
+        /// Set giá trị cho paramter theo tên
+        /// </summary>
+        /// <param name="el"></param>
+        /// <param name="parameterName"></param>
+        /// <param name="valuePara"></param>
+        /// <returns></returns>
+        public static bool SetValueParameterByListName(Element el, object valuePara, params string[] parameterNames)
+        {
+            if (el == null || parameterNames.Length == 0)
+                return false;
+            foreach (string parameterName in parameterNames)
+            {
+                if (string.IsNullOrEmpty(parameterName))
+                    continue;
+                Parameter prm = el.LookupParameter(parameterName);
+                if (prm != null && !prm.IsReadOnly)
+                {
+                    if (prm.StorageType == StorageType.ElementId)
+                    {
+                        prm.Set((ElementId)valuePara);
+
+                        return true;
+                    }
+                    if (prm.StorageType == StorageType.Double)
+                    {
+                        prm.Set((double)valuePara);
+
+                        return true;
+                    }
+                    if (prm.StorageType == StorageType.Integer)
+                    {
+                        prm.Set((int)valuePara);
+
+                        return true;
+                    }
+                    if (prm.StorageType == StorageType.String)
+                    {
+                        prm.Set((string)valuePara);
+
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Lấy ra fitting đang kết nối với ống
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pipe"></param>
+        /// <param name="conPipeNotConnect"></param>
+        /// <param name="fitingCreating"></param>
+        /// <returns></returns>
+        public static FamilyInstance GetFittingConnected(Document doc, MEPCurve pipe, Connector conPipeNotConnect)
+        {
+            if (doc == null || pipe == null)
+                return null;
+
+            List<FamilyInstance> allFittings = new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_PipeFitting)
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .ToList();
+            if (allFittings == null || allFittings.Count == 0)
+                return null;
+
+            List<ElementId> allElementIds = allFittings.Select(e => e.Id).ToList();
+
+            // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline.
+            Outline myOutLn = CreateOutLineFromBoundingBox(pipe);
+            if (myOutLn == null || myOutLn.IsEmpty)
+                return null;
+
+            // Create a BoundingBoxIntersects filter with this Outline
+            BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
+
+            FilteredElementCollector collector = new FilteredElementCollector(doc, allElementIds);
+
+            List<FamilyInstance> allFittingConnected = collector.WherePasses(filter).Cast<FamilyInstance>().ToList();
+
+            foreach (var ele in allFittingConnected)
+            {
+                if (ele != null)
+                {
+                    if (ele.MEPModel != null)
+                    {
+                        foreach (Connector conNector in ele.MEPModel.ConnectorManager.Connectors)
+                        {
+                            if (conNector != null)
+                            {
+                                if (IsEqual(conNector.Origin.X, conPipeNotConnect.Origin.X)
+                                    && IsEqual(conNector.Origin.Y, conPipeNotConnect.Origin.Y)
+                                    && IsEqual(conNector.Origin.Z, conPipeNotConnect.Origin.Z))
+                                {
+                                    return ele;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Lấy connector ở vị trí thấp nhất và cao nhất
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <param name="conHigher"></param>
+        /// <returns></returns>
+        public static Connector GetConnectorMinZ(MEPCurve pipe, out Connector conHigher)
+        {
+            Connector retval = null;
+            conHigher = null;
+
+            if (pipe != null)
+            {
+                ConnectorManager connectorManager = pipe.ConnectorManager;
+
+                double maxZ = double.MaxValue;
+                double minZ = double.MinValue;
+
+                foreach (Connector item in connectorManager.Connectors)
+                {
+                    // lấy connector thấp nhất
+                    if (item.Origin.Z < maxZ)
+                    {
+                        maxZ = item.Origin.Z;
+                        retval = item;
+                    }
+                    // lấy connector cao nhất
+                    if (item.Origin.Z > minZ)
+                    {
+                        minZ = item.Origin.Z;
+                        conHigher = item;
+                    }
+                }
+            }
+
+            return retval;
         }
 
         /// <summary>
@@ -522,7 +801,7 @@ namespace TotalMEPProject.Ultis
         /// <param name="pipeHor"></param>
         /// <param name="pipeVer"></param>
         /// <returns></returns>
-        public static bool IsAngleValid(MEPCurve pipeHor, Pipe pipeVer)
+        public static bool IsAngleValid(MEPCurve pipeHor, MEPCurve pipeVer)
         {
             if (pipeHor != null && pipeVer != null && pipeHor.Location is LocationCurve locationHor && pipeVer.Location is LocationCurve locationVer)
             {
@@ -577,7 +856,7 @@ namespace TotalMEPProject.Ultis
         /// <param name="lenghtElbow"></param>
         /// <param name="distanceCenterToConnector"></param>
         /// <returns></returns>
-        public static bool GetLenghtElbowFitting45(Document doc, MEPCurve pipeHorizontal, XYZ vectorMoveZ
+        public static bool GetLenghtElbowFitting45(Document doc, Level level, MEPCurve pipeHorizontal, XYZ vectorMoveZ
            , out double lenghtElbow, out double distanceCenterToConnector)
         {
             lenghtElbow = 0;
@@ -590,7 +869,7 @@ namespace TotalMEPProject.Ultis
             subTran.Start();
             try
             {
-                Connector conHor1 = GetConnectorValid(pipeHorizontal);
+                Connector conHor1 = GetConnectorValid(pipeHorizontal, level);
                 if (conHor1 != null && !conHor1.IsConnected)
                 {
                     conHor1 = GetConnectorNearest(conHor1.Origin, pipeHorizontal, out Connector conHor2);
@@ -897,7 +1176,7 @@ namespace TotalMEPProject.Ultis
         /// <param name="pipe1"></param>
         /// <param name="pipe2"></param>
         /// <param name="isHubMode"></param>
-        public static bool ConnectPipeVerticalElbow45(Document doc, MEPCurve pipe1, MEPCurve pipe2, bool isHubMode)
+        public static bool ConnectPipeVerticalElbow45(Document doc, Level level, MEPCurve pipe1, MEPCurve pipe2, bool isHubMode)
         {
             if (pipe1 == null || pipe2 == null)
                 return false;
@@ -938,7 +1217,7 @@ namespace TotalMEPProject.Ultis
 
                         XYZ vectoMoveZ = (conVert2.Origin - pointIntersec).Normalize();
 
-                        if (!GetLenghtElbowFitting45(doc, pipeHorizontal, vectoMoveZ, out double lengthElbow1, out double distanceCenterToConnector1))
+                        if (!GetLenghtElbowFitting45(doc, level, pipeHorizontal, vectoMoveZ, out double lengthElbow1, out double distanceCenterToConnector1))
                             return false;
 
                         FamilySymbol typeElbow = GetSymbolSeted(doc, pipeHorizontal, RoutingPreferenceRuleGroupType.Elbows);

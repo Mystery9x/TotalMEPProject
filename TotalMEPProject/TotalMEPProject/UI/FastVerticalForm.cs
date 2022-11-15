@@ -214,10 +214,17 @@ namespace TotalMEPProject.UI
                 cboLevel.Items.Add(keyPair.Key);
             }
 
-            AppUtils.ff(cboLevel);
+            Level level = Global.UIDoc.Document.ActiveView.GenLevel;
 
-            if (cboLevel.Items.Count != 0 && cboLevel.SelectedItem == null)
-                cboLevel.SelectedIndex = 0;
+            if (level != null)
+            {
+                cboLevel.SelectedItem = level.Name;
+            }
+            else
+            {
+                if (cboLevel.Items.Count != 0 && cboLevel.SelectedItem == null)
+                    cboLevel.SelectedIndex = 0;
+            }
 
             AppUtils.ff(txtOffset);
 

@@ -110,7 +110,8 @@
             // 
             // cboSiphon
             // 
-            this.cboSiphon.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.cboSiphon.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboSiphon.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboSiphon.FormattingEnabled = true;
             this.cboSiphon.Location = new System.Drawing.Point(83, 46);
             this.cboSiphon.Name = "cboSiphon";

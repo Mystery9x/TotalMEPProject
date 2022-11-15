@@ -74,6 +74,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             {
                 t.Start();
                 //Filter all slope pipes
+                bool isCannot = true;
                 foreach (MEPCurve mepCurve in mepCurves)
                 {
                     var con = Common.ToList(mepCurve.ConnectorManager.Connectors);
@@ -150,32 +151,106 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                     if (fastVerticalFrm.Elbow90)
                     {
-                        var end = new XYZ(p.X, p.Y, maxZ);
+                        var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
+                        if (level == null)
+                            continue;
 
-                        var elemIds = ElementTransformUtils.CopyElement(
-                            Global.UIDoc.Document, mepCurve.Id, newPlace);
-
-                        var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                        (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
-
-                        if (vertical as CableTray != null)
+                        if (mepCurve is Pipe)
                         {
-                            SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
-                        }
-                        else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
-                        {
-                            if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                            if (!Common.IsFamilySymbolSettedForPipeType(Global.UIDoc.Document, mepCurve, RoutingPreferenceRuleGroupType.Elbows))
                             {
-                                //Rotate
-                                var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
-                                var lv = Line.CreateBound(p, end);
+                                //IO.ShowWarning("Chưa set RoutingPreferenceRuleGroupType !", "Warning");
+                                continue;
+                            }
+                            Connector connector = Common.GetConnectorValid(mepCurve, level);
 
-                                ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                            if (connector != null && !connector.IsConnected)
+                            {
+                                XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, connector.Origin, fastVerticalFrm.OffSet);
+
+                                if (pointOffsetToLevel.IsAlmostEqualTo(connector.Origin))
+                                    continue;
+
+                                if (connector.Origin.IsAlmostEqualTo(pointOffsetToLevel))
+                                    continue;
+                                // Tạo ống đứng vuông góc với ống ngang
+                                Pipe pipeVertical = Pipe.Create(Global.UIDoc.Document, mepCurve.GetTypeId(), mepCurve.ReferenceLevel.Id, connector, pointOffsetToLevel);
+                                if (pipeVertical == null)
+                                    continue;
+
+                                // Tạo kết nối giữa ống đứng và ống ngang
+                                Common.GetConnectorClosedTo(mepCurve.ConnectorManager, pipeVertical.ConnectorManager, out Connector con1, out Connector con2);
+                                if (con1 != null && con2 != null && Common.IsAngleValid(mepCurve, pipeVertical))
+                                    Global.UIDoc.Document.Create.NewElbowFitting(con1, con2);
+                                else
+                                {
+                                    Global.UIDoc.Document.Delete(pipeVertical.Id);
+
+                                    if (fastVerticalFrm != null && Common.IsFormSameOpen(fastVerticalFrm.Name))
+                                        fastVerticalFrm.TopMost = false;
+                                    isCannot = false;
+                                    continue;
+                                }
                             }
                         }
+                        else
+                        {
+                            var end = new XYZ(p.X, p.Y, maxZ);
+                            XYZ end1 = new XYZ();
 
-                        var elbow = CreateElbow(mepCurve, vertical);
+                            var elemIds = ElementTransformUtils.CopyElement(
+                                Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                            var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                            (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
+
+                            bool isCop = false;
+                            Connector c = null;
+                            foreach (Connector con1 in mepCurve.ConnectorManager.Connectors)
+                            {
+                                if (con1.IsConnected)
+                                {
+                                    isCop = true;
+                                    continue;
+                                }
+                                else
+                                    c = con1;
+                            }
+
+                            if (isCop)
+                            {
+                                end1 = new XYZ(c.Origin.X, c.Origin.Y, maxZ);
+                                (vertical.Location as LocationCurve).Curve = Line.CreateBound(c.Origin, end1);
+                            }
+
+                            if (vertical as CableTray != null)
+                            {
+                                SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
+                            }
+                            else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                            {
+                                if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                                {
+                                    //Rotate
+                                    var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
+                                    if (!isCop)
+                                    {
+                                        var lv = Line.CreateBound(p, end);
+
+                                        ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                                    }
+                                    else
+                                    {
+                                        var lv = Line.CreateBound(c.Origin, end1);
+
+                                        ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                                    }
+                                }
+                            }
+
+                            var elbow = CreateElbow(mepCurve, vertical);
+                        }
                     }
                     else if (fastVerticalFrm.Elbow45)
                     {
@@ -185,21 +260,19 @@ namespace TotalMEPProject.Commands.TotalMEP
                         var pipeType = Global.UIDoc.Document.GetElement(mepCurve.GetTypeId()) as PipeType;
                         if (pipeType == null)
                             continue;
-
+                        var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
+                        if (level == null)
+                            continue;
                         //Tao mot pipe 45
                         var elemIds = ElementTransformUtils.CopyElement(
                             Global.UIDoc.Document, mepCurve.Id, newPlace);
 
                         var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
 
-                        Connector conHor1 = Common.GetConnectorValid(mepCurve);
+                        Connector conHor1 = Common.GetConnectorValid(mepCurve, level);
                         if (conHor1 != null && !conHor1.IsConnected)
                         {
                             conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
-
-                            var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
-                            if (level == null)
-                                continue;
 
                             XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
 
@@ -209,40 +282,137 @@ namespace TotalMEPProject.Commands.TotalMEP
                             Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
                             (vertical45_2.Location as LocationCurve).Curve = line;
 
-                            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
+                            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, level, mepCurve, vertical45_2, true);
                         }
                     }
                     else if (fastVerticalFrm.Siphon)
                     {
-                        var end = new XYZ(p.X, p.Y, maxZ);
-
-                        var elemIds = ElementTransformUtils.CopyElement(
-                            Global.UIDoc.Document, mepCurve.Id, newPlace);
-
-                        var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                        (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
-
-                        if (vertical as CableTray != null)
+                        if (mepCurve is Pipe)
                         {
-                            SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
-                        }
-                        else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
-                        {
-                            //Can rotate vertical duct
-                            if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                            var symbol = Global.UIDoc.Document.GetElement(fastVerticalFrm.SiphonId) as FamilySymbol;
+
+                            if (symbol.IsActive == false)
+                                symbol.Activate();
+
+                            if (Common.IsPipeVertical(mepCurve))
+                                continue;
+                            var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
+                            if (level == null)
+                                continue;
+                            Connector connector = Common.GetConnectorValid(mepCurve, level);
+                            if (connector != null && !connector.IsConnected)
                             {
-                                //Rotate
-                                var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
-                                var lv = Line.CreateBound(p, end);
+                                XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, connector.Origin, fastVerticalFrm.OffSet);
 
-                                ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                                if (pointOffsetToLevel.IsAlmostEqualTo(connector.Origin))
+                                    continue;
+
+                                XYZ vectorMoveZ = (pointOffsetToLevel - connector.Origin).Normalize();
+
+                                if (vectorMoveZ.IsAlmostEqualTo(XYZ.BasisZ.Negate()))
+                                    continue;
+
+                                if (connector.Origin.IsAlmostEqualTo(pointOffsetToLevel))
+                                    continue;
+
+                                // Create pipe vertical , it perpendicular with pipe horizontal
+                                Pipe pipeVertical = Pipe.Create(Global.UIDoc.Document, mepCurve.GetTypeId(), mepCurve.ReferenceLevel.Id, connector, pointOffsetToLevel);
+
+                                if (pipeVertical != null)
+                                {
+                                    Common.GetConnectorClosedTo(pipeVertical.ConnectorManager, mepCurve.ConnectorManager, out Connector conSt, out Connector conEnd);
+
+                                    if (conSt.IsConnectedTo(conEnd))
+                                        conSt.DisconnectFrom(conEnd);
+
+                                    ConnectPipeVerticalSiphon(Global.UIDoc.Document, pipeVertical, mepCurve, symbol);
+                                }
                             }
                         }
+                        else
+                        {
+                            bool isCop = false;
+                            Connector c = null;
+                            XYZ end1 = new XYZ();
+                            var end = new XYZ(p.X, p.Y, maxZ);
 
-                        CreateSiphon(mepCurve, vertical, fastVerticalFrm.SiphonId);
+                            var elemIds = ElementTransformUtils.CopyElement(
+                                Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                            // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline.
+                            Outline myOutLn = CreateOutLineFromBoundingBox(mepCurve);
+                            if (myOutLn == null || myOutLn.IsEmpty)
+                                continue;
+
+                            // Create a BoundingBoxIntersects filter with this Outline
+                            BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
+
+                            FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document);
+
+                            var fittingConnected = collector.WherePasses(filter).Where(x => x is FamilyInstance).ToList();
+
+                            if (fittingConnected?.Count == 1)
+                            {
+                                var loc = fittingConnected.FirstOrDefault().Location as LocationPoint;
+                                if (loc == null)
+                                    continue;
+
+                                foreach (Connector con1 in mepCurve.ConnectorManager.Connectors)
+                                {
+                                    if (con1.Origin.IsAlmostEqualTo(loc.Point))
+                                    {
+                                        isCop = true;
+                                        continue;
+                                    }
+                                    else
+                                        c = con1;
+                                }
+                            }
+                            else if (fittingConnected?.Count > 1)
+                                continue;
+
+                            var vertical = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                            (vertical.Location as LocationCurve).Curve = Line.CreateBound(p, end);
+
+                            if (isCop)
+                            {
+                                end1 = new XYZ(c.Origin.X, c.Origin.Y, maxZ);
+                                (vertical.Location as LocationCurve).Curve = Line.CreateBound(c.Origin, end1);
+                            }
+
+                            if (vertical as CableTray != null)
+                            {
+                                SetCurveNormal(vertical as CableTray, mepCurve as CableTray);
+                            }
+                            else if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                            {
+                                //Can rotate vertical duct
+                                if (vertical as Autodesk.Revit.DB.Mechanical.Duct != null)
+                                {
+                                    //Rotate
+                                    var a = v.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
+                                    if (!isCop)
+                                    {
+                                        var lv = Line.CreateBound(p, end);
+
+                                        ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                                    }
+                                    else
+                                    {
+                                        var lv = Line.CreateBound(c.Origin, end1);
+
+                                        ElementTransformUtils.RotateElement(Global.UIDoc.Document, vertical.Id, lv, a);
+                                    }
+                                }
+                            }
+
+                            CreateSiphon(mepCurve, vertical, fastVerticalFrm.SiphonId);
+                        }
                     }
                 }
+                if (!isCannot)
+                    IO.ShowWarning(Define.ERR_CAN_NOT_CREATE_THIS_CONNECTION_FOR_THIS_CASE, "Warning");
                 t.Commit();
             }
             catch (Exception ex)
@@ -266,6 +436,26 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
 
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// CreateOutLineFromBoundingBox
+        /// </summary>
+        /// <param name="ele"></param>
+        /// <returns></returns>
+
+        public static Outline CreateOutLineFromBoundingBox(Element ele)
+        {
+            Outline retVal = null;
+            if (ele == null)
+                return retVal;
+            BoundingBoxXYZ boundingBox = ele.get_BoundingBox(null);
+            if (boundingBox == null)
+                return retVal;
+            XYZ min = new XYZ(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z);
+            XYZ max = new XYZ(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z);
+            retVal = new Outline(min, max);
+            return retVal;
         }
 
         private static FamilyInstance CreateSiphon(MEPCurve mepCurve, MEPCurve vertical_pipe, ElementId symbolId)
@@ -424,6 +614,248 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
         }
 
+        /// <summary>
+        /// Kết nối ống nằm ngang với ống đứng bằng kết nối dạng siphon
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pipe1"></param>
+        /// <param name="pipe2"></param>
+        /// <param name="typeSiphon"></param>
+        public static void ConnectPipeVerticalSiphon(Document doc, MEPCurve pipe1, MEPCurve pipe2, FamilySymbol typeSiphon)
+        {
+            if (doc == null || pipe1 == null || pipe2 == null)
+                return;
+            try
+            {
+                if (!typeSiphon.IsActive)
+                    typeSiphon.Activate();
+
+                if (pipe1 != null && pipe2 != null && pipe1.Location is LocationCurve && pipe2.Location is LocationCurve)
+                {
+                    bool isSucces = Common.DetermindPipeVertcalAndHorizontal(pipe1, pipe2, out MEPCurve pipeVertical, out MEPCurve pipeHorizontal);
+
+                    Common.GetConnectorClosedTo(pipeVertical.ConnectorManager, pipeHorizontal.ConnectorManager, out Connector conSt, out Connector conEnd);
+
+                    if (conSt == null || conSt.IsConnected || conEnd == null || conEnd.IsConnected)
+                        return;
+
+                    if (isSucces)
+                    {
+                        // Di chuyển 2 pipe về cùng tâm
+                        Common.MovePipeToCenter(doc, pipeVertical, pipeHorizontal);
+
+                        Connector conLower = Common.GetConnectorMinZ(pipeVertical, out Connector conHigher);
+                        if (conLower == null)
+                            return;
+
+                        //Ngắt kết nối với fitting
+                        Connector conStPipeHor = pipeHorizontal.ConnectorManager.Lookup(0);
+                        Connector conEndPipeHor = pipeHorizontal.ConnectorManager.Lookup(1);
+
+                        FamilyInstance elbowFittingConnectedHor = null;
+                        if (conStPipeHor != null && conEndPipeHor != null)
+                        {
+                            if (conStPipeHor.IsConnected || conEndPipeHor.IsConnected)
+                            {
+                                Connector conNotConnectedHor = (conStPipeHor.IsConnected) ? conStPipeHor : conEndPipeHor;
+
+                                elbowFittingConnectedHor = Common.GetFittingConnected(doc, pipeHorizontal, conNotConnectedHor);
+                                if (elbowFittingConnectedHor != null)
+                                {
+                                    Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, elbowFittingConnectedHor.MEPModel.ConnectorManager, out Connector conPipeHor1, out Connector conFitHor);
+                                    if (conPipeHor1 != null && conFitHor != null && conPipeHor1.IsConnectedTo(conFitHor))
+                                        conPipeHor1.DisconnectFrom(conFitHor);
+                                }
+                            }
+                        }
+
+                        //Connector conHorCheck = ConnectorUtils.GetConnectorNearest(conHigher.Origin, pipeHorizontal, out Connector conUpper);
+
+                        //if (conHorCheck.Origin.Z > conHigher.Origin.Z || Common.IsEqual(conHorCheck.Origin.Z, conHigher.Origin.Z))
+                        //{
+                        //    IO.ShowWarning(Define.ERR_CAN_NOT_CREATE_THIS_CONNECTION_FOR_THIS_CASE, "Warning");
+                        //    return;
+                        //}
+
+                        if (pipeHorizontal.Diameter != pipeVertical.Diameter)
+                            Common.SetValueParameterByBuiltIn(pipeHorizontal, BuiltInParameter.RBS_PIPE_DIAMETER_PARAM, pipeVertical.Diameter);
+
+                        FamilyInstance fittingSiphon = doc.Create.NewFamilyInstance(conLower.Origin, typeSiphon, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+
+                        if (fittingSiphon != null)
+                        {
+                            if (pipeHorizontal.Name.Equals(Define.PIPE_CAST_IRON))
+                            {
+                                //Đặt lại bán kính cho siphon
+                                Common.SetValueParameterByListName(fittingSiphon, pipeVertical.Diameter / 2, "RND");
+
+                                if (!Common.IsSiphonVertical(fittingSiphon))
+                                {
+                                    Line axisY = Line.CreateBound(conLower.Origin, Common.GetPointOnVector(conLower.Origin, XYZ.BasisY, 10));
+                                    fittingSiphon.Location.Rotate(axisY, Math.PI / 2);
+                                }
+
+                                double angle = Common.GetAngleBetweenPipeAndSiphon(pipeHorizontal, fittingSiphon);
+
+                                Line axisZ = Line.CreateBound(conLower.Origin, Common.GetPointOnVector(conLower.Origin, XYZ.BasisZ, 10));
+                                fittingSiphon.Location.Rotate(axisZ, -angle);
+
+                                Connector conSiphonTop = fittingSiphon.MEPModel.ConnectorManager.Lookup(1);
+                                Connector conSiphonRight = fittingSiphon.MEPModel.ConnectorManager.Lookup(2);
+
+                                if (conSiphonTop == null || conSiphonRight == null)
+                                    return;
+
+                                // Kết nối siphon với ống thẳng đứng
+
+                                Connector con1 = Common.GetConnectorNearest(conSiphonTop.Origin, pipeVertical, out Connector con2);
+
+                                Common.ResetLocation(pipeVertical, conSiphonTop.Origin, con2.Origin);
+
+                                Common.GetConnectorClosedTo(pipeVertical.ConnectorManager, fittingSiphon.MEPModel.ConnectorManager, out con1, out con2);
+                                con1.ConnectTo(con2);
+
+                                // Di chuyển pipe nằm ngang đến vị trí mới
+
+                                // Ống nằm ngang
+                                Connector conHor1 = Common.GetConnectorNearest(conSiphonRight.Origin, pipeHorizontal, out Connector conHor2);
+
+                                XYZ vectorMoveZ1 = (conHor1.Origin.Z > conHor2.Origin.Z || Common.IsEqual(conHor1.Origin.Z, conHor2.Origin.Z)) ? XYZ.BasisZ : XYZ.BasisZ.Negate();
+
+                                XYZ newPoint2 = new XYZ(conSiphonRight.Origin.X, conSiphonRight.Origin.Y, conHor2.Origin.Z);
+                                double distance = newPoint2.DistanceTo(conHor2.Origin);
+                                double slope = Math.Round((double)Common.GetValueParameterByBuilt(pipeHorizontal, BuiltInParameter.RBS_PIPE_SLOPE), 5);
+                                newPoint2 = Common.GetPointOnVector(newPoint2, vectorMoveZ1, slope * distance);
+
+                                // Kéo dài ống thẳng đứng và siphon tới ống nằm ngang
+                                double height = Math.Abs(conSiphonRight.Origin.Z - newPoint2.Z);
+
+                                XYZ vectran = (XYZ.BasisZ.Negate()) * height;
+
+                                if (newPoint2.Z > conSiphonRight.Origin.Z)
+                                    ElementTransformUtils.MoveElement(doc, fittingSiphon.Id, vectran.Negate());
+                                else
+                                    ElementTransformUtils.MoveElement(doc, fittingSiphon.Id, vectran);
+
+                                Common.ResetLocation(pipeHorizontal, conHor2.Origin, newPoint2);
+
+                                // Kết nối ống nằm ngang với siphon
+                                Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, fittingSiphon.MEPModel.ConnectorManager, out con1, out con2);
+                                con1.ConnectTo(con2);
+
+                                if (Common.IsEqual(slope, 0))
+                                {
+                                    Connector conStPipe = pipeHorizontal.ConnectorManager.Lookup(0);
+                                    Connector conEndPipe = pipeHorizontal.ConnectorManager.Lookup(1);
+
+                                    if (conStPipe != null && conEndPipe != null)
+                                    {
+                                        if (!conStPipe.IsConnected || !conEndPipe.IsConnected)
+                                        {
+                                            Connector conPipeNotConnected = (!conStPipe.IsConnected) ? conStPipe : conEndPipe;
+
+                                            FamilyInstance elbowFittingConnected = Common.GetFittingConnected(doc, pipeHorizontal, conPipeNotConnected, fittingSiphon.Id);
+                                            if (elbowFittingConnected != null)
+                                            {
+                                                Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, elbowFittingConnected.MEPModel.ConnectorManager, out con1, out con2);
+                                                if (con1 != null && con2 != null && !con1.IsConnected && !con2.IsConnected)
+                                                    con1.ConnectTo(con2);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //Đặt lại bán kính cho siphon
+                                Common.SetValueParameterByListName(fittingSiphon, pipeVertical.Diameter, "REDY_BDN_DN", "ENG_DN");
+
+                                // Quay siphon về ống nằm ngang
+                                Line axisY = Line.CreateBound(conLower.Origin, Common.GetPointOnVector(conLower.Origin, XYZ.BasisY, 10));
+                                fittingSiphon.Location.Rotate(axisY, Math.PI / 2);
+
+                                double angle = Common.GetAngleBetweenPipeAndSiphon(pipeHorizontal, fittingSiphon);
+
+                                Line axisZ = Line.CreateBound(conLower.Origin, Common.GetPointOnVector(conLower.Origin, XYZ.BasisZ, 10));
+                                fittingSiphon.Location.Rotate(axisZ, -angle);
+
+                                // Kết nối siphon với ống thẳng đứng
+                                Common.GetConnectorClosedTo(pipeVertical.ConnectorManager, fittingSiphon.MEPModel.ConnectorManager, out Connector con1, out Connector con2);
+                                con1.ConnectTo(con2);
+
+                                // Di chuyển pipe nằm ngang đến vị trí mới
+                                Connector conNotConnected = fittingSiphon.MEPModel.ConnectorManager.Lookup(1);
+                                if (conNotConnected == null)
+                                    return;
+
+                                // Ống nằm ngang
+                                Connector conHor1 = Common.GetConnectorNearest(conNotConnected.Origin, pipeHorizontal, out Connector conHor2);
+                                XYZ vectorMoveZ1 = (conHor1.Origin.Z > conHor2.Origin.Z || Common.IsEqual(conHor1.Origin.Z, conHor2.Origin.Z)) ? XYZ.BasisZ : XYZ.BasisZ.Negate();
+                                XYZ newPoint2 = new XYZ(conNotConnected.Origin.X, conNotConnected.Origin.Y, conHor2.Origin.Z);
+                                double distance = newPoint2.DistanceTo(conHor2.Origin);
+                                double slope = Math.Round((double)Common.GetValueParameterByBuilt(pipeHorizontal, BuiltInParameter.RBS_PIPE_SLOPE), 5);
+                                newPoint2 = Common.GetPointOnVector(newPoint2, vectorMoveZ1, slope * distance);
+
+                                double height = Math.Abs(conNotConnected.Origin.Z - newPoint2.Z);
+
+                                XYZ vectran = (XYZ.BasisZ.Negate()) * height;
+
+                                if (newPoint2.Z > conNotConnected.Origin.Z)
+                                    ElementTransformUtils.MoveElement(doc, fittingSiphon.Id, vectran.Negate());
+                                else
+                                    ElementTransformUtils.MoveElement(doc, fittingSiphon.Id, vectran);
+
+                                Common.ResetLocation(pipeHorizontal, conHor2.Origin, newPoint2);
+
+                                // Kết nối ống nằm ngang với siphon
+                                Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, fittingSiphon.MEPModel.ConnectorManager, out con1, out con2);
+                                con1.ConnectTo(con2);
+
+                                if (Common.IsEqual(slope, 0))
+                                {
+                                    Connector conStPipe = pipeHorizontal.ConnectorManager.Lookup(0);
+                                    Connector conEndPipe = pipeHorizontal.ConnectorManager.Lookup(1);
+
+                                    if (conStPipe != null && conEndPipe != null)
+                                    {
+                                        if (!conStPipe.IsConnected || !conEndPipe.IsConnected)
+                                        {
+                                            Connector conPipeNotConnected = (!conStPipe.IsConnected) ? conStPipe : conEndPipe;
+
+                                            FamilyInstance elbowFittingConnected = Common.GetFittingConnected(doc, pipeHorizontal, conPipeNotConnected, fittingSiphon.Id);
+                                            if (elbowFittingConnected != null)
+                                            {
+                                                Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, elbowFittingConnected.MEPModel.ConnectorManager, out con1, out con2);
+                                                if (con1 != null && con2 != null && !con1.IsConnected && !con2.IsConnected)
+                                                    con1.ConnectTo(con2);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Join lại fitting
+                        if (elbowFittingConnectedHor != null)
+                        {
+                            Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, elbowFittingConnectedHor.MEPModel.ConnectorManager, out Connector conPipeHor1, out Connector conFitHor);
+                            if (conPipeHor1 != null && conFitHor != null && !conPipeHor1.IsConnected && !conFitHor.IsConnected)
+                            {
+                                elbowFittingConnectedHor.Location.Move(conPipeHor1.Origin - conFitHor.Origin);
+
+                                conPipeHor1.ConnectTo(conFitHor);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                //IO.ShowError(ex.Message, "Error");
+                return;
+            }
+        }
+
         private static void SetCurveNormal(CableTray vertical, CableTray current)
         {
             var curve = current.GetCurve() as Line;
@@ -456,85 +888,6 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
 
             return pipes;
-        }
-
-        private static bool CreateElbowPipeIron(MEPCurve pipeHorizontal, Level level, double offsetFromLevel)
-        {
-            Pipe pipeVertical = null;
-            double slope = Math.Round((double)Common.GetValueParameterByBuilt(pipeHorizontal, BuiltInParameter.RBS_PIPE_SLOPE), 5);
-
-            if (Common.IsEqual(slope, 0))
-            {
-                Connector conHor1 = Common.GetConnectorValid(pipeHorizontal);
-                if (conHor1 != null && !conHor1.IsConnected)
-                {
-                    conHor1 = Common.GetConnectorNearest(conHor1.Origin, pipeHorizontal, out Connector conHor2);
-
-                    XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, offsetFromLevel);
-
-                    if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
-                        return false;
-
-                    pipeVertical = Pipe.Create(Global.UIDoc.Document, pipeHorizontal.GetTypeId(), pipeHorizontal.ReferenceLevel.Id, conHor1, pointOffsetToLevel);
-                    if (pipeVertical == null)
-                        return false; ;
-                }
-            }
-            else
-            {
-                XYZ pointSt = ((LocationCurve)pipeHorizontal.Location).Curve.GetEndPoint(0);
-
-                Connector conSt = Common.GetConnectorNearest(pointSt, pipeHorizontal, out Connector conEnd);
-
-                XYZ pointOffsetToLevelSt = Common.GetPointOffsetFromLevel(level, conSt.Origin, offsetFromLevel);
-
-                XYZ pointOffsetToLevelEnd = Common.GetPointOffsetFromLevel(level, conEnd.Origin, offsetFromLevel);
-
-                bool isTop = false;
-                if (pointOffsetToLevelSt.Z > conSt.Origin.Z && pointOffsetToLevelEnd.Z > conEnd.Origin.Z)
-                    isTop = true;
-
-                Connector retval = null;
-                if (!conSt.IsConnected && !conEnd.IsConnected)
-                {
-                    if (isTop)
-                        retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conSt : conEnd;
-                    else
-                        retval = (conSt.Origin.Z < conEnd.Origin.Z) ? conSt : conEnd;
-
-                    pointOffsetToLevelSt = Common.GetPointOffsetFromLevel(level, retval.Origin, offsetFromLevel);
-                    if (pointOffsetToLevelSt.IsAlmostEqualTo(retval.Origin))
-                        return false;
-
-                    pipeVertical = Pipe.Create(Global.UIDoc.Document, pipeHorizontal.GetTypeId(), pipeHorizontal.ReferenceLevel.Id, retval, pointOffsetToLevelSt);
-                    if (pipeVertical == null)
-                        return false;
-                }
-                else
-                {
-                    Connector conHor1 = Common.GetConnectorValid(pipeHorizontal);
-                    if (conHor1 != null && !conHor1.IsConnected)
-                    {
-                        conHor1 = Common.GetConnectorNearest(conHor1.Origin, pipeHorizontal, out Connector conHor2);
-
-                        XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, offsetFromLevel);
-
-                        if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
-                            return false;
-
-                        pipeVertical = Pipe.Create(Global.UIDoc.Document, pipeHorizontal.GetTypeId(), pipeHorizontal.ReferenceLevel.Id, conHor1, pointOffsetToLevel);
-                        if (pipeVertical == null)
-                            return false;
-                    }
-                }
-            }
-
-            Common.GetConnectorClosedTo(pipeHorizontal.ConnectorManager, pipeVertical.ConnectorManager, out Connector con1, out Connector con2);
-            if (con1 != null && con2 != null && con1.IsConnectedTo(con2))
-                con1.DisconnectFrom(con2);
-            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, pipeHorizontal, pipeVertical, true);
-
-            return true;
         }
 
         private void MoveToOldPosition(List<ElementId> ids, Line old_curve, XYZ oldPoint, XYZ current)
