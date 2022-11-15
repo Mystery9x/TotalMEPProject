@@ -27,6 +27,36 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8EC822E2735F41BD91543CB99FEA81FD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_91D018E5DAEA4BE1B87F56A807704F7A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A07231FCEDD828AAAEFCB97F5FB97E80"
+        "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A7013E5B305F42E8AEDCCBD852FB23BF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D1A049D263C44A2E91817DC881053403"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F8DFC199D21D4C1FAF32FC928EC95524"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -41,6 +71,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_6CA13111E06004AFFB3FAFBCD8AAD111"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A07231FCEDD828AAAEFCB97F5FB97E80"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -442,6 +478,117 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_184183A6EFDA4C4EA3FC772C576789F1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8EC822E2735F41BD91543CB99FEA81FD"
+            {
+            "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Holy Updown-01.png"
+            "TargetName" = "8:Holy Updown-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_BF095F42A26F476ABE604E6F5677F140"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_91D018E5DAEA4BE1B87F56A807704F7A"
+            {
+            "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Vertical Connection-01.png"
+            "TargetName" = "8:Vertical Connection-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_BF095F42A26F476ABE604E6F5677F140"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A07231FCEDD828AAAEFCB97F5FB97E80"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:AdWindows, Version=2016.11.4.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_A07231FCEDD828AAAEFCB97F5FB97E80"
+                    {
+                    "Name" = "8:AdWindows.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:AdWindows.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_184183A6EFDA4C4EA3FC772C576789F1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A7013E5B305F42E8AEDCCBD852FB23BF"
+            {
+            "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Vertical MEP-01.png"
+            "TargetName" = "8:Vertical MEP-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_BF095F42A26F476ABE604E6F5677F140"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D1A049D263C44A2E91817DC881053403"
+            {
+            "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Fast Vertical-01.png"
+            "TargetName" = "8:Fast Vertical-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_BF095F42A26F476ABE604E6F5677F140"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

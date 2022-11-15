@@ -15,7 +15,25 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_0D05F3E934B040ADA9AF22D0F79F80E2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_39AE9618FEE84FCB002FC4545AA1ABE4"
+        "OwnerKey" = "8:_F217115B31E0475B9AC355ABD16F78F9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3F433411303043BCA16CF1247E0FA4E2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B5F6C00E165840C5B407906E5851EF6B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -23,6 +41,18 @@
         {
         "MsmKey" = "8:_C7898F242D23C398D779AAE9E6E44604"
         "OwnerKey" = "8:_F217115B31E0475B9AC355ABD16F78F9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ECFEB2ECC2EC4F449189D49E0490BFCA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F0183BC33290403E81155E9E89C3BAD1"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -41,6 +71,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_C7898F242D23C398D779AAE9E6E44604"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_39AE9618FEE84FCB002FC4545AA1ABE4"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -394,12 +430,83 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0D05F3E934B040ADA9AF22D0F79F80E2"
+            {
+            "SourcePath" = "8:..\\Output\\2021\\TotalMEPTools\\Icon\\Vertical MEP-01.png"
+            "TargetName" = "8:Vertical MEP-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_09F7987626304E68B97D72CFA42CC970"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_39AE9618FEE84FCB002FC4545AA1ABE4"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:AdWindows, Version=3.0.4.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_39AE9618FEE84FCB002FC4545AA1ABE4"
+                    {
+                    "Name" = "8:AdWindows.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:AdWindows.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_FDFEB5B7FD4D405ABF0AF3FA0DF42D01"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3F433411303043BCA16CF1247E0FA4E2"
             {
             "SourcePath" = "8:..\\Output\\2021\\TotalMEPTools.addin"
             "TargetName" = "8:TotalMEPTools.addin"
             "Tag" = "8:"
             "Folder" = "8:_2F55095FA2DB412286FF01A9793AE749"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B5F6C00E165840C5B407906E5851EF6B"
+            {
+            "SourcePath" = "8:..\\Output\\2021\\TotalMEPTools\\Icon\\Vertical Connection-01.png"
+            "TargetName" = "8:Vertical Connection-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_09F7987626304E68B97D72CFA42CC970"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -443,6 +550,46 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ECFEB2ECC2EC4F449189D49E0490BFCA"
+            {
+            "SourcePath" = "8:..\\Output\\2021\\TotalMEPTools\\Icon\\Holy Updown-01.png"
+            "TargetName" = "8:Holy Updown-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_09F7987626304E68B97D72CFA42CC970"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F0183BC33290403E81155E9E89C3BAD1"
+            {
+            "SourcePath" = "8:..\\Output\\2021\\TotalMEPTools\\Icon\\Fast Vertical-01.png"
+            "TargetName" = "8:Fast Vertical-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_09F7987626304E68B97D72CFA42CC970"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F217115B31E0475B9AC355ABD16F78F9"

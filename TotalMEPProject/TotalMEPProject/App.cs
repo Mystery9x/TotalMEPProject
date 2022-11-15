@@ -127,23 +127,18 @@ namespace TotalMEPProject
 
             //Create button
             PushButtonData veticalMEPData = new PushButtonData("btnVeticalMEP", "Vetical\nMEP", assemblyPath, Define.CmdVerticalMEPClassName);
-            //AddImages(veticalMEPData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(veticalMEPData, iconFolder, "Vertical MEP-01.png", "Vertical MEP-01.png");
             totalMEPPanel.AddItem(veticalMEPData);
 
             //Create button
             PushButtonData fastVerticalData = new PushButtonData("btnFastVertical", "Fast\nVertical", assemblyPath, Define.CmdFastVerticalClassName);
-            //AddImages(fastVerticalData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(fastVerticalData, iconFolder, "Fast Vertical-01.png", "Fast Vertical-01.png");
             totalMEPPanel.AddItem(fastVerticalData);
 
             //Create button
             PushButtonData HolyUpdownData = new PushButtonData("btnHolyUpdown", "Holy\nUpdown", assemblyPath, Define.CmdHolyUpdownClassName);
-            //AddImages(HolyUpdownData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(HolyUpdownData, iconFolder, "Holy Updown-01.png", "Holy Updown-01.png");
             totalMEPPanel.AddItem(HolyUpdownData);
-
-            //Create button
-            PushButtonData changeElevationData = new PushButtonData("btnChangeElevation", "Change\nElevation", assemblyPath, Define.CmdChangeElevationClassName);
-            //AddImages(changeElevationData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
-            totalMEPPanel.AddItem(changeElevationData);
 
             //Create button
             PushButtonData MEPConnectionData = new PushButtonData("btnMEPConnection", "MEP\nConnection", assemblyPath, Define.CmdMEPConnectionClassName);
