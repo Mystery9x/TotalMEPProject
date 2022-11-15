@@ -15,7 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_6CA13111E06004AFFB3FAFBCD8AAD111"
+        "MsmKey" = "8:_136A4AA233910A55771FB91F3F7FB3D4"
+        "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_45C49635C6C1EA707F6345562A60C457"
         "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -39,12 +45,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A07231FCEDD828AAAEFCB97F5FB97E80"
-        "OwnerKey" = "8:_8867F0CD14AB4945BAF440C07AEEDF5A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_A7013E5B305F42E8AEDCCBD852FB23BF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -52,6 +52,12 @@
         "Entry"
         {
         "MsmKey" = "8:_D1A049D263C44A2E91817DC881053403"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F4A991045AD1460A8BB3EF4F2D4F590F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -70,13 +76,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6CA13111E06004AFFB3FAFBCD8AAD111"
+        "OwnerKey" = "8:_45C49635C6C1EA707F6345562A60C457"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A07231FCEDD828AAAEFCB97F5FB97E80"
+        "OwnerKey" = "8:_136A4AA233910A55771FB91F3F7FB3D4"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -430,14 +436,45 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6CA13111E06004AFFB3FAFBCD8AAD111"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_136A4AA233910A55771FB91F3F7FB3D4"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:AdWindows, Version=2016.11.4.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_136A4AA233910A55771FB91F3F7FB3D4"
+                    {
+                    "Name" = "8:AdWindows.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:AdWindows.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_184183A6EFDA4C4EA3FC772C576789F1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_45C49635C6C1EA707F6345562A60C457"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_6CA13111E06004AFFB3FAFBCD8AAD111"
+                    "_45C49635C6C1EA707F6345562A60C457"
                     {
                     "Name" = "8:Newtonsoft.Json.dll"
                     "Attributes" = "3:512"
@@ -532,37 +569,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A07231FCEDD828AAAEFCB97F5FB97E80"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:AdWindows, Version=2016.11.4.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_A07231FCEDD828AAAEFCB97F5FB97E80"
-                    {
-                    "Name" = "8:AdWindows.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:AdWindows.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_184183A6EFDA4C4EA3FC772C576789F1"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A7013E5B305F42E8AEDCCBD852FB23BF"
             {
             "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Vertical MEP-01.png"
@@ -587,6 +593,26 @@
             {
             "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Fast Vertical-01.png"
             "TargetName" = "8:Fast Vertical-01.png"
+            "Tag" = "8:"
+            "Folder" = "8:_BF095F42A26F476ABE604E6F5677F140"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F4A991045AD1460A8BB3EF4F2D4F590F"
+            {
+            "SourcePath" = "8:..\\Output\\2020\\TotalMEPTools\\Icon\\Setting.png"
+            "TargetName" = "8:Setting.png"
             "Tag" = "8:"
             "Folder" = "8:_BF095F42A26F476ABE604E6F5677F140"
             "Condition" = "8:"
@@ -779,7 +805,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TotalMEPInstaller2020"
         "ProductCode" = "8:{704FD4B2-50CB-4B73-8758-3C6C829AD1FA}"
-        "PackageCode" = "8:{C1AD4A21-5DE9-44FB-BE60-38D5DB19C613}"
+        "PackageCode" = "8:{366D9776-0158-4659-9ACE-7008F65B3FE5}"
         "UpgradeCode" = "8:{A597C705-0F45-40EB-8B39-186FD0360790}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"

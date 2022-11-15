@@ -101,7 +101,7 @@ namespace TotalMEPProject
 
             //Create button
             PushButtonData loginData = new PushButtonData("btnLogin", "License Server", assemblyPath, Define.CmdLoginClassName);
-            //AddImages(loginData, iconFolder, "Setting.png", "Setting.png");
+            AddImages(loginData, iconFolder, "Setting.png", "Setting.png");
             loginHangerPanel.AddItem(loginData);
         }
 
@@ -122,7 +122,7 @@ namespace TotalMEPProject
 
             //Create button
             PushButtonData pickLineData = new PushButtonData("btnPickLine", "PickLine", assemblyPath, Define.CmdPickLineClassName);
-            //AddImages(veticalMEPData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(pickLineData, iconFolder, "Vertical MEP-01.png", "Vertical MEP-01.png");
             totalMEPPanel.AddItem(pickLineData);
 
             //Create button
@@ -142,7 +142,7 @@ namespace TotalMEPProject
 
             //Create button
             PushButtonData MEPConnectionData = new PushButtonData("btnMEPConnection", "MEP\nConnection", assemblyPath, Define.CmdMEPConnectionClassName);
-            //AddImages(reinforcedHangerData, iconFolder, "Re-Inforced Hanger.png", "Re-Inforced Hanger.png");
+            AddImages(MEPConnectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             totalMEPPanel.AddItem(MEPConnectionData);
         }
 
@@ -164,40 +164,41 @@ namespace TotalMEPProject
             ////Create button
             PulldownButtonData groupVerticalData = new PulldownButtonData("PulldownGroup1", "Vertical\nConnection");
             PulldownButton groupVertical = plumbingPanel.AddItem(groupVerticalData) as PulldownButton;
+            AddImagesPullDown(groupVertical, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
 
             //Create button
             PushButtonData veticalWYEData = new PushButtonData("btnVeticalWYE", "Vetical WYED\nConnection 1", assemblyPath, Define.CmdVerticalWYEConnection1ClassName);
-            //AddImages(veticalWYEData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(veticalWYEData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupVertical.AddPushButton(veticalWYEData);
 
             //Create button
             PushButtonData verticalTeeConnectionData = new PushButtonData("btnVerticalTeeConnection", "Vertical Tee\nConnection", assemblyPath, Define.CmdVeticalTeeConnectionClassName);
-            //AddImages(verticalTeeConnectionData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(verticalTeeConnectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupVertical.AddPushButton(verticalTeeConnectionData);
 
             //Create button
             PushButtonData createEndCapData = new PushButtonData("btnCreateEndCap", "Create\nEnd Cap", assemblyPath, Define.CmdCreateEndCapClassName);
-            //AddImages(createEndCapData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(createEndCapData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             plumbingPanel.AddItem(createEndCapData);
 
             //Create button
             PushButtonData extendPipeData = new PushButtonData("btnExtendPipe", "Extend\nPipe", assemblyPath, Define.CmdExtendPipeClassName);
-            //AddImages(extendPipeData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(extendPipeData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             plumbingPanel.AddItem(extendPipeData);
 
             //Create button
             PushButtonData slopePipeConnectionData = new PushButtonData("btnSlopePipeConnection", "Slope Pipe\nConnection", assemblyPath, Define.CmdSlopePipeConnectionClassName);
-            //AddImages(slopePipeConnectionData, iconFolder, "Re-Inforced Hanger.png", "Re-Inforced Hanger.png");
+            AddImages(slopePipeConnectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             plumbingPanel.AddItem(slopePipeConnectionData);
 
             //Create button
             PushButtonData createCouplingData = new PushButtonData("btnCreateCoupling", "Create\nCoupling", assemblyPath, Define.CmdCreateCouplingClassName);
-            //AddImages(createCouplingData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(createCouplingData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             plumbingPanel.AddItem(createCouplingData);
 
             //Create button
             PushButtonData createNippleData = new PushButtonData("btnCreateNipple", "Create\nNipple", assemblyPath, Define.CmdCreateNippleClassName);
-            //AddImages(createNippleData, iconFolder, "Re-Inforced Hanger.png", "Re-Inforced Hanger.png");
+            AddImages(createNippleData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             plumbingPanel.AddItem(createNippleData);
         }
 
@@ -218,26 +219,27 @@ namespace TotalMEPProject
 
             //Create button
             PushButtonData levelSmartData = new PushButtonData("btnLevelSmart", "2level\nSmart", assemblyPath, Define.Cmd2LevelSmartClassName);
-            //AddImages(levelSmartData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(levelSmartData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             fireFightingPanel.AddItem(levelSmartData);
 
             ////Create button
             PulldownButtonData groupSprinklerData = new PulldownButtonData("Sprinkler", "Sprinkler\nConnection");
             PulldownButton groupSprinkler = fireFightingPanel.AddItem(groupSprinklerData) as PulldownButton;
+            AddImagesPullDown(groupSprinkler, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
 
             //Create button
             PushButtonData sprinklerUprightData = new PushButtonData("btnSprinklerUpright", "Sprinkler\nUpright", assemblyPath, Define.CmdSprinklerUprightClassName);
-            //AddImages(sprinklerUprightData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(sprinklerUprightData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSprinkler.AddPushButton(sprinklerUprightData);
 
             //Create button
             PushButtonData sprinklerDownrightData = new PushButtonData("btnSprinklerDownright", "Sprinkler\nDownright", assemblyPath, Define.CmdSprinklerDownrightClassName);
-            //AddImages(sprinklerDownrightData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(sprinklerDownrightData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSprinkler.AddPushButton(sprinklerDownrightData);
 
             //Create button
             PushButtonData flexSprinkerData = new PushButtonData("btnFlexSprinker", "Flex Sprinker", assemblyPath, Define.CmdFlexSprinklerClassName);
-            //AddImages(flexSprinkerData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(flexSprinkerData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSprinkler.AddPushButton(flexSprinkerData);
         }
 
@@ -259,30 +261,31 @@ namespace TotalMEPProject
             ////Create button
             PulldownButtonData groupSplitData = new PulldownButtonData("SplitDuct", "Split\nDuct");
             PulldownButton groupSplit = ductPanel.AddItem(groupSplitData) as PulldownButton;
+            AddImagesPullDown(groupSplit, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
 
             //Create button
             PushButtonData splitDuctData = new PushButtonData("btnSplitDuct", "Setting", assemblyPath, Define.CmdSplitDuctClassName);
-            //AddImages(splitDuctData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(splitDuctData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSplit.AddPushButton(splitDuctData);
 
             //Create button
             PushButtonData deleteUnionData = new PushButtonData("btnDeleteUnion", "Delete\nUnion", assemblyPath, Define.CmdDeleteUnionClassName);
-            //AddImages(deleteUnionData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(deleteUnionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSplit.AddPushButton(deleteUnionData);
 
             //Create button
             PushButtonData diffuserConnectionData = new PushButtonData("btnDiffuserConnection", "Diffuser\nConnection", assemblyPath, Define.CmdDiffuserConnectionClassName);
-            //AddImages(diffuserConnectionData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(diffuserConnectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             ductPanel.AddItem(diffuserConnectionData);
 
             //Create button
             PushButtonData tapFlipData = new PushButtonData("btnTapFlip", "Tap\nFlip", assemblyPath, Define.CmdTapFlipClassName);
-            //AddImages(tapFlipData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(tapFlipData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             ductPanel.AddItem(tapFlipData);
 
             //Create button
             PushButtonData grillOnDuctData = new PushButtonData("btnGrillOnDuct", "Grill On Duct", assemblyPath, Define.CmdGrillOnDuctClassName);
-            //AddImages(grillOnDuctData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(grillOnDuctData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             ductPanel.AddItem(grillOnDuctData);
         }
 
@@ -304,49 +307,51 @@ namespace TotalMEPProject
             ////Create button
             PulldownButtonData groupOpeningData = new PulldownButtonData("PulldownGroup1", "Opening");
             PulldownButton groupOpening = openingPanel.AddItem(groupOpeningData) as PulldownButton;
+            AddImagesPullDown(groupOpening, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
 
             //Create button
             PushButtonData createOpeningData = new PushButtonData("btnCreateOpening", "Create\nOpening", assemblyPath, Define.CmdCreateOpeningClassName);
-            //AddImages(createOpeningData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(createOpeningData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupOpening.AddPushButton(createOpeningData);
 
             PushButtonData deleteAllData = new PushButtonData("btnDeleteAll", "Delete All", assemblyPath, Define.CmdDeleteAllOpeningClassName);
-            //AddImages(deleteAllData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(deleteAllData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupOpening.AddPushButton(deleteAllData);
 
             PushButtonData deleteBySelectionOpeningData = new PushButtonData("btnDeleteSelection", "Delete By Selection", assemblyPath, Define.CmdDeleteBySelectionOpeningClassName);
-            //AddImages(deleteAllSleeveData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(deleteBySelectionOpeningData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupOpening.AddPushButton(deleteBySelectionOpeningData);
 
             ////Create button
             PulldownButtonData groupSleeveData = new PulldownButtonData("PulldownGroup2", "Sleeve");
             PulldownButton groupSleeve = openingPanel.AddItem(groupSleeveData) as PulldownButton;
+            AddImagesPullDown(groupSleeve, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
 
             //Create button
             PushButtonData createSleeveData = new PushButtonData("btnCreateSleeve", "Create\nSleeve", assemblyPath, Define.CmdCreateSleeveClassName);
-            //AddImages(createSleeveData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(createSleeveData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSleeve.AddPushButton(createSleeveData);
 
             PushButtonData deleteAllSleeveData = new PushButtonData("btnDeleteAll", "Delete All", assemblyPath, Define.CmdDeleteAllSleeveClassName);
-            //AddImages(deleteAllSleeveData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(deleteAllSleeveData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSleeve.AddPushButton(deleteAllSleeveData);
 
             PushButtonData deleteBySelectionData = new PushButtonData("btnDeleteSelection", "Delete By Selection", assemblyPath, Define.CmdDeleteBySelectionSleeveClassName);
-            //AddImages(deleteAllSleeveData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(deleteBySelectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupSleeve.AddPushButton(deleteBySelectionData);
 
             ////Create button
             PulldownButtonData groupChangeData = new PulldownButtonData("PulldownGroupChange", "Change \nObject");
             PulldownButton groupChange = openingPanel.AddItem(groupChangeData) as PulldownButton;
-
+            AddImagesPullDown(groupChange, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             //Create button
             PushButtonData changeOpeningData = new PushButtonData("btnChangeOpening", "Change Opening", assemblyPath, Define.CmdChangeOpeningClassName);
-            //AddImages(changeObjectData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(changeOpeningData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupChange.AddPushButton(changeOpeningData);
 
             //Create button
             PushButtonData changeSleeveData = new PushButtonData("btnChangeSleeve", "Change Sleeve", assemblyPath, Define.CmdChangeSleeveClassName);
-            //AddImages(changeObjectData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(changeSleeveData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             groupChange.AddPushButton(changeSleeveData);
         }
 
@@ -367,41 +372,42 @@ namespace TotalMEPProject
 
             //Create button
             PushButtonData fittingRotationData = new PushButtonData("btnFittingRotation", "Fitting\nRotation", assemblyPath, Define.CmdFittingRotationClassName);
-            //AddImages(fittingRotationData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(fittingRotationData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             modifyPanel.AddItem(fittingRotationData);
 
             ////Create button
             PulldownButtonData groupData = new PulldownButtonData("PulldownGroup2", "Tee Tap\nTransfer");
             PulldownButton group = modifyPanel.AddItem(groupData) as PulldownButton;
+            AddImagesPullDown(group, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
 
             //Create button
             PushButtonData tapToTeeData = new PushButtonData("btnTapToTee", "Tap To Tee", assemblyPath, Define.CmdTapToTeeClassName);
-            //AddImages(tapToTeeData, iconFolder, "LoadFamily.png", "LoadFamily.png");
+            AddImages(tapToTeeData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             group.AddPushButton(tapToTeeData);
 
             //Create button
             PushButtonData teeToTapData = new PushButtonData("btnTeeToTap", "Tee To Tap", assemblyPath, Define.CmdTeeToTapClassName);
-            //AddImages(teeToTapData, iconFolder, "Manual Hanger.png", "Manual Hanger.png");
+            AddImages(teeToTapData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             group.AddPushButton(teeToTapData);
 
             //Create button
             PushButtonData blockCADToFamilyData = new PushButtonData("btnBlockCADToFamily", "Block CAD\nTo Family", assemblyPath, Define.CmdBlockCADToFamilyClassName);
-            //AddImages(blockCADToFamilyData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(blockCADToFamilyData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             modifyPanel.AddItem(blockCADToFamilyData);
 
             //Create button
             PushButtonData smartSelectionData = new PushButtonData("btnSmartSelection", "Smart\nSelection", assemblyPath, Define.CmdSmartSelectionClassName);
-            //AddImages(smartSelectionData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(smartSelectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             modifyPanel.AddItem(smartSelectionData);
 
             //Create button
             PushButtonData flipSelectionData = new PushButtonData("btnFlipSelection", "Flip\nSelection", assemblyPath, Define.CmdFlipSelectionClassName);
-            //AddImages(flipSelectionData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(flipSelectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             modifyPanel.AddItem(flipSelectionData);
 
             //Create button
             PushButtonData moveFittingData = new PushButtonData("btnMoveFitting", "Move\nFitting", assemblyPath, Define.CmdMoveFittingClassName);
-            //AddImages(moveFittingData, iconFolder, "Auto Hanger.png", "Auto Hanger.png");
+            AddImages(moveFittingData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
             modifyPanel.AddItem(moveFittingData);
         }
 
@@ -413,6 +419,31 @@ namespace TotalMEPProject
         /// <param name="largeImage"></param>
         /// <param name="smallImage"></param>
         private void AddImages(ButtonData buttonData,
+                               string iconFolder,
+                               string largeImage,
+                               string smallImage)
+        {
+            if (!string.IsNullOrEmpty(iconFolder)
+                && Directory.Exists(iconFolder))
+            {
+                string largeImagePath = Path.Combine(iconFolder, largeImage);
+                if (File.Exists(largeImagePath))
+                    buttonData.LargeImage = new BitmapImage(new Uri(largeImagePath));
+
+                string smallImagePath = Path.Combine(iconFolder, smallImage);
+                if (File.Exists(smallImagePath))
+                    buttonData.Image = new BitmapImage(new Uri(smallImagePath));
+            }
+        }
+
+        /// <summary>
+        /// Add images
+        /// </summary>
+        /// <param name="buttonData"></param>
+        /// <param name="iconFolder"></param>
+        /// <param name="largeImage"></param>
+        /// <param name="smallImage"></param>
+        private void AddImagesPullDown(PulldownButton buttonData,
                                string iconFolder,
                                string largeImage,
                                string smallImage)
