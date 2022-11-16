@@ -158,7 +158,7 @@ namespace TotalMEPProject.UI
 
         private void txtDistance_KeyPress(object sender, KeyPressEventArgs e)
         {
-            NumberCheck(sender, e, false);
+            NumberCheck(sender, e, true);
         }
 
         private void HolyUpDownForm_Load(object sender, EventArgs e)
