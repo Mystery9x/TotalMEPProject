@@ -13,6 +13,10 @@ namespace TotalMEPProject.Request
         HolyUpdown,
         HolyUpDown_PickObjects,
         HolyUpDown_OK,
+        HolyUpDown_UpStep,
+        HolyUpDown_DownStep,
+        HolyUpDown_UpElbowControl,
+        HolyUpDown_DownElbowControl,
     }
 
     public class Request

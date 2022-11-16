@@ -80,6 +80,54 @@ namespace TotalMEPProject.UI
             }
         }
 
+        public double UpStepValue
+        {
+            get
+            {
+                double dvalue = 0;
+                if (double.TryParse(txtUpdownStepValue.Text.Trim(), out dvalue) == false)
+                    return double.MinValue;
+                else
+                    return dvalue;
+            }
+        }
+
+        public double DownStepValue
+        {
+            get
+            {
+                double dvalue = 0;
+                if (double.TryParse(txtUpdownStepValue.Text.Trim(), out dvalue) == false)
+                    return double.MinValue;
+                else
+                    return dvalue;
+            }
+        }
+
+        public double UpElbowControlValue
+        {
+            get
+            {
+                double dvalue = 0;
+                if (double.TryParse(txtEblowControlValue.Text.Trim(), out dvalue) == false)
+                    return double.MinValue;
+                else
+                    return dvalue;
+            }
+        }
+
+        public double DownElbowControlValue
+        {
+            get
+            {
+                double dvalue = 0;
+                if (double.TryParse(txtEblowControlValue.Text.Trim(), out dvalue) == false)
+                    return double.MinValue;
+                else
+                    return dvalue;
+            }
+        }
+
         #endregion Properties
 
         #region Constructor
@@ -134,6 +182,38 @@ namespace TotalMEPProject.UI
 
             //Events
             Global.UIApp.PostCommand(id);
+        }
+
+        private void btnUpStep_Click(object sender, EventArgs e)
+        {
+            if (UpStepValue == double.MinValue)
+                return;
+
+            MakeRequest(RequestId.HolyUpDown_UpStep);
+        }
+
+        private void btnDownStep_Click(object sender, EventArgs e)
+        {
+            if (UpStepValue == double.MinValue)
+                return;
+
+            MakeRequest(RequestId.HolyUpDown_DownStep);
+        }
+
+        private void btnUpElbowControl_Click(object sender, EventArgs e)
+        {
+            if (UpStepValue == double.MinValue)
+                return;
+
+            MakeRequest(RequestId.HolyUpDown_UpElbowControl);
+        }
+
+        private void btnDownElbowControl_Click(object sender, EventArgs e)
+        {
+            if (UpStepValue == double.MinValue)
+                return;
+
+            MakeRequest(RequestId.HolyUpDown_DownElbowControl);
         }
 
         private void txtAngle_KeyPress(object sender, KeyPressEventArgs e)

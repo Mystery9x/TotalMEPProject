@@ -36,8 +36,8 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
+            this.btnUpElbowControl = new System.Windows.Forms.Button();
+            this.btnDownElbowControl = new System.Windows.Forms.Button();
             this.txtEblowControlValue = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -52,8 +52,8 @@
             this.radNotApply = new System.Windows.Forms.RadioButton();
             this.txtDistance = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnUpStep = new System.Windows.Forms.Button();
+            this.btnDownStep = new System.Windows.Forms.Button();
             this.txtUpdownStepValue = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.radOE = new System.Windows.Forms.RadioButton();
@@ -168,8 +168,8 @@
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Controls.Add(this.button3, 0, 0);
-            this.tableLayoutPanel5.Controls.Add(this.button4, 1, 0);
+            this.tableLayoutPanel5.Controls.Add(this.btnUpElbowControl, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.btnDownElbowControl, 1, 0);
             this.tableLayoutPanel5.Controls.Add(this.txtEblowControlValue, 2, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(140, 90);
@@ -180,28 +180,30 @@
             this.tableLayoutPanel5.Size = new System.Drawing.Size(329, 30);
             this.tableLayoutPanel5.TabIndex = 59;
             // 
-            // button3
+            // btnUpElbowControl
             // 
-            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.ForeColor = System.Drawing.Color.Blue;
-            this.button3.Location = new System.Drawing.Point(5, 0);
-            this.button3.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(28, 28);
-            this.button3.TabIndex = 0;
-            this.button3.Text = "➕";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnUpElbowControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUpElbowControl.ForeColor = System.Drawing.Color.Blue;
+            this.btnUpElbowControl.Location = new System.Drawing.Point(5, 0);
+            this.btnUpElbowControl.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
+            this.btnUpElbowControl.Name = "btnUpElbowControl";
+            this.btnUpElbowControl.Size = new System.Drawing.Size(28, 28);
+            this.btnUpElbowControl.TabIndex = 0;
+            this.btnUpElbowControl.Text = "➕";
+            this.btnUpElbowControl.UseVisualStyleBackColor = true;
+            this.btnUpElbowControl.Click += new System.EventHandler(this.btnUpElbowControl_Click);
             // 
-            // button4
+            // btnDownElbowControl
             // 
-            this.button4.ForeColor = System.Drawing.Color.Red;
-            this.button4.Location = new System.Drawing.Point(45, 0);
-            this.button4.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(28, 28);
-            this.button4.TabIndex = 1;
-            this.button4.Text = "➖";
-            this.button4.UseVisualStyleBackColor = true;
+            this.btnDownElbowControl.ForeColor = System.Drawing.Color.Red;
+            this.btnDownElbowControl.Location = new System.Drawing.Point(45, 0);
+            this.btnDownElbowControl.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
+            this.btnDownElbowControl.Name = "btnDownElbowControl";
+            this.btnDownElbowControl.Size = new System.Drawing.Size(28, 28);
+            this.btnDownElbowControl.TabIndex = 1;
+            this.btnDownElbowControl.Text = "➖";
+            this.btnDownElbowControl.UseVisualStyleBackColor = true;
+            this.btnDownElbowControl.Click += new System.EventHandler(this.btnDownElbowControl_Click);
             // 
             // txtEblowControlValue
             // 
@@ -353,8 +355,8 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Controls.Add(this.button1, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.button2, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.btnUpStep, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.btnDownStep, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.txtUpdownStepValue, 2, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(140, 60);
@@ -365,28 +367,30 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(329, 30);
             this.tableLayoutPanel3.TabIndex = 56;
             // 
-            // button1
+            // btnUpStep
             // 
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.ForeColor = System.Drawing.Color.Blue;
-            this.button1.Location = new System.Drawing.Point(5, 0);
-            this.button1.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(28, 28);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "➕";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnUpStep.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUpStep.ForeColor = System.Drawing.Color.Blue;
+            this.btnUpStep.Location = new System.Drawing.Point(5, 0);
+            this.btnUpStep.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
+            this.btnUpStep.Name = "btnUpStep";
+            this.btnUpStep.Size = new System.Drawing.Size(28, 28);
+            this.btnUpStep.TabIndex = 0;
+            this.btnUpStep.Text = "➕";
+            this.btnUpStep.UseVisualStyleBackColor = true;
+            this.btnUpStep.Click += new System.EventHandler(this.btnUpStep_Click);
             // 
-            // button2
+            // btnDownStep
             // 
-            this.button2.ForeColor = System.Drawing.Color.Red;
-            this.button2.Location = new System.Drawing.Point(45, 0);
-            this.button2.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(28, 28);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "➖";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnDownStep.ForeColor = System.Drawing.Color.Red;
+            this.btnDownStep.Location = new System.Drawing.Point(45, 0);
+            this.btnDownStep.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
+            this.btnDownStep.Name = "btnDownStep";
+            this.btnDownStep.Size = new System.Drawing.Size(28, 28);
+            this.btnDownStep.TabIndex = 1;
+            this.btnDownStep.Text = "➖";
+            this.btnDownStep.UseVisualStyleBackColor = true;
+            this.btnDownStep.Click += new System.EventHandler(this.btnDownStep_Click);
             // 
             // txtUpdownStepValue
             // 
@@ -483,15 +487,15 @@
         private System.Windows.Forms.RadioButton radNotApply;
         private System.Windows.Forms.TextBox txtDistance;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnUpStep;
+        private System.Windows.Forms.Button btnDownStep;
         private System.Windows.Forms.TextBox txtUpdownStepValue;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
         private System.Windows.Forms.RadioButton radOE;
         private System.Windows.Forms.RadioButton radPTE;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btnUpElbowControl;
+        private System.Windows.Forms.Button btnDownElbowControl;
         private System.Windows.Forms.TextBox txtEblowControlValue;
     }
 }

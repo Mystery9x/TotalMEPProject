@@ -970,5 +970,143 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
             return targetConnector;
         }
+
+        public static Result Run_UpDownStep(bool downStep = false)
+        {
+            try
+            {
+                if (App.m_HolyUpDownForm == null)
+                    return Result.Cancelled;
+
+                List<MEPCurve> mepCurveSelects = GetSelectedMEP();
+                if (mepCurveSelects == null || mepCurveSelects.Count == 0)
+                    return Result.Cancelled;
+
+                double dStepValue = UnitUtils.ConvertToInternalUnits(Math.Abs(App.m_HolyUpDownForm.UpStepValue), DisplayUnitType.DUT_MILLIMETERS);
+
+                foreach (MEPCurve mepCurve in mepCurveSelects)
+                {
+                    double dOldOffsetParamVal = GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
+                                                != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
+
+                    if (dOldOffsetParamVal == double.MinValue)
+                        continue;
+                    using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "HOLYUPDOWN_UPSTEP"))
+                    {
+                        if (reTrans.Start() == TransactionStatus.Started)
+                        {
+                            try
+                            {
+                                double dNewOffsetParamVal = downStep == false ? dOldOffsetParamVal + dStepValue : dOldOffsetParamVal - dStepValue;
+                                SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, dNewOffsetParamVal);
+                                reTrans.Commit();
+                            }
+                            catch (Exception)
+                            {
+                                reTrans.RollBack();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return Result.Cancelled;
+        }
+
+        public static Result Run_UpDownElbowControl(bool downElbowControl = false)
+        {
+            try
+            {
+            }
+            catch (Exception)
+            {
+            }
+            return Result.Cancelled;
+        }
+
+        /// <summary>
+        /// set builtin parameter value
+        /// </summary>
+        public static bool SetBuiltinParameterValue(Element elem, BuiltInParameter paramId, object value)
+        {
+            Parameter param = elem.get_Parameter(paramId);
+            return SetParameterValue(param, value);
+        }
+
+        /// <summary>
+        /// Set value to parameter based on its storage type
+        /// </summary>
+        private static bool SetParameterValue(Parameter param, object value)
+        {
+            if (param != null
+                && !param.IsReadOnly
+                && value != null)
+            {
+                try
+                {
+                    switch (param.StorageType)
+                    {
+                        case StorageType.Integer:
+                            param.Set((int)value);
+                            break;
+
+                        case StorageType.Double:
+                            param.Set((double)value);
+                            break;
+
+                        case StorageType.String:
+                            param.Set((string)value);
+                            break;
+
+                        case StorageType.ElementId:
+                            param.Set((ElementId)value);
+                            break;
+                    }
+                    return true;
+                }
+                catch (Exception) { }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get builtin parameter value based on its storage type
+        /// </summary>
+        public static dynamic GetBuiltInParameterValue(Element elem, BuiltInParameter paramId)
+        {
+            if (elem != null)
+            {
+                Parameter parameter = elem.get_Parameter(paramId);
+                return GetParameterValue(parameter);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// get parameter value based on its storage type
+        /// </summary>
+        private static dynamic GetParameterValue(Parameter parameter)
+        {
+            if (parameter != null && parameter.HasValue)
+            {
+                switch (parameter.StorageType)
+                {
+                    case StorageType.Double:
+                        return parameter.AsDouble();
+
+                    case StorageType.ElementId:
+                        return parameter.AsElementId();
+
+                    case StorageType.Integer:
+                        return parameter.AsInteger();
+
+                    case StorageType.String:
+                        return parameter.AsString();
+                }
+            }
+            return null;
+        }
     }
 }

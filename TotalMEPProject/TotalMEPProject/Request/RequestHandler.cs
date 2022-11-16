@@ -39,6 +39,30 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.HolyUpDown_UpStep:
+                    {
+                        CmdHolyUpdown.Run_UpDownStep();
+                    }
+                    break;
+
+                case RequestId.HolyUpDown_DownStep:
+                    {
+                        CmdHolyUpdown.Run_UpDownStep(true);
+                    }
+                    break;
+
+                case RequestId.HolyUpDown_UpElbowControl:
+                    {
+                        CmdHolyUpdown.Run_UpDownElbowControl();
+                    }
+                    break;
+
+                case RequestId.HolyUpDown_DownElbowControl:
+                    {
+                        CmdHolyUpdown.Run_UpDownElbowControl(true);
+                    }
+                    break;
+
                 default:
                     {
                         break;
