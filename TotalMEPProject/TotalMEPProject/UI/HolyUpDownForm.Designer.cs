@@ -339,6 +339,7 @@
             this.radNotApply.TabStop = true;
             this.radNotApply.Text = "Not Apply";
             this.radNotApply.UseVisualStyleBackColor = true;
+            this.radNotApply.CheckedChanged += new System.EventHandler(this.radNotApply_CheckedChanged);
             // 
             // txtDistance
             // 
