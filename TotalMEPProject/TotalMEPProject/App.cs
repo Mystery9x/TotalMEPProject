@@ -82,6 +82,25 @@ namespace TotalMEPProject
             CreateLoginTab(app, tabName, assemblyPath, iconFolder);
 
             bool isHasInternet = LicenseUtils.CheckForInternetConnection();
+            string errMess = string.Empty;
+            bool isValidLicense = LicenseUtils.CheckLicense(isHasInternet, ref errMess);
+
+            if (!isValidLicense)
+            {
+                DisableItemRibbonHanger(app);
+                if (errMess != "")
+                    IO.ShowError(errMess, "TotalMEP");
+            }
+        }
+
+        public static void DisableItemRibbonHanger(UIControlledApplication app)
+        {
+            var ribbonPanels = app.GetRibbonPanels("TotalMEP");
+            foreach (var item in ribbonPanels)
+            {
+                if (item.Name != Define.LoginLicense)
+                    item.Enabled = false;
+            }
         }
 
         /// <summary>

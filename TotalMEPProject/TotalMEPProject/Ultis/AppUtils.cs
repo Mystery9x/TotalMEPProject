@@ -10,6 +10,15 @@ namespace TotalMEPProject.Ultis
 {
     public class AppUtils
     {
+        public static void EnableItemRibbonHanger(Autodesk.Revit.UI.UIControlledApplication app)
+        {
+            var ribbonPanels = app.GetRibbonPanels("TotalMEP");
+            foreach (var item in ribbonPanels)
+            {
+                item.Enabled = true;
+            }
+        }
+
         public static string a(string name)
         {
             try

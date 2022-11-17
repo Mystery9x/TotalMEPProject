@@ -54,6 +54,7 @@ namespace TotalMEPProject.UI
             {
                 if (App.cachedUiCtrApp != null)
                 {
+                    AppUtils.EnableItemRibbonHanger(App.cachedUiCtrApp);
                     IO.ShowInfor("Active successfully!", "TotalMEP");
                 }
             }
