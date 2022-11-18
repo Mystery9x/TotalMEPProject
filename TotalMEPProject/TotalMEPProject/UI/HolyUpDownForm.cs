@@ -184,7 +184,7 @@ namespace TotalMEPProject.UI
             AppUtils.sa(txtUpdownStepValue);
             AppUtils.sa(radOE);
             AppUtils.sa(radPTE);
-            radOE.Checked = true;
+
             MakeRequest(GetRequestId(RunMode.OK));
 
             this.Close();

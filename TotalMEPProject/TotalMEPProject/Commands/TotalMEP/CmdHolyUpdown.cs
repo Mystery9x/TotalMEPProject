@@ -187,7 +187,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                             var curve = (mepCurve.Location as LocationCurve).Curve;
                             dataMep._Start = curve.GetEndPoint(0);
                             dataMep._End = curve.GetEndPoint(1);
-
+                            dataMep._OldOffset = offset;
                             _Datas.Add(dataMep);
 
                             data_exist.Add(mepCurve, false);
@@ -198,6 +198,14 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                         if (dataMep._Start != null && dataMep._End != null)
                         {
+                            if (App.m_HolyUpDownForm.OriginalElevation == false)
+                            {
+                                offset += dataMep._OldOffset;
+                                dataMep._OldOffset = offset;
+                            }
+                            else
+                                dataMep._OldOffset = offset;
+
                             var p0New = OffsetZ(dataMep._Start, offset);
                             var p1New = OffsetZ(dataMep._End, offset);
 
@@ -727,6 +735,16 @@ namespace TotalMEPProject.Commands.TotalMEP
                     continue;
                 dataMep._End = Read(attribute.Value);
 
+                attribute = node.Attributes["PStart"];
+                if (attribute == null || attribute.Value == null)
+                    continue;
+                dataMep._PStart = Read(attribute.Value);
+
+                attribute = node.Attributes["PEnd"];
+                if (attribute == null || attribute.Value == null)
+                    continue;
+                dataMep._PEnd = Read(attribute.Value);
+
                 attribute = node.Attributes["UnionPoint01"];
                 dataMep._UnionPoint01 = Read(attribute.Value);
 
@@ -785,6 +803,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                     dataMep._Other02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
                 }
 
+                attribute = node.Attributes["OldOffset"];
+                if (attribute != null && attribute.Value != null)
+                {
+                    dataMep._OldOffset = ToDouble(attribute.Value);
+                }
+
                 _Datas.Add(dataMep);
             }
         }
@@ -808,6 +832,16 @@ namespace TotalMEPProject.Commands.TotalMEP
             double dz = Convert.ToDouble(z);
 
             return new XYZ(dx, dy, dz);
+        }
+
+        public static double ToDouble(string input)
+        {
+            double output = 0.0;
+            if (double.TryParse(input, out double space))
+            {
+                output = space;
+            }
+            return output;
         }
 
         public static string WriteXML()
@@ -837,6 +871,20 @@ namespace TotalMEPProject.Commands.TotalMEP
                 attribute = xmlDoc.CreateAttribute("End");
                 if (data._End != null)
                     attribute.Value = data._End.ToString();
+                else
+                    attribute.Value = string.Empty;
+                dataNode.Attributes.Append(attribute);
+
+                attribute = xmlDoc.CreateAttribute("PStart");
+                if (data._PStart != null)
+                    attribute.Value = data._PStart.ToString();
+                else
+                    attribute.Value = string.Empty;
+                dataNode.Attributes.Append(attribute);
+
+                attribute = xmlDoc.CreateAttribute("PEnd");
+                if (data._PEnd != null)
+                    attribute.Value = data._PEnd.ToString();
                 else
                     attribute.Value = string.Empty;
                 dataNode.Attributes.Append(attribute);
@@ -907,6 +955,13 @@ namespace TotalMEPProject.Commands.TotalMEP
                 attribute = xmlDoc.CreateAttribute("Other02");
                 if (data._Other02 != null)
                     attribute.Value = data._Other02.UniqueId.ToString();
+                else
+                    attribute.Value = string.Empty;
+                dataNode.Attributes.Append(attribute);
+
+                attribute = xmlDoc.CreateAttribute("OldOffset");
+                if (data._OldOffset != double.NaN)
+                    attribute.Value = data._OldOffset.ToString();
                 else
                     attribute.Value = string.Empty;
                 dataNode.Attributes.Append(attribute);
