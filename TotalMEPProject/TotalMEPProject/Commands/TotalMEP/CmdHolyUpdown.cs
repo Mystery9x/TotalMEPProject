@@ -76,10 +76,10 @@ namespace TotalMEPProject.Commands.TotalMEP
                     }
                 }
 
-                double offset = UnitUtils.ConvertToInternalUnits(Math.Abs(App.m_HolyUpDownForm.Distance), DisplayUnitType.DUT_MILLIMETERS);// Math.Abs(App.m_HolyUpDownForm.Distance) * Common.mmToFT;
+                double offsetMain = UnitUtils.ConvertToInternalUnits(Math.Abs(App.m_HolyUpDownForm.Distance), DisplayUnitType.DUT_MILLIMETERS);// Math.Abs(App.m_HolyUpDownForm.Distance) * Common.mmToFT;
                 if (App.m_HolyUpDownForm.Distance < 0)
                 {
-                    offset *= -1;
+                    offsetMain *= -1;
                 }
 
                 Transaction tran = new Transaction(Global.UIDoc.Document, "Holy");
@@ -181,6 +181,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                         var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
 
+                        double offset = offsetMain;
                         if (dataMep == null)
                         {
                             dataMep = new Data(mepCurve);
@@ -343,7 +344,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject)
                                         Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
 
-                                    var p2 = OffsetZ(dataMep._UnionPoint01, offset);
+                                    var p2 = OffsetZ(dataMep._UnionPoint01, dataMep._OldOffset);
                                     dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(dataMep._UnionPoint01, p2));
 
                                     if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject)
@@ -360,7 +361,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject)
                                         Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
 
-                                    var p2 = OffsetZ(dataMep._UnionPoint02, offset);
+                                    var p2 = OffsetZ(dataMep._UnionPoint02, dataMep._OldOffset);
                                     dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(dataMep._UnionPoint02, p2));
 
                                     if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject)
@@ -389,7 +390,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                                         dataMep._UnionPoint02 = locationPoint;
                                     }
 
-                                    var p2 = OffsetZ(locationPoint, offset);
+                                    var p2 = OffsetZ(locationPoint, dataMep._OldOffset);
 
                                     if (dataMep._Vertical01 == null && index == 0)
                                     {
@@ -446,10 +447,10 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                         else
                         {
-                            double split = offset;
+                            double split = dataMep._OldOffset;
                             if (App.m_HolyUpDownForm.ElbowCustom)
                             {
-                                var cgv = offset;
+                                var cgv = dataMep._OldOffset;
                                 var radian = MyUnit.da(App.m_HolyUpDownForm.AngleCustom);
                                 var ch = cgv / Math.Sin(radian);
                                 split = ch * Math.Cos(radian);
@@ -483,7 +484,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     var locationPoint = dataMep._UnionPoint01;
 
                                     XYZ newPoint = null;
-                                    var p3 = OffsetZ(locationPoint, offset);
+                                    var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
 
                                     if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
                                     {
@@ -531,7 +532,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     var locationPoint = dataMep._UnionPoint02;
 
                                     XYZ newPoint = null;
-                                    var p3 = OffsetZ(locationPoint, offset);
+                                    var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
 
                                     if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
                                     {
@@ -582,7 +583,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                                     XYZ newPoint = null;
 
-                                    var p3 = OffsetZ(locationPoint, offset);
+                                    var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
 
                                     Line newCurve = null;
                                     if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
