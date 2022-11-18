@@ -92,6 +92,18 @@ namespace TotalMEPProject.UI
             }
         }
 
+        public double UpElbowStepValue
+        {
+            get
+            {
+                double dvalue = 0;
+                if (double.TryParse(txtEblowControlValue.Text.Trim(), out dvalue) == false)
+                    return double.MinValue;
+                else
+                    return dvalue;
+            }
+        }
+
         public double DownStepValue
         {
             get
@@ -218,7 +230,7 @@ namespace TotalMEPProject.UI
 
         private void btnUpElbowControl_Click(object sender, EventArgs e)
         {
-            if (UpStepValue == double.MinValue)
+            if (UpElbowStepValue == double.MinValue)
                 return;
 
             MakeRequest(RequestId.HolyUpDown_UpElbowControl);
@@ -226,7 +238,7 @@ namespace TotalMEPProject.UI
 
         private void btnDownElbowControl_Click(object sender, EventArgs e)
         {
-            if (UpStepValue == double.MinValue)
+            if (UpElbowStepValue == double.MinValue)
                 return;
 
             MakeRequest(RequestId.HolyUpDown_DownElbowControl);
