@@ -56,6 +56,14 @@ namespace TotalMEPProject.UI
             }
         }
 
+        public bool NotApply
+        {
+            get
+            {
+                return radNotApply.Checked;
+            }
+        }
+
         public double AngleCustom
         {
             get
@@ -290,6 +298,7 @@ namespace TotalMEPProject.UI
             AppUtils.ff(radOE);
             AppUtils.ff(radPTE);
 
+            radOE.Checked = true;
             txtAngle.Enabled = radCustom.Checked;
             label4.Enabled = !radNotApply.Checked;
             btnUpElbowControl.Enabled = !radNotApply.Checked;

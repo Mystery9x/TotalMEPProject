@@ -313,352 +313,377 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                     }
 
-                    foreach (KeyValuePair<MEPCurve, List<FamilyInstance>> keyPair in data)
+                    if (App.m_HolyUpDownForm.NotApply)
                     {
-                        var mepCurve = keyPair.Key;
-
-                        Level level = null;
-
-                        var levelPara = mepCurve.LookupParameter("Reference Level");
-                        if (levelPara != null)
+                        var lstSel = GetSelectedMEP();
+                        foreach (MEPCurve mepCurve in lstSel)
                         {
-                            level = Global.UIDoc.Document.GetElement(levelPara.AsElementId()) as Level;
+                            var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
+                            if (dataMep == null)
+                                continue;
+
+                            double offset = dataMep._OldOffset / 304.8;
+
+                            var loc = mepCurve.Location as LocationCurve;
+                            if (loc == null)
+                                continue;
+
+                            var point = OffsetZ((loc.Curve as Line).Origin, offset);
+
+                            var vectorMove = point - (loc.Curve as Line).Origin;
+
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, mepCurve.Id, vectorMove);
                         }
-                        var unions = keyPair.Value;
-
-                        bool exist = false;
-
-                        if (data_exist.ContainsKey(mepCurve))
-                            exist = data_exist[mepCurve];
-
-                        var dataMep = _Datas.Find(item => item._MEPCurve.Id == keyPair.Key.Id);
-                        if (dataMep == null)
-                            continue;
-
-                        if (App.m_HolyUpDownForm.Elbow90)
+                    }
+                    else
+                    {
+                        foreach (KeyValuePair<MEPCurve, List<FamilyInstance>> keyPair in data)
                         {
-                            if (exist)
+                            var mepCurve = keyPair.Key;
+
+                            Level level = null;
+
+                            var levelPara = mepCurve.LookupParameter("Reference Level");
+                            if (levelPara != null)
                             {
-                                if (dataMep._UnionPoint01 != null)
-                                {
-                                    if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
-
-                                    var p2 = OffsetZ(dataMep._UnionPoint01, dataMep._OldOffset);
-                                    dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(dataMep._UnionPoint01, p2));
-
-                                    if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow01.Id);
-
-                                    dataMep._Elbow01 = MEPUtilscs.CE(dataMep._Other01, dataMep._Vertical01, dataMep._UnionPoint01);
-
-                                    if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow02.Id);
-                                    dataMep._Elbow02 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, p2);
-                                }
-                                if (dataMep._UnionPoint02 != null)
-                                {
-                                    if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
-
-                                    var p2 = OffsetZ(dataMep._UnionPoint02, dataMep._OldOffset);
-                                    dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(dataMep._UnionPoint02, p2));
-
-                                    if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow03.Id);
-
-                                    dataMep._Elbow03 = MEPUtilscs.CE(dataMep._Other02, dataMep._Vertical02, dataMep._UnionPoint02);
-
-                                    if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow04.Id);
-                                    dataMep._Elbow04 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, p2);
-                                }
+                                level = Global.UIDoc.Document.GetElement(levelPara.AsElementId()) as Level;
                             }
-                            else
+                            var unions = keyPair.Value;
+
+                            bool exist = false;
+
+                            if (data_exist.ContainsKey(mepCurve))
+                                exist = data_exist[mepCurve];
+
+                            var dataMep = _Datas.Find(item => item._MEPCurve.Id == keyPair.Key.Id);
+                            if (dataMep == null)
+                                continue;
+
+                            if (App.m_HolyUpDownForm.Elbow90)
                             {
-                                int index = 0;
-                                foreach (FamilyInstance union in unions)
+                                if (exist)
                                 {
-                                    var locationPoint = (union.Location as LocationPoint).Point;
+                                    if (dataMep._UnionPoint01 != null)
+                                    {
+                                        if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
 
-                                    if (index == 0)
-                                    {
-                                        dataMep._UnionPoint01 = locationPoint;
-                                    }
-                                    else
-                                    {
-                                        dataMep._UnionPoint02 = locationPoint;
-                                    }
+                                        var p2 = OffsetZ(dataMep._UnionPoint01, dataMep._OldOffset);
+                                        dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(dataMep._UnionPoint01, p2));
 
-                                    var p2 = OffsetZ(locationPoint, dataMep._OldOffset);
+                                        if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow01.Id);
 
-                                    if (dataMep._Vertical01 == null && index == 0)
-                                    {
-                                        dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, p2));
-                                    }
-                                    else
-                                    {
-                                        dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, p2));
-                                    }
+                                        dataMep._Elbow01 = MEPUtilscs.CE(dataMep._Other01, dataMep._Vertical01, dataMep._UnionPoint01);
 
-                                    MEPCurve mepOther = null;
-                                    foreach (Connector c in union.MEPModel.ConnectorManager.Connectors)
-                                    {
-                                        foreach (Connector cmep in c.AllRefs)
-                                        {
-                                            if (cmep.Owner.Id == mepCurve.Id)
-                                                continue;
-
-                                            if (cmep.Owner as MEPCurve != null)
-                                            {
-                                                mepOther = cmep.Owner as MEPCurve;
-                                                break;
-                                            }
-                                        }
+                                        if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow02.Id);
+                                        dataMep._Elbow02 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, p2);
                                     }
-                                    if (mepOther != null)
+                                    if (dataMep._UnionPoint02 != null)
                                     {
+                                        if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
+
+                                        var p2 = OffsetZ(dataMep._UnionPoint02, dataMep._OldOffset);
+                                        dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(dataMep._UnionPoint02, p2));
+
+                                        if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow03.Id);
+
+                                        dataMep._Elbow03 = MEPUtilscs.CE(dataMep._Other02, dataMep._Vertical02, dataMep._UnionPoint02);
+
+                                        if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow04.Id);
+                                        dataMep._Elbow04 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, p2);
+                                    }
+                                }
+                                else
+                                {
+                                    int index = 0;
+                                    foreach (FamilyInstance union in unions)
+                                    {
+                                        var locationPoint = (union.Location as LocationPoint).Point;
+
                                         if (index == 0)
                                         {
-                                            var elbow1 = MEPUtilscs.CE(mepOther, dataMep._Vertical01, locationPoint);
-                                            dataMep._Elbow01 = (elbow1 as FamilyInstance);
-
-                                            var elbow2 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, p2);
-                                            dataMep._Elbow02 = (elbow2 as FamilyInstance);
-
-                                            dataMep._Other01 = mepOther;
+                                            dataMep._UnionPoint01 = locationPoint;
                                         }
                                         else
                                         {
-                                            var elbow3 = MEPUtilscs.CE(mepOther, dataMep._Vertical02, locationPoint);
-                                            dataMep._Elbow03 = (elbow3 as FamilyInstance);
-
-                                            var elbow4 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, p2);
-                                            dataMep._Elbow04 = (elbow4 as FamilyInstance);
-
-                                            dataMep._Other02 = mepOther;
+                                            dataMep._UnionPoint02 = locationPoint;
                                         }
-                                    }
-                                    Global.UIDoc.Document.Delete(union.Id);
 
-                                    index++;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            double split = dataMep._OldOffset;
-                            if (App.m_HolyUpDownForm.ElbowCustom)
-                            {
-                                var cgv = dataMep._OldOffset;
-                                var radian = MyUnit.da(App.m_HolyUpDownForm.AngleCustom);
-                                var ch = cgv / Math.Sin(radian);
-                                split = ch * Math.Cos(radian);
-                            }
+                                        var p2 = OffsetZ(locationPoint, dataMep._OldOffset);
 
-                            if (exist == true)
-                            {
-                                var curve = (mepCurve.Location as LocationCurve).Curve;
+                                        if (dataMep._Vertical01 == null && index == 0)
+                                        {
+                                            dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, p2));
+                                        }
+                                        else
+                                        {
+                                            dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, p2));
+                                        }
 
-                                if (dataMep._UnionPoint01 != null)
-                                {
-                                    var p0 = curve.GetEndPoint(0);
-                                    var p1 = curve.GetEndPoint(1);
+                                        MEPCurve mepOther = null;
+                                        foreach (Connector c in union.MEPModel.ConnectorManager.Connectors)
+                                        {
+                                            foreach (Connector cmep in c.AllRefs)
+                                            {
+                                                if (cmep.Owner.Id == mepCurve.Id)
+                                                    continue;
 
-                                    var line = Line.CreateBound(p0, p1);
-                                    if (line.Length <= Math.Abs(split))
-                                    {
-                                        MessageBox.Show("Offset is invalid.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                        return Result.Cancelled;
-                                    }
+                                                if (cmep.Owner as MEPCurve != null)
+                                                {
+                                                    mepOther = cmep.Owner as MEPCurve;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (mepOther != null)
+                                        {
+                                            if (index == 0)
+                                            {
+                                                var elbow1 = MEPUtilscs.CE(mepOther, dataMep._Vertical01, locationPoint);
+                                                dataMep._Elbow01 = (elbow1 as FamilyInstance);
 
-                                    if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
+                                                var elbow2 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, p2);
+                                                dataMep._Elbow02 = (elbow2 as FamilyInstance);
 
-                                    if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow01.Id);
+                                                dataMep._Other01 = mepOther;
+                                            }
+                                            else
+                                            {
+                                                var elbow3 = MEPUtilscs.CE(mepOther, dataMep._Vertical02, locationPoint);
+                                                dataMep._Elbow03 = (elbow3 as FamilyInstance);
 
-                                    if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow02.Id);
+                                                var elbow4 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, p2);
+                                                dataMep._Elbow04 = (elbow4 as FamilyInstance);
 
-                                    var locationPoint = dataMep._UnionPoint01;
+                                                dataMep._Other02 = mepOther;
+                                            }
+                                        }
+                                        Global.UIDoc.Document.Delete(union.Id);
 
-                                    XYZ newPoint = null;
-                                    var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
-
-                                    if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
-                                    {
-                                        newPoint = line.Evaluate(Math.Abs(split), false);
-                                        (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(newPoint, p1);
-                                    }
-                                    else
-                                    {
-                                        newPoint = line.Evaluate(line.Length - Math.Abs(split), false);
-                                        (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(p0, newPoint);
-                                    }
-
-                                    dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
-
-                                    if (dataMep._Other01 != null)
-                                    {
-                                        dataMep._Elbow01 = MEPUtilscs.CE(dataMep._Other01, dataMep._Vertical01, locationPoint);
-                                        dataMep._Elbow02 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, newPoint);
-                                    }
-                                }
-
-                                if (dataMep._UnionPoint02 != null)
-                                {
-                                    //Get again location
-                                    curve = (mepCurve.Location as LocationCurve).Curve;
-                                    var p0 = curve.GetEndPoint(0);
-                                    var p1 = curve.GetEndPoint(1);
-
-                                    var line = Line.CreateBound(p0, p1);
-                                    if (line.Length <= Math.Abs(split))
-                                    {
-                                        MessageBox.Show("Offset is invalid.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                        return Result.Cancelled;
-                                    }
-
-                                    if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
-
-                                    if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow03.Id);
-
-                                    if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject)
-                                        Global.UIDoc.Document.Delete(dataMep._Elbow04.Id);
-
-                                    var locationPoint = dataMep._UnionPoint02;
-
-                                    XYZ newPoint = null;
-                                    var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
-
-                                    if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
-                                    {
-                                        newPoint = line.Evaluate(Math.Abs(split), false);
-                                        (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(newPoint, p1);
-                                    }
-                                    else
-                                    {
-                                        newPoint = line.Evaluate(line.Length - Math.Abs(split), false);
-                                        (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(p0, newPoint);
-                                    }
-
-                                    dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
-
-                                    if (dataMep._Other02 != null)
-                                    {
-                                        dataMep._Elbow03 = MEPUtilscs.CE(dataMep._Other02, dataMep._Vertical02, locationPoint);
-                                        dataMep._Elbow04 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, newPoint);
+                                        index++;
                                     }
                                 }
                             }
                             else
                             {
-                                int index = 0;
-                                foreach (FamilyInstance union in unions)
+                                double split = dataMep._OldOffset;
+                                if (App.m_HolyUpDownForm.ElbowCustom)
+                                {
+                                    var cgv = dataMep._OldOffset;
+                                    var radian = MyUnit.da(App.m_HolyUpDownForm.AngleCustom);
+                                    var ch = cgv / Math.Sin(radian);
+                                    split = ch * Math.Cos(radian);
+                                }
+
+                                if (exist == true)
                                 {
                                     var curve = (mepCurve.Location as LocationCurve).Curve;
-                                    var p0 = curve.GetEndPoint(0);
-                                    var p1 = curve.GetEndPoint(1);
 
-                                    var line = Line.CreateBound(p0, p1);
-                                    if (line.Length <= Math.Abs(split))
+                                    if (dataMep._UnionPoint01 != null)
                                     {
-                                        MessageBox.Show("Offset is invalid.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                        return Result.Cancelled;
-                                    }
+                                        var p0 = curve.GetEndPoint(0);
+                                        var p1 = curve.GetEndPoint(1);
 
-                                    var locationPoint = (union.Location as LocationPoint).Point;
-
-                                    if (index == 0)
-                                    {
-                                        dataMep._UnionPoint01 = locationPoint;
-                                    }
-                                    else
-                                    {
-                                        dataMep._UnionPoint02 = locationPoint;
-                                    }
-
-                                    XYZ newPoint = null;
-
-                                    var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
-
-                                    Line newCurve = null;
-                                    if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
-                                    {
-                                        newPoint = line.Evaluate(Math.Abs(split), false);
-                                        newCurve = Line.CreateBound(newPoint, p1);
-                                    }
-                                    else
-                                    {
-                                        newPoint = line.Evaluate(line.Length - Math.Abs(split), false);
-                                        newCurve = Line.CreateBound(p0, newPoint);
-                                    }
-
-                                    (mepCurve.Location as LocationCurve).Curve = newCurve;
-
-                                    //Must set Middle Elevation
-                                    var midleEle = mepCurve.LookupParameter("Middle Elevation");
-                                    if (midleEle != null)
-                                    {
-                                        var mid = (newCurve.GetEndPoint(0).Z + newCurve.GetEndPoint(1).Z) / 2;
-
-                                        if (level != null)
+                                        var line = Line.CreateBound(p0, p1);
+                                        if (line.Length <= Math.Abs(split))
                                         {
-                                            mid -= level.Elevation;
+                                            MessageBox.Show("Offset is invalid.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            return Result.Cancelled;
                                         }
 
-                                        midleEle.Set(mid);
-                                    }
+                                        if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
 
-                                    if (index == 0)
-                                        dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
-                                    else
-                                        dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
+                                        if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow01.Id);
 
-                                    MEPCurve mepOther = null;
-                                    foreach (Connector c in union.MEPModel.ConnectorManager.Connectors)
-                                    {
-                                        foreach (Connector cmep in c.AllRefs)
+                                        if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow02.Id);
+
+                                        var locationPoint = dataMep._UnionPoint01;
+
+                                        XYZ newPoint = null;
+                                        var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
+
+                                        if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
                                         {
-                                            if (cmep.Owner.Id == mepCurve.Id)
-                                                continue;
-
-                                            if (cmep.Owner as MEPCurve != null)
-                                            {
-                                                mepOther = cmep.Owner as MEPCurve;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (mepOther != null)
-                                    {
-                                        if (index == 0)
-                                        {
-                                            var elbow1 = MEPUtilscs.CE(mepOther, dataMep._Vertical01, locationPoint);
-                                            dataMep._Elbow01 = (elbow1 as FamilyInstance);
-
-                                            var elbow2 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, newPoint);
-                                            dataMep._Elbow02 = (elbow2 as FamilyInstance);
-
-                                            dataMep._Other01 = mepOther;
+                                            newPoint = line.Evaluate(Math.Abs(split), false);
+                                            (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(newPoint, p1);
                                         }
                                         else
                                         {
-                                            var elbow3 = MEPUtilscs.CE(mepOther, dataMep._Vertical02, locationPoint);
-                                            dataMep._Elbow03 = (elbow3 as FamilyInstance);
+                                            newPoint = line.Evaluate(line.Length - Math.Abs(split), false);
+                                            (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(p0, newPoint);
+                                        }
 
-                                            var elbow4 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, newPoint);
-                                            dataMep._Elbow04 = (elbow4 as FamilyInstance);
+                                        dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
 
-                                            dataMep._Other02 = mepOther;
+                                        if (dataMep._Other01 != null)
+                                        {
+                                            dataMep._Elbow01 = MEPUtilscs.CE(dataMep._Other01, dataMep._Vertical01, locationPoint);
+                                            dataMep._Elbow02 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, newPoint);
                                         }
                                     }
 
-                                    Global.UIDoc.Document.Delete(union.Id);
-                                    index++;
+                                    if (dataMep._UnionPoint02 != null)
+                                    {
+                                        //Get again location
+                                        curve = (mepCurve.Location as LocationCurve).Curve;
+                                        var p0 = curve.GetEndPoint(0);
+                                        var p1 = curve.GetEndPoint(1);
+
+                                        var line = Line.CreateBound(p0, p1);
+                                        if (line.Length <= Math.Abs(split))
+                                        {
+                                            MessageBox.Show("Offset is invalid.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            return Result.Cancelled;
+                                        }
+
+                                        if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
+
+                                        if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow03.Id);
+
+                                        if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject)
+                                            Global.UIDoc.Document.Delete(dataMep._Elbow04.Id);
+
+                                        var locationPoint = dataMep._UnionPoint02;
+
+                                        XYZ newPoint = null;
+                                        var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
+
+                                        if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
+                                        {
+                                            newPoint = line.Evaluate(Math.Abs(split), false);
+                                            (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(newPoint, p1);
+                                        }
+                                        else
+                                        {
+                                            newPoint = line.Evaluate(line.Length - Math.Abs(split), false);
+                                            (mepCurve.Location as LocationCurve).Curve = Line.CreateBound(p0, newPoint);
+                                        }
+
+                                        dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
+
+                                        if (dataMep._Other02 != null)
+                                        {
+                                            dataMep._Elbow03 = MEPUtilscs.CE(dataMep._Other02, dataMep._Vertical02, locationPoint);
+                                            dataMep._Elbow04 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, newPoint);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    int index = 0;
+                                    foreach (FamilyInstance union in unions)
+                                    {
+                                        var curve = (mepCurve.Location as LocationCurve).Curve;
+                                        var p0 = curve.GetEndPoint(0);
+                                        var p1 = curve.GetEndPoint(1);
+
+                                        var line = Line.CreateBound(p0, p1);
+                                        if (line.Length <= Math.Abs(split))
+                                        {
+                                            MessageBox.Show("Offset is invalid.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            return Result.Cancelled;
+                                        }
+
+                                        var locationPoint = (union.Location as LocationPoint).Point;
+
+                                        if (index == 0)
+                                        {
+                                            dataMep._UnionPoint01 = locationPoint;
+                                        }
+                                        else
+                                        {
+                                            dataMep._UnionPoint02 = locationPoint;
+                                        }
+
+                                        XYZ newPoint = null;
+
+                                        var p3 = OffsetZ(locationPoint, dataMep._OldOffset);
+
+                                        Line newCurve = null;
+                                        if (p0.DistanceTo(p3) < p1.DistanceTo(p3))
+                                        {
+                                            newPoint = line.Evaluate(Math.Abs(split), false);
+                                            newCurve = Line.CreateBound(newPoint, p1);
+                                        }
+                                        else
+                                        {
+                                            newPoint = line.Evaluate(line.Length - Math.Abs(split), false);
+                                            newCurve = Line.CreateBound(p0, newPoint);
+                                        }
+
+                                        (mepCurve.Location as LocationCurve).Curve = newCurve;
+
+                                        //Must set Middle Elevation
+                                        var midleEle = mepCurve.LookupParameter("Middle Elevation");
+                                        if (midleEle != null)
+                                        {
+                                            var mid = (newCurve.GetEndPoint(0).Z + newCurve.GetEndPoint(1).Z) / 2;
+
+                                            if (level != null)
+                                            {
+                                                mid -= level.Elevation;
+                                            }
+
+                                            midleEle.Set(mid);
+                                        }
+
+                                        if (index == 0)
+                                            dataMep._Vertical01 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
+                                        else
+                                            dataMep._Vertical02 = MEPUtilscs.CC(mepCurve, Line.CreateBound(locationPoint, newPoint));
+
+                                        MEPCurve mepOther = null;
+                                        foreach (Connector c in union.MEPModel.ConnectorManager.Connectors)
+                                        {
+                                            foreach (Connector cmep in c.AllRefs)
+                                            {
+                                                if (cmep.Owner.Id == mepCurve.Id)
+                                                    continue;
+
+                                                if (cmep.Owner as MEPCurve != null)
+                                                {
+                                                    mepOther = cmep.Owner as MEPCurve;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (mepOther != null)
+                                        {
+                                            if (index == 0)
+                                            {
+                                                var elbow1 = MEPUtilscs.CE(mepOther, dataMep._Vertical01, locationPoint);
+                                                dataMep._Elbow01 = (elbow1 as FamilyInstance);
+
+                                                var elbow2 = MEPUtilscs.CE(mepCurve, dataMep._Vertical01, newPoint);
+                                                dataMep._Elbow02 = (elbow2 as FamilyInstance);
+
+                                                dataMep._Other01 = mepOther;
+                                            }
+                                            else
+                                            {
+                                                var elbow3 = MEPUtilscs.CE(mepOther, dataMep._Vertical02, locationPoint);
+                                                dataMep._Elbow03 = (elbow3 as FamilyInstance);
+
+                                                var elbow4 = MEPUtilscs.CE(mepCurve, dataMep._Vertical02, newPoint);
+                                                dataMep._Elbow04 = (elbow4 as FamilyInstance);
+
+                                                dataMep._Other02 = mepOther;
+                                            }
+                                        }
+
+                                        Global.UIDoc.Document.Delete(union.Id);
+                                        index++;
+                                    }
                                 }
                             }
                         }
