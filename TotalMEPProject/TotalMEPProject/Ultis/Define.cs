@@ -35,6 +35,7 @@
         public const string CmdTeeToTapClassName = "TotalMEPProject.Commands.Modify.CmdTeeToTap";
         public const string CmdChangeOpeningClassName = "TotalMEPProject.Commands.Opening.ChangeObject.CmdChangeOpening";
         public const string CmdChangeSleeveClassName = "TotalMEPProject.Commands.Opening.ChangeObject.CmdChangeSleeve";
+        public const string CmdSettingChangeOpeningClassName = "TotalMEPProject.Commands.Opening.ChangeObject.CmdSettingChangeOpening";
         public const string CmdCreateOpeningClassName = "TotalMEPProject.Commands.Opening.CmdCreateOpening";
         public const string CmdCreateSleeveClassName = "TotalMEPProject.Commands.Opening.CmdCreateSleeve";
         public const string CmdDeleteAllOpeningClassName = "TotalMEPProject.Commands.Opening.DeleteOpening.CmdDeleteAll";
