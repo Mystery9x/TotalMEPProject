@@ -292,7 +292,6 @@ namespace TotalMEPProject.UI
         {
             PressCancel();
 
-            AppUtils.sa(cboLevel);
             AppUtils.sa(cboMEPType);
 
             AppUtils.sa(txtOffset);
