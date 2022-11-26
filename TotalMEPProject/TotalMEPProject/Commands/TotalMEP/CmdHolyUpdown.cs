@@ -40,6 +40,8 @@ namespace TotalMEPProject.Commands.TotalMEP
 
         public static List<Data> _Datas = new List<Data>();
 
+        public static double eleOld = 0;
+
         public static Result Run_PickObjects()
         {
             try
@@ -266,53 +268,6 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                     }
 
-                    //Delete old element
-                    foreach (KeyValuePair<MEPCurve, List<FamilyInstance>> keyPair in data)
-                    {
-                        var mepCurve = keyPair.Key;
-                        var unions = keyPair.Value;
-
-                        var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
-                        if (dataMep == null)
-                            continue;
-
-                        if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject == true)
-                        {
-                            Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
-                            dataMep._Vertical01 = null;
-                        }
-
-                        if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject == true)
-                        {
-                            Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
-                            dataMep._Vertical02 = null;
-                        }
-
-                        if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject == true)
-                        {
-                            Global.UIDoc.Document.Delete(dataMep._Elbow01.Id);
-                            dataMep._Elbow01 = null;
-                        }
-
-                        if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject == true)
-                        {
-                            Global.UIDoc.Document.Delete(dataMep._Elbow02.Id);
-                            dataMep._Elbow02 = null;
-                        }
-
-                        if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject == true)
-                        {
-                            Global.UIDoc.Document.Delete(dataMep._Elbow03.Id);
-                            dataMep._Elbow03 = null;
-                        }
-
-                        if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject == true)
-                        {
-                            Global.UIDoc.Document.Delete(dataMep._Elbow04.Id);
-                            dataMep._Elbow04 = null;
-                        }
-                    }
-
                     if (App.m_HolyUpDownForm.NotApply)
                     {
                         var lstSel = GetSelectedMEP();
@@ -322,21 +277,84 @@ namespace TotalMEPProject.Commands.TotalMEP
                             if (dataMep == null)
                                 continue;
 
-                            double offset = dataMep._OldOffset / 304.8;
+                            //bool exist = false;
 
-                            var loc = mepCurve.Location as LocationCurve;
-                            if (loc == null)
-                                continue;
+                            //if (data_exist.ContainsKey(mepCurve))
+                            //{
+                            //    exist = data_exist[mepCurve];
+                            //    var data1 = data_exist.FirstOrDefault(x => x.Key.Id == mepCurve.Id);
+                            //    if (exist)
+                            //    {
+                            //        eleOld = GetBuiltInParameterValue(data1.Key, BuiltInParameter.RBS_OFFSET_PARAM)
+                            //                   != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
+                            //    }
+                            //}
 
-                            var point = OffsetZ((loc.Curve as Line).Origin, offset);
+                            eleOld = GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
+                                       != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
 
-                            var vectorMove = point - (loc.Curve as Line).Origin;
+                            double offset = eleOld + dataMep._OldOffset;
+                            SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, offset);
+                            //var loc = mepCurve.Location as LocationCurve;
+                            //if (loc == null)
+                            //    continue;
 
-                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, mepCurve.Id, vectorMove);
+                            //var point = OffsetZ((loc.Curve as Line).Origin, offset);
+
+                            //var vectorMove = point - (loc.Curve as Line).Origin;
+
+                            //ElementTransformUtils.MoveElement(Global.UIDoc.Document, mepCurve.Id, vectorMove);
                         }
                     }
                     else
                     {
+                        //Delete old element
+                        foreach (KeyValuePair<MEPCurve, List<FamilyInstance>> keyPair in data)
+                        {
+                            var mepCurve = keyPair.Key;
+                            var unions = keyPair.Value;
+
+                            var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
+                            if (dataMep == null)
+                                continue;
+
+                            if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject == true)
+                            {
+                                Global.UIDoc.Document.Delete(dataMep._Vertical01.Id);
+                                dataMep._Vertical01 = null;
+                            }
+
+                            if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject == true)
+                            {
+                                Global.UIDoc.Document.Delete(dataMep._Vertical02.Id);
+                                dataMep._Vertical02 = null;
+                            }
+
+                            if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject == true)
+                            {
+                                Global.UIDoc.Document.Delete(dataMep._Elbow01.Id);
+                                dataMep._Elbow01 = null;
+                            }
+
+                            if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject == true)
+                            {
+                                Global.UIDoc.Document.Delete(dataMep._Elbow02.Id);
+                                dataMep._Elbow02 = null;
+                            }
+
+                            if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject == true)
+                            {
+                                Global.UIDoc.Document.Delete(dataMep._Elbow03.Id);
+                                dataMep._Elbow03 = null;
+                            }
+
+                            if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject == true)
+                            {
+                                Global.UIDoc.Document.Delete(dataMep._Elbow04.Id);
+                                dataMep._Elbow04 = null;
+                            }
+                        }
+
                         foreach (KeyValuePair<MEPCurve, List<FamilyInstance>> keyPair in data)
                         {
                             var mepCurve = keyPair.Key;
