@@ -83,6 +83,65 @@ namespace TotalMEPProject.Ultis.StorageUtility
             return null;
         }
 
+        public static bool SetValue(Element element, Guid guid, string fieldName, Type type, object value)
+        {
+            if (element == null)
+                return false;
+
+            try
+            {
+                var schema = Autodesk.Revit.DB.ExtensibleStorage.Schema.Lookup(guid);
+                if (schema == null)
+                    return false;
+
+                var entity = element.GetEntity(schema);
+                if (entity == null || entity.Schema == null)
+                    return false;
+
+                if (type == typeof(IList<ElementId>))
+                {
+                    var list = (IList<ElementId>)value;
+                    entity.Set<IList<ElementId>>(fieldName, list);
+                }
+                else if (type == typeof(string))
+                {
+                    var str = (string)value;
+                    entity.Set<string>(fieldName, str);
+                }
+                else if (type == typeof(ElementId))
+                {
+                    var id = (ElementId)value;
+                    entity.Set<ElementId>(fieldName, id);
+                }
+                else if (type == typeof(int))
+                {
+                    var iValue = (int)value;
+                    entity.Set<int>(fieldName, iValue);
+                }
+                else if (type == typeof(bool))
+                {
+                    var iValue = (bool)value == true ? 1 : 0;
+                    entity.Set<int>(fieldName, iValue);
+                }
+                else if (type == typeof(double))
+                {
+                    var iValue = (double)value;
+                    entity.Set<double>(fieldName, iValue, DisplayUnitType.DUT_CUSTOM);
+                }
+
+                element.Document.Regenerate();
+
+                element.SetEntity(entity);
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                string mess = ex.Message;
+                return false;
+            }
+        }
+
         public static bool AddEntity(Element element, Guid guid, string name, object value)
         {
             try

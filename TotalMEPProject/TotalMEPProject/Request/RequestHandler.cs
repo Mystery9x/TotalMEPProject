@@ -39,6 +39,12 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.HolyUpDown_OK:
+                    {
+                        CmdHolyUpdown.Run_OKRefreshDara();
+                    }
+                    break;
+
                 case RequestId.HolyUpDown_UpStep:
                     {
                         CmdHolyUpdown.Run_UpDownStep();

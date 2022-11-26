@@ -705,6 +705,29 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
         }
 
+        public static Result Run_OKRefreshDara()
+        {
+            try
+            {
+                using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "DELETE_HOLY_UPDOWN_SCHEMA"))
+                {
+                    reTrans.Start();
+                    try
+                    {
+                        string saveValue = string.Empty;
+                        StorageUtility.SetValue(Global.UIDoc.Document.ProjectInformation, StorageUtility.m_MEP_HoLyUpDown_Guild, StorageUtility.m_MEP_HoLyUpDown, typeof(string), saveValue);
+                        reTrans.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        reTrans.RollBack();
+                    }
+                }
+            }
+            catch { }
+            return Result.Cancelled;
+        }
+
         private static XYZ OffsetZ(XYZ point, double offset)
         {
             return new XYZ(point.X, point.Y, point.Z + offset);
@@ -752,111 +775,119 @@ namespace TotalMEPProject.Commands.TotalMEP
 
         public static void ReadData(string xml)
         {
-            _Datas.Clear();
-
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
-
-            var dataNodes = xmlDoc.SelectNodes("/Datas/Data");
-
-            foreach (XmlNode node in dataNodes)
+            try
             {
-                XmlAttribute attribute = node.Attributes["MEPCurve"];
-                if (attribute == null || attribute.Value == null)
-                    continue;
+                _Datas.Clear();
 
-                var mepCurve = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
-                if (mepCurve == null)
-                    continue;
-
-                Data dataMep = new Data(mepCurve);
-
-                attribute = node.Attributes["Start"];
-                if (attribute == null || attribute.Value == null)
-                    continue;
-                dataMep._Start = Read(attribute.Value);
-
-                attribute = node.Attributes["End"];
-                if (attribute == null || attribute.Value == null)
-                    continue;
-                dataMep._End = Read(attribute.Value);
-
-                attribute = node.Attributes["PStart"];
-                if (attribute == null || attribute.Value == null)
-                    continue;
-                dataMep._PStart = Read(attribute.Value);
-
-                attribute = node.Attributes["PEnd"];
-                if (attribute == null || attribute.Value == null)
-                    continue;
-                dataMep._PEnd = Read(attribute.Value);
-
-                attribute = node.Attributes["UnionPoint01"];
-                dataMep._UnionPoint01 = Read(attribute.Value);
-
-                attribute = node.Attributes["UnionPoint02"];
-                dataMep._UnionPoint02 = Read(attribute.Value);
-
-                attribute = node.Attributes["Elbow01"];
-                if (attribute != null && attribute.Value != null)
+                if (!string.IsNullOrWhiteSpace(xml))
                 {
-                    dataMep._Elbow01 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
-                }
-                attribute = node.Attributes["Elbow02"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Elbow02 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
-                }
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.LoadXml(xml);
 
-                attribute = node.Attributes["Elbow03"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Elbow03 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
-                }
-                attribute = node.Attributes["Elbow04"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Elbow04 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
-                }
+                    var dataNodes = xmlDoc.SelectNodes("/Datas/Data");
 
-                attribute = node.Attributes["Vertical01"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Vertical01 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
-                }
+                    foreach (XmlNode node in dataNodes)
+                    {
+                        XmlAttribute attribute = node.Attributes["MEPCurve"];
+                        if (attribute == null || attribute.Value == null)
+                            continue;
 
-                attribute = node.Attributes["Vertical02"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Vertical02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
-                }
+                        var mepCurve = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
+                        if (mepCurve == null)
+                            continue;
 
-                attribute = node.Attributes["Other02"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Other02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
-                }
+                        Data dataMep = new Data(mepCurve);
 
-                attribute = node.Attributes["Other01"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Other01 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
-                }
+                        attribute = node.Attributes["Start"];
+                        if (attribute == null || attribute.Value == null)
+                            continue;
+                        dataMep._Start = Read(attribute.Value);
 
-                attribute = node.Attributes["Other02"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._Other02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
-                }
+                        attribute = node.Attributes["End"];
+                        if (attribute == null || attribute.Value == null)
+                            continue;
+                        dataMep._End = Read(attribute.Value);
 
-                attribute = node.Attributes["OldOffset"];
-                if (attribute != null && attribute.Value != null)
-                {
-                    dataMep._OldOffset = ToDouble(attribute.Value);
-                }
+                        attribute = node.Attributes["PStart"];
+                        if (attribute == null || attribute.Value == null)
+                            continue;
+                        dataMep._PStart = Read(attribute.Value);
 
-                _Datas.Add(dataMep);
+                        attribute = node.Attributes["PEnd"];
+                        if (attribute == null || attribute.Value == null)
+                            continue;
+                        dataMep._PEnd = Read(attribute.Value);
+
+                        attribute = node.Attributes["UnionPoint01"];
+                        dataMep._UnionPoint01 = Read(attribute.Value);
+
+                        attribute = node.Attributes["UnionPoint02"];
+                        dataMep._UnionPoint02 = Read(attribute.Value);
+
+                        attribute = node.Attributes["Elbow01"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Elbow01 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
+                        }
+                        attribute = node.Attributes["Elbow02"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Elbow02 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
+                        }
+
+                        attribute = node.Attributes["Elbow03"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Elbow03 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
+                        }
+                        attribute = node.Attributes["Elbow04"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Elbow04 = Global.UIDoc.Document.GetElement(attribute.Value) as Element;
+                        }
+
+                        attribute = node.Attributes["Vertical01"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Vertical01 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
+                        }
+
+                        attribute = node.Attributes["Vertical02"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Vertical02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
+                        }
+
+                        attribute = node.Attributes["Other02"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Other02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
+                        }
+
+                        attribute = node.Attributes["Other01"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Other01 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
+                        }
+
+                        attribute = node.Attributes["Other02"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._Other02 = Global.UIDoc.Document.GetElement(attribute.Value) as MEPCurve;
+                        }
+
+                        attribute = node.Attributes["OldOffset"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._OldOffset = ToDouble(attribute.Value);
+                        }
+
+                        _Datas.Add(dataMep);
+                    }
+                }
             }
+            catch (Exception)
+            { }
         }
 
         private static XYZ Read(string stringValue)
