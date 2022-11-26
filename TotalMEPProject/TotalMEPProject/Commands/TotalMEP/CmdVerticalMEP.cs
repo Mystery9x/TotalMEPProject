@@ -39,6 +39,8 @@ namespace TotalMEPProject.Commands.TotalMEP
 
             Transaction t = new Transaction(Global.UIDoc.Document, "a");
 
+            form.Hide();
+
             while (true)
             {
                 try
@@ -118,6 +120,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                 catch (System.Exception ex)
                 {
                     string mess = ex.Message;
+
+                    if (mess.Contains("The user aborted the pick operation."))
+                    {
+                        form.TopMost = true;
+                        form.Show();
+                    }
                     break;
                 }
             }
