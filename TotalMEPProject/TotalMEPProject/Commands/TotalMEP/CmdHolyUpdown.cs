@@ -1172,7 +1172,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                     lstElbowY = lstElbowY.OrderByDescending(x => (x.Location as LocationPoint).Point.Z).ToList();
                     lstElbowX = lstElbowX.OrderByDescending(x => (x.Location as LocationPoint).Point.Z).ToList();
 
-                    var d = keyValuePairs.Where(x => !lstElbowX.Select(y => y.Id).Contains(x.Key.Id) && !lstElbowX.Select(y => y.Id).Contains(x.Key.Id));
+                    var d = keyValuePairs.Where(x => !lstElbowX.Select(y => y.Id).Contains(x.Key.Id) && !lstElbowY.Select(y => y.Id).Contains(x.Key.Id));
 
                     foreach (var item in d)
                     {
