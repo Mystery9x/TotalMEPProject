@@ -1736,9 +1736,22 @@ namespace TotalMEPProject.Commands.TotalMEP
                         {
                             if (elbows.Count > 1)
                             {
-                                var twoElbow = GetTwoPointFurthest(elbowControlDatas);
+                                var twoElbow = GetTwoPointFurthest(elbows);
                                 ElbowControlData elbow_1 = twoElbow.Item1;
                                 ElbowControlData elbow_2 = twoElbow.Item2;
+
+                                List<FamilyInstance> lstElbow = new List<FamilyInstance>();
+                                lstElbow.Add(elbow_1.ElbowMain);
+                                lstElbow.Add(elbow_2.ElbowMain);
+                                double slope = 0;
+                                var mepSame = GetMepSame(lstElbow);
+                                if (mepSame != null)
+                                {
+                                    if (mepSame.get_Parameter(BuiltInParameter.RBS_PIPE_SLOPE) != null)
+                                        slope = GetBuiltInParameterValue(mepSame, BuiltInParameter.RBS_PIPE_SLOPE);
+                                    else if (mepSame.get_Parameter(BuiltInParameter.RBS_DUCT_SLOPE) != null)
+                                        slope = GetBuiltInParameterValue(mepSame, BuiltInParameter.RBS_DUCT_SLOPE);
+                                }
 
                                 XYZ p1_1 = elbow_1.LocationPoint + elbow_1.MEPCurveDataMain.Direction.Normalize() * offset;
                                 XYZ p1_2 = elbow_1.LocationPoint + elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset;
@@ -1755,50 +1768,78 @@ namespace TotalMEPProject.Commands.TotalMEP
                                 double minVal = distances.Min();
                                 double maxVal = distances.Max();
 
-                                if (downElbowControl)
+                                if (slope < 0.03)
                                 {
-                                    if (minVal == distance_1)
+                                    if (downElbowControl)
                                     {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
-                                    }
-                                    else if (minVal == distance_2)
-                                    {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
-                                    }
-                                    else if (minVal == distance_3)
-                                    {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        if (minVal == distance_1)
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        }
+                                        else if (minVal == distance_2)
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        }
+                                        else if (minVal == distance_3)
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        }
+                                        else
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        }
                                     }
                                     else
                                     {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        if (maxVal == distance_1)
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        }
+                                        else if (maxVal == distance_2)
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        }
+                                        else if (maxVal == distance_3)
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        }
+                                        else
+                                        {
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    if (maxVal == distance_1)
+                                    if (downElbowControl)
                                     {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
-                                    }
-                                    else if (maxVal == distance_2)
-                                    {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
-                                    }
-                                    else if (maxVal == distance_3)
-                                    {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        if (minVal == distance_1)
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        else if (minVal == distance_2)
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        else if (minVal == distance_3)
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        else
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
                                     }
                                     else
                                     {
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
-                                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, elbow_2.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        if (maxVal == distance_1)
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        else if (maxVal == distance_2)
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                        else if (maxVal == distance_3)
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
+                                        else
+                                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize().Negate() * offset);
                                     }
                                 }
                             }
@@ -2052,7 +2093,10 @@ namespace TotalMEPProject.Commands.TotalMEP
                 }
                 return StartPoint;
             }
-            private set { StartPoint = value; }
+            private set
+            {
+                StartPoint = value;
+            }
         }
 
         public XYZ EndPointXtend
@@ -2065,7 +2109,10 @@ namespace TotalMEPProject.Commands.TotalMEP
                 }
                 return EndPoint;
             }
-            private set { EndPoint = value; }
+            private set
+            {
+                EndPoint = value;
+            }
         }
 
         public Connector Connector1 { get => m_connector1; set => m_connector1 = value; }
@@ -2090,9 +2137,6 @@ namespace TotalMEPProject.Commands.TotalMEP
                 {
                     XYZ directionTemp = ((MEPCurveMain.Location as LocationCurve).Curve as Line).Direction;
 
-                    double xVal = Math.Round(directionTemp.X, 6);
-                    double yVal = Math.Round(directionTemp.Y, 6);
-                    double zVal = Math.Round(directionTemp.Z, 6);
                     Slope = 1 - Math.Sin(directionTemp.AngleTo(XYZ.BasisZ));
                     Direction = EndPoint - StartPoint;
                     DirectionFlatten = new XYZ(Direction.X, Direction.Y, 0);

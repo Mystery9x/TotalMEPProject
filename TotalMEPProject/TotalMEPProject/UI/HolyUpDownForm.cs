@@ -210,16 +210,6 @@ namespace TotalMEPProject.UI
             this.Close();
         }
 
-        private void btnUndo_Click(object sender, EventArgs e)
-        {
-            PressCancel();
-
-            var id = RevitCommandId.LookupPostableCommandId(PostableCommand.Undo);
-
-            //Events
-            Global.UIApp.PostCommand(id);
-        }
-
         private void btnUpStep_Click(object sender, EventArgs e)
         {
             if (UpStepValue == double.MinValue)
