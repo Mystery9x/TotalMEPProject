@@ -1218,8 +1218,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                     }
 
-                    lstElbowY = lstElbowY.OrderByDescending(x => (x.Location as LocationPoint).Point.Z).ToList();
-                    lstElbowX = lstElbowX.OrderByDescending(x => (x.Location as LocationPoint).Point.Z).ToList();
+                    lstElbowY = lstElbowY.OrderByDescending(x => (x.Location as LocationPoint).Point.Y).ThenByDescending(x => (x.Location as LocationPoint).Point.Z).ToList();
+                    lstElbowX = lstElbowX.OrderByDescending(x => (x.Location as LocationPoint).Point.X).ThenByDescending(x => (x.Location as LocationPoint).Point.Z).ToList();
+
+                    //Group cac elbow cung gian
+                    var groupY = lstElbowY.GroupBy(x => (x.Location as LocationPoint).Point.Y).ToList();
+                    var groupX = lstElbowX.GroupBy(x => (x.Location as LocationPoint).Point.X).ToList();
 
                     var d = keyValuePairs.Where(x => !lstElbowX.Select(y => y.Id).Contains(x.Key.Id) && !lstElbowY.Select(y => y.Id).Contains(x.Key.Id));
 
@@ -1264,8 +1268,41 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                     }
 
-                    var dicX = GetDicElbow(lstElbowX);
-                    var dicY = GetDicElbow(lstElbowY);
+                    //Chia cac elbow theo gian X
+                    Dictionary<ElementId, List<FamilyInstance>> dicX = new Dictionary<ElementId, List<FamilyInstance>>();
+                    foreach (var key in groupX)
+                    {
+                        List<FamilyInstance> lstFml = new List<FamilyInstance>();
+                        foreach (var item in key)
+                        {
+                            lstFml.Add(item);
+                        }
+
+                        var dic = GetDicElbow(lstFml);
+
+                        foreach (var item1 in dic)
+                        {
+                            dicX.Add(item1.Key, item1.Value);
+                        }
+                    }
+
+                    //Chia cac elbow theo gian Y
+                    Dictionary<ElementId, List<FamilyInstance>> dicY = new Dictionary<ElementId, List<FamilyInstance>>();
+                    foreach (var key in groupY)
+                    {
+                        List<FamilyInstance> lstFml = new List<FamilyInstance>();
+                        foreach (var item in key)
+                        {
+                            lstFml.Add(item);
+                        }
+
+                        var dic = GetDicElbow(lstFml);
+
+                        foreach (var item1 in dic)
+                        {
+                            dicY.Add(item1.Key, item1.Value);
+                        }
+                    }
 
                     MoveElbowY(Global.UIDoc.Document, dicY, offset, downElbowControl);
 
@@ -1281,222 +1318,270 @@ namespace TotalMEPProject.Commands.TotalMEP
             return Result.Cancelled;
         }
 
-        private static void MoveElbowY(Document doc, Dictionary<int, List<FamilyInstance>> dicY, double offset, bool isDown)
+        private static void MoveElbowY(Document doc, Dictionary<ElementId, List<FamilyInstance>> dicY, double offset, bool isDown)
         {
             foreach (var item in dicY)
             {
                 if (item.Value.Count > 1)
                 {
-                    for (int i = 0; i < item.Value.Count; i++)
+                    double slope = 0;
+                    var mepSame = GetMepSame(item.Value);
+                    if (mepSame != null)
                     {
-                        if (i == item.Value.Count - 1)
+                        if (mepSame.get_Parameter(BuiltInParameter.RBS_PIPE_SLOPE) != null)
+                            slope = GetBuiltInParameterValue(mepSame, BuiltInParameter.RBS_PIPE_SLOPE);
+                        else if (mepSame.get_Parameter(BuiltInParameter.RBS_DUCT_SLOPE) != null)
+                            slope = GetBuiltInParameterValue(mepSame, BuiltInParameter.RBS_DUCT_SLOPE);
+                    }
+
+                    if (slope < 0.03)
+                    {
+                        for (int i = 0; i < item.Value.Count; i++)
                         {
-                            var vector = (item.Value[0].Location as LocationPoint).Point - (item.Value[1].Location as LocationPoint).Point;
-                            if (vector.X < 0)
+                            if (i == item.Value.Count - 1)
                             {
-                                if (isDown)
+                                var vector = (item.Value[0].Location as LocationPoint).Point - (item.Value[1].Location as LocationPoint).Point;
+                                if (vector.X < 0)
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                                 else
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                             }
                             else
                             {
-                                if (isDown)
+                                var vector = (item.Value[1].Location as LocationPoint).Point - (item.Value[0].Location as LocationPoint).Point;
+                                if (vector.X > 0)
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                                 else
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var vector = (item.Value[1].Location as LocationPoint).Point - (item.Value[0].Location as LocationPoint).Point;
-                            if (vector.X > 0)
-                            {
-                                if (isDown)
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                                else
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
-
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                            }
-                            else
-                            {
-                                if (isDown)
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X - offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
-
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                                else
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X + offset, (item.Value[i].Location as LocationPoint).Point.Y, (item.Value[i].Location as LocationPoint).Point.Z);
-
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                else
-                {
-                    List<Connector> lstCon = GetListConnector(item.Value.FirstOrDefault().MEPModel.ConnectorManager.Connectors);
-                    if (lstCon?.Count > 0)
+                    else
                     {
-                        var vector = lstCon[1].Origin - lstCon[0].Origin;
-                        if (vector.X > 0)
+                        if (!isDown)
                         {
-                            if (isDown)
-                            {
-                                XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X + offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
+                            XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X + offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
 
-                                ElementTransformUtils.MoveElement(doc, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
-                            }
-                            else
-                            {
-                                XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X - offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
-
-                                ElementTransformUtils.MoveElement(doc, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
-                            }
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
                         }
                         else
                         {
-                            if (isDown)
-                            {
-                                XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X - offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
+                            XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X - offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
 
-                                ElementTransformUtils.MoveElement(doc, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
-                            }
-                            else
-                            {
-                                XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X + offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
-
-                                ElementTransformUtils.MoveElement(doc, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
-                            }
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
                         }
                     }
                 }
             }
         }
 
-        private static void MoveElbowX(Document doc, Dictionary<int, List<FamilyInstance>> dicX, double offset, bool isDown)
+        private static void MoveElbowX(Document doc, Dictionary<ElementId, List<FamilyInstance>> dicX, double offset, bool isDown)
         {
             foreach (var item in dicX)
             {
                 if (item.Value.Count > 1)
                 {
-                    for (int i = 0; i < item.Value.Count; i++)
+                    double slope = 0;
+                    var mepSame = GetMepSame(item.Value);
+                    if (mepSame != null)
                     {
-                        if (i == item.Value.Count - 1)
-                        {
-                            var vector = (item.Value[0].Location as LocationPoint).Point - (item.Value[1].Location as LocationPoint).Point;
-                            if (vector.Y < 0)
-                            {
-                                if (isDown)
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
+                        if (mepSame.get_Parameter(BuiltInParameter.RBS_PIPE_SLOPE) != null)
+                            slope = GetBuiltInParameterValue(mepSame, BuiltInParameter.RBS_PIPE_SLOPE);
+                        else if (mepSame.get_Parameter(BuiltInParameter.RBS_DUCT_SLOPE) != null)
+                            slope = GetBuiltInParameterValue(mepSame, BuiltInParameter.RBS_DUCT_SLOPE);
+                    }
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                    if (slope < 0.03)
+                    {
+                        for (int i = 0; i < item.Value.Count; i++)
+                        {
+                            if (i == item.Value.Count - 1)
+                            {
+                                var vector = (item.Value[0].Location as LocationPoint).Point - (item.Value[1].Location as LocationPoint).Point;
+                                if (vector.Y < 0)
+                                {
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                                 else
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                             }
                             else
                             {
-                                if (isDown)
+                                var vector = (item.Value[1].Location as LocationPoint).Point - (item.Value[0].Location as LocationPoint).Point;
+                                if (vector.Y > 0)
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
+
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                                 else
                                 {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
+                                    if (isDown)
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var vector = (item.Value[1].Location as LocationPoint).Point - (item.Value[0].Location as LocationPoint).Point;
-                            if (vector.Y > 0)
-                            {
-                                if (isDown)
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
+                                    else
+                                    {
+                                        XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
 
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                                else
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
-
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                            }
-                            else
-                            {
-                                if (isDown)
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y - offset, (item.Value[i].Location as LocationPoint).Point.Z);
-
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
-                                }
-                                else
-                                {
-                                    XYZ a = new XYZ((item.Value[i].Location as LocationPoint).Point.X, (item.Value[i].Location as LocationPoint).Point.Y + offset, (item.Value[i].Location as LocationPoint).Point.Z);
-
-                                    ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                        ElementTransformUtils.MoveElement(doc, item.Value[i].Id, a - (item.Value[i].Location as LocationPoint).Point);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                else
-                {
-                    List<Connector> lstCon = GetListConnector(item.Value.FirstOrDefault().MEPModel.ConnectorManager.Connectors);
-                    if (lstCon?.Count > 0)
+                    else
                     {
-                        var vector = lstCon[1].Origin - lstCon[0].Origin;
-                        if (vector.Y > 0)
-                        {
-                            XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y + offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
-
-                            ElementTransformUtils.MoveElement(doc, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
-                        }
-                        else
+                        if (isDown)
                         {
                             XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y - offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
 
-                            ElementTransformUtils.MoveElement(doc, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
+                        }
+                        else
+                        {
+                            XYZ a = new XYZ((item.Value.FirstOrDefault().Location as LocationPoint).Point.X, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Y + offset, (item.Value.FirstOrDefault().Location as LocationPoint).Point.Z);
+
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, item.Value.FirstOrDefault().Id, a - (item.Value.FirstOrDefault().Location as LocationPoint).Point);
                         }
                     }
                 }
             }
+        }
+
+        public static MEPCurve GetMepSame(List<FamilyInstance> lstElbow)
+        {
+            MEPCurve retVal = null;
+            Dictionary<FamilyInstance, List<ElementId>> dic = new Dictionary<FamilyInstance, List<ElementId>>();
+            foreach (var elbow in lstElbow)
+            {
+                Connector c = null;
+
+                var loc = elbow.Location as LocationPoint;
+                if (loc == null)
+                    continue;
+
+                List<ElementId> pipesId = new List<ElementId>();
+                foreach (Connector con in elbow.MEPModel.ConnectorManager.Connectors)
+                {
+                    var pipeCon = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(MEPCurve)).Cast<MEPCurve>().Where(x => x.Location as LocationCurve != null
+                                                                                                                                && (Common.IsEqual((x.Location as LocationCurve).Curve.GetEndPoint(0), con.Origin)
+                                                                                                                                || Common.IsEqual((x.Location as LocationCurve).Curve.GetEndPoint(1), con.Origin)))
+                                                                                                       .FirstOrDefault();
+                    if (pipeCon != null)
+                        pipesId.Add(pipeCon.Id);
+                }
+
+                dic.Add(elbow, pipesId);
+            }
+
+            Dictionary<ElementId, List<FamilyInstance>> dicSamePipe = new Dictionary<ElementId, List<FamilyInstance>>();
+            List<FamilyInstance> lstElbowNoSame = new List<FamilyInstance>();
+
+            foreach (var item in dic)
+            {
+                foreach (var item1 in dic)
+                {
+                    if (item.Key.Id.IntegerValue == item1.Key.Id.IntegerValue)
+                        continue;
+
+                    var samePipeId = item.Value.Intersect(item1.Value).FirstOrDefault();
+
+                    if (samePipeId != null)
+                    {
+                        List<FamilyInstance> lstElbowSame = new List<FamilyInstance>();
+                        retVal = Global.UIDoc.Document.GetElement(samePipeId) as MEPCurve;
+                        return retVal;
+                    }
+                }
+            }
+
+            return retVal;
         }
 
         public static List<Connector> GetListConnector(ConnectorSet connectors)
@@ -1509,10 +1594,10 @@ namespace TotalMEPProject.Commands.TotalMEP
             return connects;
         }
 
-        public static Dictionary<int, List<FamilyInstance>> GetDicElbow(List<FamilyInstance> lstElbow)
+        public static Dictionary<ElementId, List<FamilyInstance>> GetDicElbow(List<FamilyInstance> lstElbow)
         {
-            Dictionary<int, List<FamilyInstance>> dic = new Dictionary<int, List<FamilyInstance>>();
-            int j = 1;
+            Dictionary<ElementId, List<FamilyInstance>> dic = new Dictionary<ElementId, List<FamilyInstance>>();
+
             for (int i = 0; i < lstElbow.Count; i++)
             {
                 List<FamilyInstance> lst = new List<FamilyInstance>();
@@ -1521,9 +1606,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                 if (i != lstElbow.Count - 1)
                     lst.Add(lstElbow[i + 1]);
 
-                dic.Add(j, lst);
-
-                j++;
+                dic.Add(lstElbow[i].Id, lst);
 
                 if (lstElbow.Count != i + 1)
                     i = i + 1;

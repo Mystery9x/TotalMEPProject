@@ -452,7 +452,7 @@ namespace TotalMEPProject.Ultis
         /// </summary>
         /// <param name="pipe"></param>
         /// <returns></returns>
-        public static Connector GetConnectorValid(MEPCurve pipe, Level level)
+        public static Connector GetConnectorValid(MEPCurve pipe, double offset)
         {
             if (pipe != null && pipe.Location is LocationCurve locationCurve)
             {
@@ -477,7 +477,7 @@ namespace TotalMEPProject.Ultis
                 else
                 {
                     var levelPipe = pipe.ReferenceLevel;
-                    if (levelPipe.Elevation < level.Elevation)
+                    if (levelPipe.Elevation < offset)
                     {
                         Connector retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conSt : conEnd;
                         if (retval.IsConnected)
@@ -493,6 +493,41 @@ namespace TotalMEPProject.Ultis
 
                         return retval;
                     }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Lấy connector có cao độ cao hơn
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <returns></returns>
+        public static Connector GetConnectorValid1(MEPCurve pipe)
+        {
+            if (pipe != null && pipe.Location is LocationCurve locationCurve)
+            {
+                double slope = Math.Round((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE), 5);
+
+                XYZ pointSt = locationCurve.Curve.GetEndPoint(0);
+
+                Connector conSt = GetConnectorNearest(pointSt, pipe, out Connector conEnd);
+
+                if (Common.IsEqual(slope, 0))
+                {
+                    if (conEnd.IsConnected)
+                        return conSt;
+
+                    return conEnd;
+                }
+                else
+                {
+                    Connector retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conSt : conEnd;
+                    if (retval.IsConnected)
+                        return (conSt.Origin.Z < conEnd.Origin.Z) ? conSt : conEnd;
+
+                    return retval;
                 }
             }
 
@@ -856,7 +891,7 @@ namespace TotalMEPProject.Ultis
         /// <param name="lenghtElbow"></param>
         /// <param name="distanceCenterToConnector"></param>
         /// <returns></returns>
-        public static bool GetLenghtElbowFitting45(Document doc, Level level, MEPCurve pipeHorizontal, XYZ vectorMoveZ
+        public static bool GetLenghtElbowFitting45(Document doc, MEPCurve pipeHorizontal, XYZ vectorMoveZ
            , out double lenghtElbow, out double distanceCenterToConnector)
         {
             lenghtElbow = 0;
@@ -869,7 +904,7 @@ namespace TotalMEPProject.Ultis
             subTran.Start();
             try
             {
-                Connector conHor1 = GetConnectorValid(pipeHorizontal, level);
+                Connector conHor1 = GetConnectorValid1(pipeHorizontal);
                 if (conHor1 != null && !conHor1.IsConnected)
                 {
                     conHor1 = GetConnectorNearest(conHor1.Origin, pipeHorizontal, out Connector conHor2);
@@ -1176,7 +1211,7 @@ namespace TotalMEPProject.Ultis
         /// <param name="pipe1"></param>
         /// <param name="pipe2"></param>
         /// <param name="isHubMode"></param>
-        public static bool ConnectPipeVerticalElbow45(Document doc, Level level, MEPCurve pipe1, MEPCurve pipe2, bool isHubMode)
+        public static bool ConnectPipeVerticalElbow45(Document doc, MEPCurve pipe1, MEPCurve pipe2, bool isHubMode)
         {
             if (pipe1 == null || pipe2 == null)
                 return false;
@@ -1217,7 +1252,7 @@ namespace TotalMEPProject.Ultis
 
                         XYZ vectoMoveZ = (conVert2.Origin - pointIntersec).Normalize();
 
-                        if (!GetLenghtElbowFitting45(doc, level, pipeHorizontal, vectoMoveZ, out double lengthElbow1, out double distanceCenterToConnector1))
+                        if (!GetLenghtElbowFitting45(doc, pipeHorizontal, vectoMoveZ, out double lengthElbow1, out double distanceCenterToConnector1))
                             return false;
 
                         FamilySymbol typeElbow = GetSymbolSeted(doc, pipeHorizontal, RoutingPreferenceRuleGroupType.Elbows);

@@ -155,6 +155,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                         if (level == null)
                             continue;
 
+                        var offsetFromLevel = UnitUtils.ConvertToInternalUnits(fastVerticalFrm.OffSet, DisplayUnitType.DUT_MILLIMETERS);
+
                         if (mepCurve is Pipe)
                         {
                             if (!Common.IsFamilySymbolSettedForPipeType(Global.UIDoc.Document, mepCurve, RoutingPreferenceRuleGroupType.Elbows))
@@ -162,7 +164,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                                 //IO.ShowWarning("Chưa set RoutingPreferenceRuleGroupType !", "Warning");
                                 continue;
                             }
-                            Connector connector = Common.GetConnectorValid(mepCurve, level);
+                            Connector connector = Common.GetConnectorValid(mepCurve, level.Elevation + offsetFromLevel);
 
                             if (connector != null && !connector.IsConnected)
                             {
@@ -263,32 +265,113 @@ namespace TotalMEPProject.Commands.TotalMEP
                         var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
                         if (level == null)
                             continue;
-                        //Tao mot pipe 45
-                        var elemIds = ElementTransformUtils.CopyElement(
-                            Global.UIDoc.Document, mepCurve.Id, newPlace);
 
-                        var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
-
-                        Connector conHor1 = Common.GetConnectorValid(mepCurve, level);
-                        if (conHor1 != null && !conHor1.IsConnected)
+                        double slope = Math.Round((double)Common.GetValueParameterByBuilt(mepCurve, BuiltInParameter.RBS_PIPE_SLOPE), 5);
+                        Pipe pipeVertical = null;
+                        if (pipeType.Name.Contains(Define.PIPE_CAST_IRON))
                         {
-                            conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
+                            if (Common.IsEqual(slope, 0))
+                            {
+                                Connector conHor1 = Common.GetConnectorValid1(mepCurve);
+                                if (conHor1 != null && !conHor1.IsConnected)
+                                {
+                                    conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
 
-                            XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
+                                    XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
 
-                            if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
-                                continue;
+                                    if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
+                                        continue;
 
-                            Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
-                            (vertical45_2.Location as LocationCurve).Curve = line;
+                                    pipeVertical = Pipe.Create(Global.UIDoc.Document, mepCurve.GetTypeId(), mepCurve.ReferenceLevel.Id, conHor1, pointOffsetToLevel);
+                                    if (pipeVertical == null)
+                                        continue;
+                                }
+                            }
+                            else
+                            {
+                                XYZ pointSt = ((LocationCurve)mepCurve.Location).Curve.GetEndPoint(0);
 
-                            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, level, mepCurve, vertical45_2, true);
+                                Connector conSt = Common.GetConnectorNearest(pointSt, mepCurve, out Connector conEnd);
+
+                                XYZ pointOffsetToLevelSt = Common.GetPointOffsetFromLevel(level, conSt.Origin, fastVerticalFrm.OffSet);
+
+                                XYZ pointOffsetToLevelEnd = Common.GetPointOffsetFromLevel(level, conEnd.Origin, fastVerticalFrm.OffSet);
+
+                                bool isTop = false;
+                                if (pointOffsetToLevelSt.Z > conSt.Origin.Z && pointOffsetToLevelEnd.Z > conEnd.Origin.Z)
+                                    isTop = true;
+
+                                Connector retval = null;
+                                if (!conSt.IsConnected && !conEnd.IsConnected)
+                                {
+                                    if (isTop)
+                                        retval = (conSt.Origin.Z > conEnd.Origin.Z) ? conSt : conEnd;
+                                    else
+                                        retval = (conSt.Origin.Z < conEnd.Origin.Z) ? conSt : conEnd;
+
+                                    pointOffsetToLevelSt = Common.GetPointOffsetFromLevel(level, retval.Origin, fastVerticalFrm.OffSet);
+                                    if (pointOffsetToLevelSt.IsAlmostEqualTo(retval.Origin))
+                                        continue;
+
+                                    pipeVertical = Pipe.Create(Global.UIDoc.Document, mepCurve.GetTypeId(), mepCurve.ReferenceLevel.Id, retval, pointOffsetToLevelSt);
+                                    if (pipeVertical == null)
+                                        continue;
+                                }
+                                else
+                                {
+                                    Connector conHor1 = Common.GetConnectorValid1(mepCurve);
+                                    if (conHor1 != null && !conHor1.IsConnected)
+                                    {
+                                        conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
+
+                                        XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
+
+                                        if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
+                                            continue;
+
+                                        pipeVertical = Pipe.Create(Global.UIDoc.Document, mepCurve.GetTypeId(), mepCurve.ReferenceLevel.Id, conHor1, pointOffsetToLevel);
+                                        if (pipeVertical == null)
+                                            continue;
+                                    }
+                                }
+                            }
+
+                            Common.GetConnectorClosedTo(mepCurve.ConnectorManager, pipeVertical.ConnectorManager, out Connector con1, out Connector con2);
+                            if (con1 != null && con2 != null && con1.IsConnectedTo(con2))
+                                con1.DisconnectFrom(con2);
+                            Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, pipeVertical, true);
+                        }
+                        else
+                        {
+                            var offsetFromLevel = UnitUtils.ConvertToInternalUnits(fastVerticalFrm.OffSet, DisplayUnitType.DUT_MILLIMETERS);
+                            //Tao mot pipe 45
+                            var elemIds = ElementTransformUtils.CopyElement(
+                                Global.UIDoc.Document, mepCurve.Id, newPlace);
+
+                            var vertical45_2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as MEPCurve;
+
+                            Connector conHor1 = Common.GetConnectorValid(mepCurve, level.Elevation + offsetFromLevel);
+                            if (conHor1 != null && !conHor1.IsConnected)
+                            {
+                                conHor1 = Common.GetConnectorNearest(conHor1.Origin, mepCurve, out Connector conHor2);
+
+                                XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, conHor1.Origin, fastVerticalFrm.OffSet);
+
+                                if (pointOffsetToLevel.IsAlmostEqualTo(conHor1.Origin))
+                                    continue;
+
+                                Line line = Line.CreateBound(conHor1.Origin, pointOffsetToLevel);
+                                (vertical45_2.Location as LocationCurve).Curve = line;
+
+                                Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
+                            }
                         }
                     }
                     else if (fastVerticalFrm.Siphon)
                     {
                         if (mepCurve is Pipe)
                         {
+                            var offsetFromLevel = UnitUtils.ConvertToInternalUnits(fastVerticalFrm.OffSet, DisplayUnitType.DUT_MILLIMETERS);
                             var symbol = Global.UIDoc.Document.GetElement(fastVerticalFrm.SiphonId) as FamilySymbol;
 
                             if (symbol.IsActive == false)
@@ -299,7 +382,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                             var level = Global.UIDoc.Document.GetElement(fastVerticalFrm.LevelId) as Level;
                             if (level == null)
                                 continue;
-                            Connector connector = Common.GetConnectorValid(mepCurve, level);
+                            Connector connector = Common.GetConnectorValid(mepCurve, level.Elevation + offsetFromLevel);
                             if (connector != null && !connector.IsConnected)
                             {
                                 XYZ pointOffsetToLevel = Common.GetPointOffsetFromLevel(level, connector.Origin, fastVerticalFrm.OffSet);
@@ -307,10 +390,10 @@ namespace TotalMEPProject.Commands.TotalMEP
                                 if (pointOffsetToLevel.IsAlmostEqualTo(connector.Origin))
                                     continue;
 
-                                XYZ vectorMoveZ = (pointOffsetToLevel - connector.Origin).Normalize();
+                                //XYZ vectorMoveZ = (pointOffsetToLevel - connector.Origin).Normalize();
 
-                                if (vectorMoveZ.IsAlmostEqualTo(XYZ.BasisZ.Negate()))
-                                    continue;
+                                //if (vectorMoveZ.IsAlmostEqualTo(XYZ.BasisZ.Negate()))
+                                //    continue;
 
                                 if (connector.Origin.IsAlmostEqualTo(pointOffsetToLevel))
                                     continue;
@@ -325,7 +408,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     if (conSt.IsConnectedTo(conEnd))
                                         conSt.DisconnectFrom(conEnd);
 
-                                    ConnectPipeVerticalSiphon(Global.UIDoc.Document, pipeVertical, mepCurve, symbol);
+                                    CreateSiphon(mepCurve, pipeVertical, fastVerticalFrm.SiphonId);
+                                    //ConnectPipeVerticalSiphon(Global.UIDoc.Document, pipeVertical, mepCurve, symbol);
                                 }
                             }
                         }
