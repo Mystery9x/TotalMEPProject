@@ -1696,5 +1696,349 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
             return null;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public static Result Run_UpdownElbowControl1(bool downElbowControl = false)
+        {
+            try
+            {
+                using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "HOLY_UPDOWN_ELBOW_CONTROL"))
+                {
+                    reTrans.Start();
+
+                    try
+                    {
+                        if (App.m_HolyUpDownForm == null)
+                            return Result.Cancelled;
+
+                        var selElbows = GetSelectedElbow();
+                        if (selElbows == null || selElbows.Count == 0)
+                            return Result.Cancelled;
+
+                        List<MEPCurveData> filterMEPCurve = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(MEPCurve))
+                                                                                    .Cast<MEPCurve>()
+                                                                                    .Select(item => new MEPCurveData(item))
+                                                                                    .ToList();
+
+                        List<ElbowControlData> elbowControlDatas = new List<ElbowControlData>();
+                        foreach (FamilyInstance elbow in selElbows)
+                        {
+                            elbowControlDatas.Add(new ElbowControlData(elbow, filterMEPCurve));
+                        }
+
+                        List<ElbowControlData> validElbow = elbowControlDatas.Where(item => item.MEPCurveConnects.Count > 0).ToList();
+
+                        var test = FilterElbow(validElbow).ToList();
+                        MessageBox.Show(test.Count.ToString());
+                        reTrans.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        reTrans.RollBack();
+                    }
+                }
+            }
+            catch (Exception)
+            { }
+            return Result.Cancelled;
+        }
+
+        private static IEnumerable<List<ElbowControlData>> FilterElbow(List<ElbowControlData> elbowControlDatas)
+        {
+            List<ElbowControlData> processElbows = new List<ElbowControlData>(elbowControlDatas);
+            List<ElbowControlData> processElbows_1 = new List<ElbowControlData>(elbowControlDatas);
+
+            for (int i = 0; i < processElbows.Count; i++)
+            {
+                ElbowControlData elbowMain = processElbows[i];
+                List<ElbowControlData> retVal = new List<ElbowControlData>();
+
+                processElbows_1.Remove(elbowMain);
+                var elbowDirectionDuplicate = processElbows_1.Where(item => PointOnLineSegment(elbowMain.MEPCurveDataMain.StartPointXtend,
+                                                                                               elbowMain.MEPCurveDataMain.EndPointXtend,
+                                                                                               item.MEPCurveDataMain.StartPoint) && PointOnLineSegment(elbowMain.MEPCurveDataMain.StartPointXtend,
+                                                                                                                                                       elbowMain.MEPCurveDataMain.EndPointXtend,
+                                                                                                                                                       item.MEPCurveDataMain.EndPoint))
+                                                             .ToList();
+
+                if (elbowDirectionDuplicate.Count >= 0)
+                {
+                    processElbows.Remove(elbowMain);
+                    i--;
+
+                    retVal.Add(elbowMain);
+                    retVal.AddRange(elbowDirectionDuplicate);
+                    elbowDirectionDuplicate.ForEach(item =>
+                    {
+                        processElbows_1.Remove(item);
+                        processElbows.Remove(item);
+                    });
+
+                    yield return retVal;
+                }
+            }
+        }
+
+        public static bool PointOnLineSegment(XYZ pt1, XYZ pt2, XYZ pt, double epsilon = 1e-6)
+        {
+            if (pt.X - Math.Max(pt1.X, pt2.X) > epsilon ||
+                Math.Min(pt1.X, pt2.X) - pt.X > epsilon ||
+                pt.Y - Math.Max(pt1.Y, pt2.Y) > epsilon ||
+                Math.Min(pt1.Y, pt2.Y) - pt.Y > epsilon)
+                return false;
+
+            if (Math.Abs(pt2.X - pt1.X) < epsilon)
+                return Math.Abs(pt1.X - pt.X) < epsilon || Math.Abs(pt2.X - pt.X) < epsilon;
+            if (Math.Abs(pt2.Y - pt1.Y) < epsilon)
+                return Math.Abs(pt1.Y - pt.Y) < epsilon || Math.Abs(pt2.Y - pt.Y) < epsilon;
+
+            var x = pt1.X + (pt.Y - pt1.Y) * (pt2.X - pt1.X) / (pt2.Y - pt1.Y);
+            var y = pt1.Y + (pt.X - pt1.X) * (pt2.Y - pt1.Y) / (pt2.X - pt1.X);
+
+            return Math.Abs(pt.X - x) < epsilon || Math.Abs(pt.Y - y) < epsilon;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public class ElbowControlData
+    {
+        private FamilyInstance m_elbow = null;
+        private List<MEPCurve> m_MEPCurveConnects = new List<MEPCurve>();
+        private Connector m_connector1 = null;
+        private Connector m_connector2 = null;
+        private MEPCurveData m_MEPCurveDataMain = null;
+        private Tuple<double, double> m_linearEquations = new Tuple<double, double>(double.MinValue, double.MinValue);
+
+        public Connector Connector1 { get => m_connector1; set => m_connector1 = value; }
+        public Connector Connector2 { get => m_connector2; set => m_connector2 = value; }
+        public Tuple<double, double> LinearEquations { get => m_linearEquations; set => m_linearEquations = value; }
+
+        public List<MEPCurveData> AllMEPCurveDataInModels = new List<MEPCurveData>();
+
+        public List<MEPCurveData> MEPCurveConnects = new List<MEPCurveData>();
+        public MEPCurveData MEPCurveDataMain { get => m_MEPCurveDataMain; set => m_MEPCurveDataMain = value; }
+
+        public ElbowControlData(FamilyInstance elbow, List<MEPCurveData> allMEPCurveModels)
+        {
+            m_elbow = elbow;
+            AllMEPCurveDataInModels = allMEPCurveModels;
+            GetConnector();
+            GetLinearEquations();
+            GetMEPCurveConnects();
+        }
+
+        public void GetConnector()
+        {
+            if (m_elbow != null)
+            {
+                if (m_elbow.MEPModel != null)
+                {
+                    List<Connector> cntorOfElbow = GetConnectorFromElbow(m_elbow.MEPModel.ConnectorManager.Connectors);
+                    if (cntorOfElbow != null && cntorOfElbow.Count == 2)
+                    {
+                        Connector1 = cntorOfElbow[0];
+                        Connector2 = cntorOfElbow[1];
+                    }
+                }
+            }
+        }
+
+        public void GetLinearEquations()
+        {
+            if (Connector1 != null && Connector2 != null)
+            {
+                XYZ vector = (Connector1.Origin - Connector2.Origin).Normalize();
+                double u = vector.X;
+                double v = vector.Y;
+
+                if (u < 0)
+                {
+                    u *= -1;
+                    v *= -1;
+                }
+                LinearEquations = new Tuple<double, double>(u, v);
+            }
+        }
+
+        public void GetMEPCurveConnects()
+        {
+            var filterMEPCurve = AllMEPCurveDataInModels.Where(item => item.Connector1 != null && item.Connector2 != null)
+                                                    .Where(item => item.Connector1.IsConnectedTo(Connector1)
+                                                                   || item.Connector1.IsConnectedTo(Connector2)
+                                                                   || item.Connector2.IsConnectedTo(Connector1)
+                                                                   || item.Connector2.IsConnectedTo(Connector2))
+                                                    .ToList();
+
+            MEPCurveConnects = filterMEPCurve.Where(item => item.Slope <= 0.00021).ToList();
+
+            if (MEPCurveConnects.Count > 0)
+            {
+                MEPCurveDataMain = MEPCurveConnects[0];
+            }
+        }
+
+        public List<Connector> GetConnectorFromElbow(ConnectorSet connectorSet)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+    }
+
+    public class MEPCurveData
+    {
+        private MEPCurve m_MEPCurve = null;
+        private double m_slope = double.MaxValue;
+        private XYZ m_startPoint = null;
+        private XYZ m_endPoint = null;
+
+        private XYZ m_direction = null;
+        private XYZ m_directionFlatten = null;
+        private Connector m_connector1 = null;
+        private Connector m_connector2 = null;
+
+        public MEPCurve MEPCurveMain { get => m_MEPCurve; set => m_MEPCurve = value; }
+        public double Slope { get => m_slope; set => m_slope = value; }
+        public XYZ StartPoint { get => m_startPoint; set => m_startPoint = value; }
+        public XYZ EndPoint { get => m_endPoint; set => m_endPoint = value; }
+        public XYZ Direction { get => m_direction; set => m_direction = value; }
+        public XYZ DirectionFlatten { get => m_directionFlatten; set => m_directionFlatten = value; }
+
+        public XYZ StartPointXtend
+        {
+            get
+            {
+                if (StartPoint != null)
+                {
+                    return StartPoint - Direction.Normalize() * 100;
+                }
+                return StartPoint;
+            }
+            private set { StartPoint = value; }
+        }
+
+        public XYZ EndPointXtend
+        {
+            get
+            {
+                if (EndPoint != null)
+                {
+                    return EndPoint + Direction.Normalize() * 100;
+                }
+                return EndPoint;
+            }
+            private set { EndPoint = value; }
+        }
+
+        public Connector Connector1 { get => m_connector1; set => m_connector1 = value; }
+        public Connector Connector2 { get => m_connector2; set => m_connector2 = value; }
+
+        public MEPCurveData(MEPCurve mEPCurve)
+        {
+            MEPCurveMain = mEPCurve;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            if (MEPCurveMain != null && MEPCurveMain.Location as LocationCurve != null)
+            {
+                StartPoint = (MEPCurveMain.Location as LocationCurve).Curve.GetEndPoint(0);
+                EndPoint = (MEPCurveMain.Location as LocationCurve).Curve.GetEndPoint(1);
+
+                GetConnector();
+
+                try
+                {
+                    XYZ directionTemp = ((MEPCurveMain.Location as LocationCurve).Curve as Line).Direction;
+
+                    double xVal = Math.Round(directionTemp.X, 6);
+                    double yVal = Math.Round(directionTemp.Y, 6);
+                    double zVal = Math.Round(directionTemp.Z, 6);
+                    Slope = 1 - Math.Sin(directionTemp.AngleTo(XYZ.BasisZ));
+                    Direction = EndPoint - StartPoint;
+                    DirectionFlatten = new XYZ(Direction.X, Direction.Y, 0);
+                }
+                catch (Exception)
+                { }
+            }
+        }
+
+        public void GetConnector()
+        {
+            if (m_MEPCurve != null)
+            {
+                if (m_MEPCurve.ConnectorManager != null)
+                {
+                    List<Connector> cntorOfElbow = GetConnectorFromPipe(m_MEPCurve.ConnectorManager.Connectors);
+                    if (cntorOfElbow != null && cntorOfElbow.Count == 2)
+                    {
+                        Connector1 = cntorOfElbow[0];
+                        Connector2 = cntorOfElbow[1];
+                    }
+                }
+            }
+        }
+
+        public List<Connector> GetConnectorFromPipe(ConnectorSet connectorSet)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        public dynamic GetBuiltInParameterValue(Element elem, BuiltInParameter paramId)
+        {
+            if (elem != null)
+            {
+                Parameter parameter = elem.get_Parameter(paramId);
+                return GetParameterValue(parameter);
+            }
+            return null;
+        }
+
+        private dynamic GetParameterValue(Parameter parameter)
+        {
+            if (parameter != null && parameter.HasValue)
+            {
+                switch (parameter.StorageType)
+                {
+                    case StorageType.Double:
+                        return parameter.AsDouble();
+
+                    case StorageType.ElementId:
+                        return parameter.AsElementId();
+
+                    case StorageType.Integer:
+                        return parameter.AsInteger();
+
+                    case StorageType.String:
+                        return parameter.AsString();
+                }
+            }
+            return null;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
