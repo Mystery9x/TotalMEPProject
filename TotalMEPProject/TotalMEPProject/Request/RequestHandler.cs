@@ -59,13 +59,13 @@ namespace TotalMEPProject.Request
 
                 case RequestId.HolyUpDown_UpElbowControl:
                     {
-                        CmdHolyUpdown.Run_UpDownElbowControl();
+                        CmdHolyUpdown.Run_UpdownElbowControl1();
                     }
                     break;
 
                 case RequestId.HolyUpDown_DownElbowControl:
                     {
-                        CmdHolyUpdown.Run_UpDownElbowControl(true);
+                        CmdHolyUpdown.Run_UpdownElbowControl1(true);
                     }
                     break;
 

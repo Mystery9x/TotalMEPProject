@@ -1728,8 +1728,44 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                         List<ElbowControlData> validElbow = elbowControlDatas.Where(item => item.MEPCurveConnects.Count > 0).ToList();
 
-                        var test = FilterElbow(validElbow).ToList();
-                        MessageBox.Show(test.Count.ToString());
+                        var filterElbows = FilterElbow(validElbow).ToList();
+
+                        double offset = App.m_HolyUpDownForm.UpElbowStepValue / 304.8;
+
+                        foreach (List<ElbowControlData> elbows in filterElbows)
+                        {
+                            if (elbows.Count > 1)
+                            {
+                                var twoElbow = GetTwoPointFurthest(elbowControlDatas);
+                                ElbowControlData elbow_1 = twoElbow.Item1;
+                                ElbowControlData elbow_2 = twoElbow.Item2;
+
+                                if (downElbowControl)
+                                {
+                                    ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, -elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                    ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, -elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                }
+                                else
+                                {
+                                    ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_1.ElbowMain.Id, elbow_1.MEPCurveDataMain.Direction.Normalize() * offset);
+                                    ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow_2.ElbowMain.Id, -elbow_2.MEPCurveDataMain.Direction.Normalize() * offset);
+                                }
+                            }
+                            else if (elbows.Count > 0)
+                            {
+                                ElbowControlData elbow = elbows[0];
+
+                                if (downElbowControl)
+                                {
+                                    ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow.ElbowMain.Id, -elbow.MEPCurveDataMain.Direction.Normalize() * offset);
+                                }
+                                else
+                                {
+                                    ElementTransformUtils.MoveElement(Global.UIDoc.Document, elbow.ElbowMain.Id, elbow.MEPCurveDataMain.Direction.Normalize() * offset);
+                                }
+                            }
+                        }
+
                         reTrans.Commit();
                     }
                     catch (Exception)
@@ -1798,6 +1834,32 @@ namespace TotalMEPProject.Commands.TotalMEP
             return Math.Abs(pt.X - x) < epsilon || Math.Abs(pt.Y - y) < epsilon;
         }
 
+        // Check two point
+        public static Tuple<ElbowControlData, ElbowControlData> GetTwoPointFurthest(List<ElbowControlData> elbowControlDatas)
+        {
+            try
+            {
+                double max = -1;
+
+                List<Tuple<double, Tuple<ElbowControlData, ElbowControlData>>> temp = new List<Tuple<double, Tuple<ElbowControlData, ElbowControlData>>>();
+                for (int i = 0; i < elbowControlDatas.Count - 1; i++)
+                {
+                    for (int j = i + 1; j < elbowControlDatas.Count; j++)
+                    {
+                        double distance = elbowControlDatas[i].LocationPoint.DistanceTo(elbowControlDatas[j].LocationPoint);
+                        Tuple<double, Tuple<ElbowControlData, ElbowControlData>> tuple = new Tuple<double, Tuple<ElbowControlData, ElbowControlData>>(distance, new Tuple<ElbowControlData, ElbowControlData>(elbowControlDatas[i], elbowControlDatas[j]));
+                        temp.Add(tuple);
+                    }
+                }
+
+                return temp.OrderByDescending(item => item.Item1).FirstOrDefault().Item2;
+            }
+            catch (Exception)
+            { }
+
+            return null;
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
@@ -1810,7 +1872,9 @@ namespace TotalMEPProject.Commands.TotalMEP
         private Connector m_connector2 = null;
         private MEPCurveData m_MEPCurveDataMain = null;
         private Tuple<double, double> m_linearEquations = new Tuple<double, double>(double.MinValue, double.MinValue);
+        private XYZ m_locationPoint = null;
 
+        public FamilyInstance ElbowMain { get => m_elbow; set => m_elbow = value; }
         public Connector Connector1 { get => m_connector1; set => m_connector1 = value; }
         public Connector Connector2 { get => m_connector2; set => m_connector2 = value; }
         public Tuple<double, double> LinearEquations { get => m_linearEquations; set => m_linearEquations = value; }
@@ -1819,12 +1883,14 @@ namespace TotalMEPProject.Commands.TotalMEP
 
         public List<MEPCurveData> MEPCurveConnects = new List<MEPCurveData>();
         public MEPCurveData MEPCurveDataMain { get => m_MEPCurveDataMain; set => m_MEPCurveDataMain = value; }
+        public XYZ LocationPoint { get => m_locationPoint; set => m_locationPoint = value; }
 
         public ElbowControlData(FamilyInstance elbow, List<MEPCurveData> allMEPCurveModels)
         {
-            m_elbow = elbow;
+            ElbowMain = elbow;
             AllMEPCurveDataInModels = allMEPCurveModels;
             GetConnector();
+            GetLocationPoint();
             GetLinearEquations();
             GetMEPCurveConnects();
         }
@@ -1876,6 +1942,14 @@ namespace TotalMEPProject.Commands.TotalMEP
             if (MEPCurveConnects.Count > 0)
             {
                 MEPCurveDataMain = MEPCurveConnects[0];
+            }
+        }
+
+        public void GetLocationPoint()
+        {
+            if (m_elbow != null)
+            {
+                LocationPoint = (m_elbow.Location as LocationPoint).Point;
             }
         }
 
