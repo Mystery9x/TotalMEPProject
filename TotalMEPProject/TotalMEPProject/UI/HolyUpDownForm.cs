@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TotalMEPProject.Request;
 using TotalMEPProject.Ultis;
+using TotalMEPProject.Ultis.StorageUtility;
 
 namespace TotalMEPProject.UI
 {
@@ -268,6 +269,11 @@ namespace TotalMEPProject.UI
             btnUpElbowControl.Enabled = !radNotApply.Checked;
             btnDownElbowControl.Enabled = !radNotApply.Checked;
             txtEblowControlValue.Enabled = !radNotApply.Checked;
+
+            if (radNotApply.Checked == false)
+            {
+                App.isApply = false;
+            }
         }
 
         private void txtDistance_KeyPress(object sender, KeyPressEventArgs e)

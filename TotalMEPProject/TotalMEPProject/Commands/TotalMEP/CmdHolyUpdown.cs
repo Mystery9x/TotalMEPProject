@@ -55,13 +55,22 @@ namespace TotalMEPProject.Commands.TotalMEP
                 var schema = Autodesk.Revit.DB.ExtensibleStorage.Schema.Lookup(StorageUtility.m_MEP_HoLyUpDown_Guild);
                 if (schema != null)
                 {
-                    object valueEntity = StorageUtility.GetValue(Global.UIDoc.Document.ProjectInformation, schema, StorageUtility.m_MEP_HoLyUpDown, typeof(string));
-
-                    if (valueEntity != null)
+                    if (!App.isApply)
                     {
-                        var str = valueEntity as string;
+                        string saveValue = string.Empty;
+                        StorageUtility.SetValue(Global.UIDoc.Document.ProjectInformation, StorageUtility.m_MEP_HoLyUpDown_Guild, StorageUtility.m_MEP_HoLyUpDown, typeof(string), saveValue);
+                        App.isApply = true;
+                    }
+                    else
+                    {
+                        object valueEntity = StorageUtility.GetValue(Global.UIDoc.Document.ProjectInformation, schema, StorageUtility.m_MEP_HoLyUpDown, typeof(string));
 
-                        ReadData(str);
+                        if (valueEntity != null)
+                        {
+                            var str = valueEntity as string;
+
+                            ReadData(str);
+                        }
                     }
                 }
 
@@ -109,40 +118,43 @@ namespace TotalMEPProject.Commands.TotalMEP
                             var mechanicalFitting = fitting.MEPModel as MechanicalFitting;
 
                             bool flag = false;
-                            if (mechanicalFitting != null)
+                            if (!App.m_HolyUpDownForm.NotApply)
                             {
-                                if (mechanicalFitting.PartType == PartType.Union)
+                                if (mechanicalFitting != null)
                                 {
-                                    cfitting.DisconnectFrom(c);
-
-                                    flag = true;
-
-                                    data[mepCurve].Add(fitting);
-                                }
-                                else
-                                {
-                                    if (mechanicalFitting.PartType == PartType.TapPerpendicular || mechanicalFitting.PartType == PartType.TapAdjustable)
-                                    {
-                                        cfitting.DisconnectFrom(c);
-                                        data_tap[mepCurve].Add(fitting);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var family = fitting.Symbol.Family;
-                                var partypePara = family.get_Parameter(BuiltInParameter.FAMILY_CONTENT_PART_TYPE);
-                                if (partypePara != null)
-                                {
-                                    var type = partypePara.AsValueString();
-
-                                    if (type.Contains("Union"))
+                                    if (mechanicalFitting.PartType == PartType.Union)
                                     {
                                         cfitting.DisconnectFrom(c);
 
                                         flag = true;
 
                                         data[mepCurve].Add(fitting);
+                                    }
+                                    else
+                                    {
+                                        if (mechanicalFitting.PartType == PartType.TapPerpendicular || mechanicalFitting.PartType == PartType.TapAdjustable)
+                                        {
+                                            cfitting.DisconnectFrom(c);
+                                            data_tap[mepCurve].Add(fitting);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var family = fitting.Symbol.Family;
+                                    var partypePara = family.get_Parameter(BuiltInParameter.FAMILY_CONTENT_PART_TYPE);
+                                    if (partypePara != null)
+                                    {
+                                        var type = partypePara.AsValueString();
+
+                                        if (type.Contains("Union"))
+                                        {
+                                            cfitting.DisconnectFrom(c);
+
+                                            flag = true;
+
+                                            data[mepCurve].Add(fitting);
+                                        }
                                     }
                                 }
                             }
@@ -291,10 +303,11 @@ namespace TotalMEPProject.Commands.TotalMEP
                             //}
 
                             eleOld = GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
-                                       != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
+                                      != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
 
                             double offset = eleOld + dataMep._OldOffset;
                             SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, offset);
+
                             //var loc = mepCurve.Location as LocationCurve;
                             //if (loc == null)
                             //    continue;
@@ -708,9 +721,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                     }
                 }
 
-                //Add to storage
-
                 var values = WriteXML();
+
                 bool result = StorageUtility.AddEntity(Global.UIDoc.Document.ProjectInformation, StorageUtility.m_MEP_HoLyUpDown_Guild, StorageUtility.m_MEP_HoLyUpDown, values);
 
                 tran.Commit();

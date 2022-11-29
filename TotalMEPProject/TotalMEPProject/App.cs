@@ -29,6 +29,7 @@ namespace TotalMEPProject
         public static HolyUpDownForm m_HolyUpDownForm = null;
 
         public static HolySplitUpdown _HolyUpdown = null;
+        public static bool isApply = true;
 
         #endregion Variable
 
