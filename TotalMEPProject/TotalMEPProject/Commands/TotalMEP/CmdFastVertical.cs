@@ -75,6 +75,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                 t.Start();
                 //Filter all slope pipes
                 bool isCannot = true;
+                bool isWarning = true;
+
                 foreach (MEPCurve mepCurve in mepCurves)
                 {
                     var con = Common.ToList(mepCurve.ConnectorManager.Connectors);
@@ -193,6 +195,11 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     isCannot = false;
                                     continue;
                                 }
+                            }
+                            else if (connector != null && connector.IsConnected && isWarning)
+                            {
+                                MessageBox.Show("Can not creat this connection for this case", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                isWarning = false;
                             }
                         }
                         else

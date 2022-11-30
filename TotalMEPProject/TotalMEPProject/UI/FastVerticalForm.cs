@@ -239,12 +239,13 @@ namespace TotalMEPProject.UI
             {
                 radElbow45.Enabled = true;
                 radElbow90.Enabled = true;
+                radSiPhon.Enabled = true;
             }
             else
             {
                 radElbow45.Enabled = false;
                 radElbow90.Enabled = false;
-
+                radSiPhon.Enabled = false;
                 radElbow90.Checked = true;
             }
         }
