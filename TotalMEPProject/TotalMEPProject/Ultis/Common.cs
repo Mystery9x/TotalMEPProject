@@ -499,6 +499,123 @@ namespace TotalMEPProject.Ultis
             return null;
         }
 
+        public static List<Solid> GetSolid(Pipe pipe)
+        {
+            var options = new Options();
+            options.ComputeReferences = false;
+
+            var goes = pipe.get_Geometry(options);
+
+            List<Solid> list = new List<Solid>();
+            Common.GetSolid(goes, list, false);
+
+            if (list.Count == 0)
+                return null;
+
+            return list;
+        }
+
+        public static void GetSolid(GeometryObject geObject, List<Solid> listSolid, bool getSymbol = false)
+        {
+            if (geObject is Solid)
+            {
+                Solid solid = geObject as Solid;
+                listSolid.Add(geObject as Solid);
+            }
+            if (geObject as GeometryElement != null)
+            {
+                GeometryElement geo = geObject as GeometryElement;
+                IEnumerator<GeometryObject> Objects = geo.GetEnumerator();
+                while (Objects.MoveNext())
+                {
+                    GeometryObject geObject1 = Objects.Current;
+                    GetSolid(geObject1, listSolid, getSymbol);
+                }
+            }
+            if (geObject as GeometryInstance != null)
+            {
+                GeometryInstance geometryInstance = geObject as GeometryInstance;
+                GeometryElement geo = null;
+                if (getSymbol == true)
+                    geo = geometryInstance.GetSymbolGeometry(); //_NOTE: GetSymbolGeometry de lay duoc face co reference = Mullion hien tai
+                else
+                    geo = geometryInstance.GetInstanceGeometry();
+                IEnumerator<GeometryObject> Objects = geo.GetEnumerator();
+                while (Objects.MoveNext())
+                {
+                    GeometryObject geObject1 = Objects.Current;
+                    GetSolid(geObject1, listSolid, getSymbol);
+                }
+            }
+        }
+
+        public static bool IsParallel(MEPCurve p1, MEPCurve p2)
+        {
+            Line c1 = p1.GetCurve() as Line;
+            Line c2 = p2.GetCurve() as Line;
+            return Math.Sin(c1.Direction.AngleTo(
+              c2.Direction)) < 0.01;
+        }
+
+        public static ConnectorProfileType GetShape(MEPCurve mep)
+        {
+            ConnectorProfileType ductShape
+              = ConnectorProfileType.Invalid;
+
+            foreach (Connector c
+              in mep.ConnectorManager.Connectors)
+            {
+                if (c.ConnectorType == ConnectorType.End)
+                {
+                    ductShape = c.Shape;
+                    break;
+                }
+            }
+            return ductShape;
+        }
+
+        public static bool IsParallel(XYZ p, XYZ q, double tolerance)
+        {
+            if (p.CrossProduct(q).IsZeroLength() == true)
+                return true;
+
+            var l = p.CrossProduct(q).GetLength();
+            if (IsZero(l, tolerance))
+                return true;
+
+            return false;
+        }
+
+        public static void GetInfo(FamilyInstance fitting, XYZ vector, out Connector main1, out Connector main2, out Connector tee)
+        {
+            //Get fitting info
+            main1 = null;
+            main2 = null;
+            tee = null;
+            Rotate45Utils.mc(fitting, vector, out main1, out main2);
+
+            foreach (Connector c in fitting.MEPModel.ConnectorManager.Connectors)
+            {
+                if (c.Id != main1.Id && c.Id != main2.Id)
+                {
+                    tee = c;
+                    break;
+                }
+            }
+        }
+
+        public static Element Clone(Element element)
+        {
+            //Create new pipe
+            var newPlace = new XYZ(0, 0, 0);
+            var elemIds = ElementTransformUtils.CopyElement(
+              Global.UIDoc.Document, element.Id, newPlace);
+
+            var clone = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]);
+
+            return clone;
+        }
+
         /// <summary>
         /// Lấy connector có cao độ cao hơn
         /// </summary>

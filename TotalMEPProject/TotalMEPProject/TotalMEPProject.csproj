@@ -183,6 +183,12 @@
     <Compile Include="UI\FastVerticalForm.Designer.cs">
       <DependentUpon>FastVerticalForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\FireFightingUI\2LevelSmartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FireFightingUI\2LevelSmartForm.Designer.cs">
+      <DependentUpon>2LevelSmartForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\FrmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -206,6 +212,7 @@
     </Compile>
     <Compile Include="Ultis\AppUtils.cs" />
     <Compile Include="Ultis\Common.cs" />
+    <Compile Include="Ultis\CreateFittingForMEPUtils.cs" />
     <Compile Include="Ultis\DataPC.cs" />
     <Compile Include="Ultis\Define.cs" />
     <Compile Include="Ultis\FamilyLoadOption.cs" />
@@ -218,6 +225,7 @@
     <Compile Include="Ultis\LicenseUtils.cs" />
     <Compile Include="Ultis\MEPCurveFilter.cs" />
     <Compile Include="Ultis\MEPUtilscs.cs" />
+    <Compile Include="Ultis\Rotate45Utils.cs" />
     <Compile Include="Ultis\StorageUtility\StorageUtility.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +234,9 @@
   <ItemGroup>
     <EmbeddedResource Include="UI\FastVerticalForm.resx">
       <DependentUpon>FastVerticalForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FireFightingUI\2LevelSmartForm.resx">
+      <DependentUpon>2LevelSmartForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FrmLogin.resx">
       <DependentUpon>FrmLogin.cs</DependentUpon>

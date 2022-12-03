@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using TotalMEPProject.Request;
 using TotalMEPProject.Services;
 using TotalMEPProject.UI;
+using TotalMEPProject.UI.FireFightingUI;
 using TotalMEPProject.Ultis;
 using TotalMEPProject.Ultis.HolyUltis;
 
@@ -25,6 +26,7 @@ namespace TotalMEPProject
 
         public static WindowHandle hWndRevit = null;
         public static VerticalMEPForm verticalMEPForm = null;
+        public static _2LevelSmartForm _2LevelSmartForm = null;
         public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
 
@@ -636,6 +638,45 @@ namespace TotalMEPProject
                 }
 
                 DisplayService.SetFocus(new HandleRef(null, App.m_HolyUpDownForm.Handle));
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static bool Show2LevelSmartForm()
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (_2LevelSmartForm == null || _2LevelSmartForm.IsDisposed)
+                {
+                    RequestHandler handler = new RequestHandler();
+
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    _2LevelSmartForm = new _2LevelSmartForm(exEvent, handler);
+
+                    _2LevelSmartForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App._2LevelSmartForm.Handle));
 
                 return true;
             }
