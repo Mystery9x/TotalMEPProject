@@ -38,7 +38,6 @@
             this.btnUpElbowControl = new System.Windows.Forms.Button();
             this.btnDownElbowControl = new System.Windows.Forms.Button();
             this.txtEblowControlValue = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -54,16 +53,12 @@
             this.btnUpStep = new System.Windows.Forms.Button();
             this.btnDownStep = new System.Windows.Forms.Button();
             this.txtUpdownStepValue = new System.Windows.Forms.TextBox();
-            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.radOE = new System.Windows.Forms.RadioButton();
-            this.radPTE = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
-            this.flowLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -79,7 +74,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(475, 196);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(475, 183);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel4
@@ -92,7 +87,7 @@
             this.tableLayoutPanel4.Controls.Add(this.btnApply, 1, 0);
             this.tableLayoutPanel4.Controls.Add(this.btnOK, 2, 0);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 159);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 146);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -127,7 +122,6 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel5, 1, 3);
-            this.tableLayoutPanel2.Controls.Add(this.label5, 0, 4);
             this.tableLayoutPanel2.Controls.Add(this.label3, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.label1, 0, 2);
@@ -135,17 +129,16 @@
             this.tableLayoutPanel2.Controls.Add(this.flowLayoutPanel1, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.txtDistance, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 1, 2);
-            this.tableLayoutPanel2.Controls.Add(this.flowLayoutPanel2, 1, 4);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 5;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(469, 150);
+            this.tableLayoutPanel2.RowCount = 4;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(469, 137);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // tableLayoutPanel5
@@ -158,12 +151,12 @@
             this.tableLayoutPanel5.Controls.Add(this.btnDownElbowControl, 1, 0);
             this.tableLayoutPanel5.Controls.Add(this.txtEblowControlValue, 2, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(140, 90);
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(140, 102);
             this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(329, 30);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(329, 35);
             this.tableLayoutPanel5.TabIndex = 59;
             // 
             // btnUpElbowControl
@@ -200,16 +193,6 @@
             this.txtEblowControlValue.TabIndex = 2;
             this.txtEblowControlValue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtEblowControlValue_KeyPress);
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 123);
-            this.label5.Margin = new System.Windows.Forms.Padding(3);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(85, 13);
-            this.label5.TabIndex = 53;
-            this.label5.Text = "Elvation Change";
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -223,7 +206,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 33);
+            this.label2.Location = new System.Drawing.Point(3, 37);
             this.label2.Margin = new System.Windows.Forms.Padding(3);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(120, 13);
@@ -233,7 +216,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 63);
+            this.label1.Location = new System.Drawing.Point(3, 71);
             this.label1.Margin = new System.Windows.Forms.Padding(3);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 13);
@@ -243,7 +226,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 93);
+            this.label4.Location = new System.Drawing.Point(3, 105);
             this.label4.Margin = new System.Windows.Forms.Padding(3);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(72, 13);
@@ -261,7 +244,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(140, 0);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(329, 30);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(329, 34);
             this.flowLayoutPanel1.TabIndex = 54;
             // 
             // radElbow90
@@ -329,7 +312,7 @@
             // 
             // txtDistance
             // 
-            this.txtDistance.Location = new System.Drawing.Point(145, 33);
+            this.txtDistance.Location = new System.Drawing.Point(145, 37);
             this.txtDistance.Margin = new System.Windows.Forms.Padding(5, 3, 3, 3);
             this.txtDistance.Name = "txtDistance";
             this.txtDistance.Size = new System.Drawing.Size(321, 20);
@@ -346,12 +329,12 @@
             this.tableLayoutPanel3.Controls.Add(this.btnDownStep, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.txtUpdownStepValue, 2, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(140, 60);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(140, 68);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(329, 30);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(329, 34);
             this.tableLayoutPanel3.TabIndex = 56;
             // 
             // btnUpStep
@@ -388,48 +371,11 @@
             this.txtUpdownStepValue.TabIndex = 2;
             this.txtUpdownStepValue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtUpdownStepValue_KeyPress);
             // 
-            // flowLayoutPanel2
-            // 
-            this.flowLayoutPanel2.Controls.Add(this.radOE);
-            this.flowLayoutPanel2.Controls.Add(this.radPTE);
-            this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(140, 120);
-            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(329, 30);
-            this.flowLayoutPanel2.TabIndex = 58;
-            // 
-            // radOE
-            // 
-            this.radOE.AutoSize = true;
-            this.radOE.Location = new System.Drawing.Point(0, 3);
-            this.radOE.Margin = new System.Windows.Forms.Padding(0, 3, 20, 3);
-            this.radOE.Name = "radOE";
-            this.radOE.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radOE.Size = new System.Drawing.Size(107, 17);
-            this.radOE.TabIndex = 2;
-            this.radOE.TabStop = true;
-            this.radOE.Text = "Original Elevation";
-            this.radOE.UseVisualStyleBackColor = true;
-            // 
-            // radPTE
-            // 
-            this.radPTE.AutoSize = true;
-            this.radPTE.Location = new System.Drawing.Point(147, 3);
-            this.radPTE.Margin = new System.Windows.Forms.Padding(20, 3, 20, 3);
-            this.radPTE.Name = "radPTE";
-            this.radPTE.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radPTE.Size = new System.Drawing.Size(135, 17);
-            this.radPTE.TabIndex = 3;
-            this.radPTE.TabStop = true;
-            this.radPTE.Text = "Previous time Elevation";
-            this.radPTE.UseVisualStyleBackColor = true;
-            // 
             // HolyUpDownForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(475, 196);
+            this.ClientSize = new System.Drawing.Size(475, 183);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -447,8 +393,6 @@
             this.flowLayoutPanel1.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
-            this.flowLayoutPanel2.ResumeLayout(false);
-            this.flowLayoutPanel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -460,7 +404,6 @@
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
@@ -476,9 +419,6 @@
         private System.Windows.Forms.Button btnUpStep;
         private System.Windows.Forms.Button btnDownStep;
         private System.Windows.Forms.TextBox txtUpdownStepValue;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
-        private System.Windows.Forms.RadioButton radOE;
-        private System.Windows.Forms.RadioButton radPTE;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
         private System.Windows.Forms.Button btnUpElbowControl;
         private System.Windows.Forms.Button btnDownElbowControl;

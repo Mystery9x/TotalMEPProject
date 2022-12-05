@@ -36,6 +36,7 @@ namespace TotalMEPProject.Ultis.HolyUltis
         public MEPCurve _Other02 = null;
 
         public double _OldOffset = 0;
+        public double _OldOffsetApply = 0;
 
         public Data(MEPCurve mepCurve)
         {

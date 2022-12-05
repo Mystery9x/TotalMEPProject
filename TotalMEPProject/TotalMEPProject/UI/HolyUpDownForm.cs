@@ -149,22 +149,6 @@ namespace TotalMEPProject.UI
             }
         }
 
-        public bool OriginalElevation
-        {
-            get
-            {
-                return radOE.Checked;
-            }
-        }
-
-        public bool PreviousTimeElevation
-        {
-            get
-            {
-                return radPTE.Checked;
-            }
-        }
-
         #endregion Properties
 
         #region Constructor
@@ -203,8 +187,6 @@ namespace TotalMEPProject.UI
             AppUtils.sa(txtAngle);
             AppUtils.sa(txtEblowControlValue);
             AppUtils.sa(txtUpdownStepValue);
-            AppUtils.sa(radOE);
-            AppUtils.sa(radPTE);
 
             MakeRequest(GetRequestId(RunMode.OK));
 
@@ -250,7 +232,7 @@ namespace TotalMEPProject.UI
 
         private void txtUpdownStepValue_KeyPress(object sender, KeyPressEventArgs e)
         {
-            NumberCheck(sender, e, false);
+            NumberCheck(sender, e, true);
         }
 
         private void txtEblowControlValue_KeyPress(object sender, KeyPressEventArgs e)
@@ -269,6 +251,7 @@ namespace TotalMEPProject.UI
             btnUpElbowControl.Enabled = !radNotApply.Checked;
             btnDownElbowControl.Enabled = !radNotApply.Checked;
             txtEblowControlValue.Enabled = !radNotApply.Checked;
+            txtDistance.Enabled = !radNotApply.Checked;
 
             if (radNotApply.Checked == false)
             {
@@ -291,10 +274,7 @@ namespace TotalMEPProject.UI
             AppUtils.ff(txtAngle);
             AppUtils.ff(txtEblowControlValue);
             AppUtils.ff(txtUpdownStepValue);
-            AppUtils.ff(radOE);
-            AppUtils.ff(radPTE);
 
-            radOE.Checked = true;
             txtAngle.Enabled = radCustom.Checked;
             label4.Enabled = !radNotApply.Checked;
             btnUpElbowControl.Enabled = !radNotApply.Checked;

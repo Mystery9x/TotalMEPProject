@@ -30,19 +30,19 @@
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.cboC1FamilyType = new System.Windows.Forms.ComboBox();
-            this.cboC1PipeSize = new System.Windows.Forms.ComboBox();
-            this.cboC1NippleFamily = new System.Windows.Forms.ComboBox();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.btnOK = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.ckbC1ElbowConnection = new System.Windows.Forms.CheckBox();
             this.ckbNippleCreating = new System.Windows.Forms.CheckBox();
+            this.cboC1PipeSize = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cboC1FamilyType = new System.Windows.Forms.ComboBox();
+            this.cboC1NippleFamily = new System.Windows.Forms.ComboBox();
+            this.ckbC1ElbowConnection = new System.Windows.Forms.CheckBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnOK = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -91,66 +91,15 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(338, 163);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
-            // label1
+            // ckbNippleCreating
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(5, 5);
-            this.label1.Margin = new System.Windows.Forms.Padding(5);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Vertical Pipe Type";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(5, 37);
-            this.label2.Margin = new System.Windows.Forms.Padding(5);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(89, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Vertical Pipe Size";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(5, 69);
-            this.label3.Margin = new System.Windows.Forms.Padding(5);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(93, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Elbow Connection";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(5, 101);
-            this.label4.Margin = new System.Windows.Forms.Padding(5);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(79, 13);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "Nipple Creating";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(5, 133);
-            this.label5.Margin = new System.Windows.Forms.Padding(5);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(69, 13);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "Nipple Family";
-            // 
-            // cboC1FamilyType
-            // 
-            this.cboC1FamilyType.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cboC1FamilyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboC1FamilyType.FormattingEnabled = true;
-            this.cboC1FamilyType.Location = new System.Drawing.Point(125, 5);
-            this.cboC1FamilyType.Margin = new System.Windows.Forms.Padding(5);
-            this.cboC1FamilyType.Name = "cboC1FamilyType";
-            this.cboC1FamilyType.Size = new System.Drawing.Size(208, 21);
-            this.cboC1FamilyType.TabIndex = 5;
+            this.ckbNippleCreating.AutoSize = true;
+            this.ckbNippleCreating.Location = new System.Drawing.Point(125, 104);
+            this.ckbNippleCreating.Margin = new System.Windows.Forms.Padding(5, 8, 5, 5);
+            this.ckbNippleCreating.Name = "ckbNippleCreating";
+            this.ckbNippleCreating.Size = new System.Drawing.Size(15, 14);
+            this.ckbNippleCreating.TabIndex = 9;
+            this.ckbNippleCreating.UseVisualStyleBackColor = true;
             // 
             // cboC1PipeSize
             // 
@@ -163,6 +112,67 @@
             this.cboC1PipeSize.Size = new System.Drawing.Size(208, 21);
             this.cboC1PipeSize.TabIndex = 6;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(5, 5);
+            this.label1.Margin = new System.Windows.Forms.Padding(5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(93, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Vertical Pipe Type";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(5, 133);
+            this.label5.Margin = new System.Windows.Forms.Padding(5);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(69, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Nipple Family";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(5, 101);
+            this.label4.Margin = new System.Windows.Forms.Padding(5);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(79, 13);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "Nipple Creating";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(5, 69);
+            this.label3.Margin = new System.Windows.Forms.Padding(5);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(93, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Elbow Connection";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(5, 37);
+            this.label2.Margin = new System.Windows.Forms.Padding(5);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(89, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Vertical Pipe Size";
+            // 
+            // cboC1FamilyType
+            // 
+            this.cboC1FamilyType.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cboC1FamilyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboC1FamilyType.FormattingEnabled = true;
+            this.cboC1FamilyType.Location = new System.Drawing.Point(125, 5);
+            this.cboC1FamilyType.Margin = new System.Windows.Forms.Padding(5);
+            this.cboC1FamilyType.Name = "cboC1FamilyType";
+            this.cboC1FamilyType.Size = new System.Drawing.Size(208, 21);
+            this.cboC1FamilyType.TabIndex = 5;
+            // 
             // cboC1NippleFamily
             // 
             this.cboC1NippleFamily.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -173,6 +183,16 @@
             this.cboC1NippleFamily.Name = "cboC1NippleFamily";
             this.cboC1NippleFamily.Size = new System.Drawing.Size(208, 21);
             this.cboC1NippleFamily.TabIndex = 7;
+            // 
+            // ckbC1ElbowConnection
+            // 
+            this.ckbC1ElbowConnection.AutoSize = true;
+            this.ckbC1ElbowConnection.Location = new System.Drawing.Point(125, 72);
+            this.ckbC1ElbowConnection.Margin = new System.Windows.Forms.Padding(5, 8, 5, 5);
+            this.ckbC1ElbowConnection.Name = "ckbC1ElbowConnection";
+            this.ckbC1ElbowConnection.Size = new System.Drawing.Size(15, 14);
+            this.ckbC1ElbowConnection.TabIndex = 8;
+            this.ckbC1ElbowConnection.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel3
             // 
@@ -191,16 +211,6 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(338, 34);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
-            // btnOK
-            // 
-            this.btnOK.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnOK.Location = new System.Drawing.Point(161, 3);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(84, 28);
-            this.btnOK.TabIndex = 0;
-            this.btnOK.Text = "OK";
-            this.btnOK.UseVisualStyleBackColor = true;
-            // 
             // btnCancel
             // 
             this.btnCancel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -211,25 +221,15 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // ckbC1ElbowConnection
+            // btnOK
             // 
-            this.ckbC1ElbowConnection.AutoSize = true;
-            this.ckbC1ElbowConnection.Location = new System.Drawing.Point(125, 72);
-            this.ckbC1ElbowConnection.Margin = new System.Windows.Forms.Padding(5, 8, 5, 5);
-            this.ckbC1ElbowConnection.Name = "ckbC1ElbowConnection";
-            this.ckbC1ElbowConnection.Size = new System.Drawing.Size(15, 14);
-            this.ckbC1ElbowConnection.TabIndex = 8;
-            this.ckbC1ElbowConnection.UseVisualStyleBackColor = true;
-            // 
-            // ckbNippleCreating
-            // 
-            this.ckbNippleCreating.AutoSize = true;
-            this.ckbNippleCreating.Location = new System.Drawing.Point(125, 104);
-            this.ckbNippleCreating.Margin = new System.Windows.Forms.Padding(5, 8, 5, 5);
-            this.ckbNippleCreating.Name = "ckbNippleCreating";
-            this.ckbNippleCreating.Size = new System.Drawing.Size(15, 14);
-            this.ckbNippleCreating.TabIndex = 9;
-            this.ckbNippleCreating.UseVisualStyleBackColor = true;
+            this.btnOK.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnOK.Location = new System.Drawing.Point(161, 3);
+            this.btnOK.Name = "btnOK";
+            this.btnOK.Size = new System.Drawing.Size(84, 28);
+            this.btnOK.TabIndex = 0;
+            this.btnOK.Text = "OK";
+            this.btnOK.UseVisualStyleBackColor = true;
             // 
             // _2LevelSmartForm
             // 

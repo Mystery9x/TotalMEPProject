@@ -88,9 +88,15 @@ namespace TotalMEPProject.Commands.TotalMEP
                 }
 
                 double offsetMain = UnitUtils.ConvertToInternalUnits(Math.Abs(App.m_HolyUpDownForm.Distance), DisplayUnitType.DUT_MILLIMETERS);// Math.Abs(App.m_HolyUpDownForm.Distance) * Common.mmToFT;
+                double offsetApply = UnitUtils.ConvertToInternalUnits(Math.Abs(App.m_HolyUpDownForm.UpStepValue), DisplayUnitType.DUT_MILLIMETERS);// Math.Abs(App.m_HolyUpDownForm.Distance) * Common.mmToFT;
                 if (App.m_HolyUpDownForm.Distance < 0)
                 {
                     offsetMain *= -1;
+                }
+
+                if (App.m_HolyUpDownForm.UpStepValue < 0)
+                {
+                    offsetApply *= -1;
                 }
 
                 Transaction tran = new Transaction(Global.UIDoc.Document, "Holy");
@@ -98,9 +104,13 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                 Dictionary<MEPCurve, List<FamilyInstance>> data = new Dictionary<MEPCurve, List<FamilyInstance>>();
                 Dictionary<MEPCurve, List<FamilyInstance>> data_tap = new Dictionary<MEPCurve, List<FamilyInstance>>();
-
+                Dictionary<ElementId, double> dicParaElevationBegin = new Dictionary<ElementId, double>();
                 foreach (MEPCurve mepCurve in meps)
                 {
+                    var eleOld = GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
+                                    != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
+
+                    dicParaElevationBegin.Add(mepCurve.Id, eleOld);
                     data.Add(mepCurve, new List<FamilyInstance>());
                     data_tap.Add(mepCurve, new List<FamilyInstance>());
 
@@ -196,6 +206,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                         var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
 
                         double offset = offsetMain;
+                        double offsetApp = offsetApply;
                         if (dataMep == null)
                         {
                             dataMep = new Data(mepCurve);
@@ -203,6 +214,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                             dataMep._Start = curve.GetEndPoint(0);
                             dataMep._End = curve.GetEndPoint(1);
                             dataMep._OldOffset = offset;
+                            dataMep._OldOffsetApply = offsetApp;
                             _Datas.Add(dataMep);
 
                             data_exist.Add(mepCurve, false);
@@ -213,14 +225,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                         if (dataMep._Start != null && dataMep._End != null)
                         {
-                            if (App.m_HolyUpDownForm.OriginalElevation == false)
-                            {
-                                offset += dataMep._OldOffset;
-                                dataMep._OldOffset = offset;
-                            }
-                            else
-                                dataMep._OldOffset = offset;
-
+                            dataMep._OldOffset = offset;
+                            dataMep._OldOffsetApply = offsetApp;
                             var p0New = OffsetZ(dataMep._Start, offset);
                             var p1New = OffsetZ(dataMep._End, offset);
 
@@ -285,38 +291,15 @@ namespace TotalMEPProject.Commands.TotalMEP
                         var lstSel = GetSelectedMEP();
                         foreach (MEPCurve mepCurve in lstSel)
                         {
-                            var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
-                            if (dataMep == null)
-                                continue;
+                            if (dicParaElevationBegin.ContainsKey(mepCurve.Id))
+                            {
+                                var dataMep = _Datas.Find(item => item._MEPCurve.Id == mepCurve.Id);
+                                if (dataMep == null)
+                                    continue;
 
-                            //bool exist = false;
-
-                            //if (data_exist.ContainsKey(mepCurve))
-                            //{
-                            //    exist = data_exist[mepCurve];
-                            //    var data1 = data_exist.FirstOrDefault(x => x.Key.Id == mepCurve.Id);
-                            //    if (exist)
-                            //    {
-                            //        eleOld = GetBuiltInParameterValue(data1.Key, BuiltInParameter.RBS_OFFSET_PARAM)
-                            //                   != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
-                            //    }
-                            //}
-
-                            eleOld = GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
-                                      != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
-
-                            double offset = eleOld + dataMep._OldOffset;
-                            SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, offset);
-
-                            //var loc = mepCurve.Location as LocationCurve;
-                            //if (loc == null)
-                            //    continue;
-
-                            //var point = OffsetZ((loc.Curve as Line).Origin, offset);
-
-                            //var vectorMove = point - (loc.Curve as Line).Origin;
-
-                            //ElementTransformUtils.MoveElement(Global.UIDoc.Document, mepCurve.Id, vectorMove);
+                                double offset = dicParaElevationBegin[mepCurve.Id] + dataMep._OldOffsetApply;
+                                SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, offset);
+                            }
                         }
                     }
                     else
@@ -912,6 +895,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                             dataMep._OldOffset = ToDouble(attribute.Value);
                         }
 
+                        attribute = node.Attributes["OldOffsetApply"];
+                        if (attribute != null && attribute.Value != null)
+                        {
+                            dataMep._OldOffsetApply = ToDouble(attribute.Value);
+                        }
+
                         _Datas.Add(dataMep);
                     }
                 }
@@ -1069,6 +1058,13 @@ namespace TotalMEPProject.Commands.TotalMEP
                 attribute = xmlDoc.CreateAttribute("OldOffset");
                 if (data._OldOffset != double.NaN)
                     attribute.Value = data._OldOffset.ToString();
+                else
+                    attribute.Value = string.Empty;
+                dataNode.Attributes.Append(attribute);
+
+                attribute = xmlDoc.CreateAttribute("OldOffsetApply");
+                if (data._OldOffsetApply != double.NaN)
+                    attribute.Value = data._OldOffsetApply.ToString();
                 else
                     attribute.Value = string.Empty;
                 dataNode.Attributes.Append(attribute);
