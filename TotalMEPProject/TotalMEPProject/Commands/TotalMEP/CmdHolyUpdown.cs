@@ -213,7 +213,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                             var curve = (mepCurve.Location as LocationCurve).Curve;
                             dataMep._Start = curve.GetEndPoint(0);
                             dataMep._End = curve.GetEndPoint(1);
-                            dataMep._OldOffset = offset;
+                            dataMep._OldOffset = 0;
                             dataMep._OldOffsetApply = offsetApp;
                             _Datas.Add(dataMep);
 
@@ -225,7 +225,9 @@ namespace TotalMEPProject.Commands.TotalMEP
                         }
                         if (dataMep._Start != null && dataMep._End != null)
                         {
+                            offset += dataMep._OldOffset;
                             dataMep._OldOffset = offset;
+
                             dataMep._OldOffsetApply = offsetApp;
                             var p0New = OffsetZ(dataMep._Start, offset);
                             var p1New = OffsetZ(dataMep._End, offset);
