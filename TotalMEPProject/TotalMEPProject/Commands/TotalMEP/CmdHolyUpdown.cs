@@ -99,8 +99,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                     offsetApply *= -1;
                 }
 
+                bool isDeleteWarning = false;
                 Transaction tran = new Transaction(Global.UIDoc.Document, "Holy");
+
                 tran.Start();
+
+                FailureHandlingOptions fhOpts = tran.GetFailureHandlingOptions();
 
                 Dictionary<MEPCurve, List<FamilyInstance>> data = new Dictionary<MEPCurve, List<FamilyInstance>>();
                 Dictionary<MEPCurve, List<FamilyInstance>> data_tap = new Dictionary<MEPCurve, List<FamilyInstance>>();
@@ -290,6 +294,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                     if (App.m_HolyUpDownForm.NotApply)
                     {
+                        isDeleteWarning = true;
                         var lstSel = GetSelectedMEP();
                         foreach (MEPCurve mepCurve in lstSel)
                         {
@@ -710,7 +715,11 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                 bool result = StorageUtility.AddEntity(Global.UIDoc.Document.ProjectInformation, StorageUtility.m_MEP_HoLyUpDown_Guild, StorageUtility.m_MEP_HoLyUpDown, values);
 
-                tran.Commit();
+                GetInfoWarning supWarning = new GetInfoWarning(isDeleteWarning);
+                fhOpts.SetFailuresPreprocessor(supWarning);
+                tran.SetFailureHandlingOptions(fhOpts);
+
+                tran.Commit(fhOpts);
 
                 return Result.Succeeded;
             }
@@ -1155,11 +1164,16 @@ namespace TotalMEPProject.Commands.TotalMEP
                     {
                         if (reTrans.Start() == TransactionStatus.Started)
                         {
+                            FailureHandlingOptions fhOpts = reTrans.GetFailureHandlingOptions();
                             try
                             {
                                 double dNewOffsetParamVal = downStep == false ? dOldOffsetParamVal + dStepValue : dOldOffsetParamVal - dStepValue;
                                 SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, dNewOffsetParamVal);
-                                reTrans.Commit();
+
+                                GetInfoWarning supWarning = new GetInfoWarning(true);
+                                fhOpts.SetFailuresPreprocessor(supWarning);
+                                reTrans.SetFailureHandlingOptions(fhOpts);
+                                reTrans.Commit(fhOpts);
                             }
                             catch (Exception)
                             {
@@ -1965,6 +1979,34 @@ namespace TotalMEPProject.Commands.TotalMEP
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
+
+    public class GetInfoWarning : IFailuresPreprocessor
+    {
+        public static bool _isApply;
+
+        public GetInfoWarning(bool isApply)
+        {
+            _isApply = isApply;
+        }
+
+        public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
+        {
+            if (_isApply)
+            {
+                var messages = failuresAccessor.GetFailureMessages();
+                if (messages.Count() > 0)
+                {
+                    foreach (FailureMessageAccessor message in messages)
+                    {
+                        var lstId = message.GetFailingElementIds();
+                        failuresAccessor.DeleteWarning(message);
+                    }
+                }
+            }
+
+            return FailureProcessingResult.Continue;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
