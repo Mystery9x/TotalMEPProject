@@ -372,6 +372,8 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                                 Common.ConnectPipeVerticalElbow45(Global.UIDoc.Document, mepCurve, vertical45_2, true);
                             }
+                            else
+                                Global.UIDoc.Document.Delete(vertical45_2.Id);
                         }
                     }
                     else if (fastVerticalFrm.Siphon)
