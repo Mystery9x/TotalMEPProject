@@ -55,7 +55,7 @@ namespace TotalMEPProject.Commands.FireFighting
                      where /*p.Id != pipe_main.Id*/ pipe_mains.Find(item => item.Id == p.Id) == null
                      select p).ToList();
 
-            var pairs = pp(pipes);
+            var pairs = PairPipe(pipes);
             if (pairs == null || pairs.Count == 0)
                 return Result.Cancelled;
 
@@ -72,7 +72,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
             var pipeType = Global.UIDoc.Document.GetElement(App._2LevelSmartForm.FamilyType) as PipeType;
 
-            foreach (pp pair in pairs)
+            foreach (PairPipes pair in pairs)
             {
                 var pipe1 = pair._Pipe1;
                 var pipe2 = pair._Pipe2;
@@ -108,14 +108,14 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipes;
         }
 
-        private static List<pp> pp(List<Pipe> pipes)
+        private static List<PairPipes> PairPipe(List<Pipe> pipes)
         {
             //             if (pipes.Count < 2)
             //                 return null;
 
             double temp = 100;
 
-            List<pp> pairs = new List<pp>();
+            List<PairPipes> pairs = new List<PairPipes>();
 
             foreach (Pipe pipe in pipes)
             {
@@ -145,18 +145,18 @@ namespace TotalMEPProject.Commands.FireFighting
                         var find = pairs.Find(item => ce(item, pipe, pipe2));
                         if (find == null)
                         {
-                            var newPair = new pp(pipe, pipe2);
+                            var newPair = new PairPipes(pipe, pipe2);
                             pairs.Add(newPair);
                         }
                     }
                 }
             }
 
-            List<ElementId> allAddeds1 = (from pp pair in pairs
+            List<ElementId> allAddeds1 = (from PairPipes pair in pairs
                                           where pair._Pipe1 != null
                                           select pair._Pipe1.Id).ToList();
 
-            List<ElementId> allAddeds2 = (from pp pair in pairs
+            List<ElementId> allAddeds2 = (from PairPipes pair in pairs
                                           where pair._Pipe2 != null
                                           select pair._Pipe2.Id).ToList();
 
@@ -170,14 +170,14 @@ namespace TotalMEPProject.Commands.FireFighting
                 if (pipe == null)
                     continue;
 
-                var newPair = new pp(pipe, null);
+                var newPair = new PairPipes(pipe, null);
                 pairs.Add(newPair);
             }
 
             return pairs;
         }
 
-        private static bool ce(pp pair, Pipe pipe1, Pipe pipe2)
+        private static bool ce(PairPipes pair, Pipe pipe1, Pipe pipe2)
         {
             if (pair._Pipe1.Id == pipe1.Id && pair._Pipe2.Id == pipe2.Id)
                 return true;
@@ -266,7 +266,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         Pipe main2 = null;
 
-                        var fitting = ee(main as Pipe, vertical as Pipe, inter_main1, out main2);
+                        var fitting = CreateTeeFitting(main as Pipe, vertical as Pipe, inter_main1, out main2);
                         if (main2 != null && fitting != null)
                         {
                             _MainPipes.Add(main2.Id);
@@ -410,7 +410,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 var futher = inters_sub1.DistanceTo(p0_sub1) > inters_sub1.DistanceTo(p1_sub1) ? p0_sub1 : p1_sub1;
 
-                                ll(pipe1, futher, p);
+                                SetLocationLine(pipe1, futher, p);
 
                                 CreateFittingForMEPUtils.CreatTransitionFitting(pipe1, pipe_moi_1);
                             }
@@ -423,7 +423,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 var futher = inters_sub1.DistanceTo(p0_sub1) > inters_sub1.DistanceTo(p1_sub1) ? p0_sub1 : p1_sub1;
 
-                                ll(pipe1, futher, p);
+                                SetLocationLine(pipe1, futher, p);
 
                                 CreateFittingForMEPUtils.CreatTransitionFitting(pipe1, pipe_moi_1);
                             }
@@ -441,7 +441,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 var futher = inters_sub2.DistanceTo(p0_sub2) > inters_sub2.DistanceTo(p1_sub2) ? p0_sub2 : p1_sub2;
 
-                                ll(pipe2, futher, p);
+                                SetLocationLine(pipe2, futher, p);
 
                                 CreateFittingForMEPUtils.CreatTransitionFitting(pipe2, pipe_moi_2);
                             }
@@ -454,7 +454,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 var futher = inters_sub2.DistanceTo(p0_sub2) > inters_sub2.DistanceTo(p1_sub2) ? p0_sub2 : p1_sub2;
 
-                                ll(pipe2, futher, p);
+                                SetLocationLine(pipe2, futher, p);
 
                                 CreateFittingForMEPUtils.CreatTransitionFitting(pipe2, pipe_moi_2);
                             }
@@ -471,7 +471,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        public static FamilyInstance ee(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        public static FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
         {
             var curve = (pipeMain.Location as LocationCurve).Curve;
 
@@ -509,7 +509,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        private static void ll(Pipe pipe, XYZ pOn, XYZ pOther)
+        private static void SetLocationLine(Pipe pipe, XYZ pOn, XYZ pOther)
         {
             var p0 = pipe.GetCurve().GetEndPoint(0);
             var p1 = pipe.GetCurve().GetEndPoint(1);
@@ -641,12 +641,12 @@ namespace TotalMEPProject.Commands.FireFighting
         }
     }
 
-    public class pp
+    public class PairPipes
     {
         public Pipe _Pipe1 = null;
         public Pipe _Pipe2 = null;
 
-        public pp(Pipe p1, Pipe p2)
+        public PairPipes(Pipe p1, Pipe p2)
         {
             _Pipe1 = p1;
             _Pipe2 = p2;
