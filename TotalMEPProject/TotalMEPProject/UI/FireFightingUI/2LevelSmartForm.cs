@@ -66,6 +66,7 @@ namespace TotalMEPProject.UI.FireFightingUI
         private void _2LevelSmartForm_Load(object sender, EventArgs e)
         {
             AddFamilyType();
+            AddNipple();
         }
 
         #endregion Constructor
@@ -103,6 +104,26 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             if (cboC1FamilyType.SelectedItem == null && cboC1FamilyType.Items.Count != 0)
                 cboC1FamilyType.SelectedIndex = 0;
+        }
+
+        private void AddNipple()
+        {
+            cboC1NippleFamily.Items.Clear();
+            var lstFmlNipple = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(FamilySymbol))
+                .Cast<FamilySymbol>()
+                .Where(x => x.FamilyName.Contains("Nipple"))
+                .ToList();
+
+            foreach (FamilySymbol fmlNipple in lstFmlNipple)
+            {
+                cboC1NippleFamily.Items.Add(fmlNipple);
+            }
+
+            cboC1NippleFamily.DisplayMember = "FamilyName";
+
+            AppUtils.ff(cboC1NippleFamily, null);
+            if (cboC1NippleFamily.SelectedItem == null && cboC1NippleFamily.Items.Count != 0)
+                cboC1NippleFamily.SelectedIndex = 0;
         }
 
         public void PressCancel(int count = 2)
@@ -169,8 +190,33 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             AppUtils.sa(cboC1FamilyType);
             AppUtils.sa(cboC1PipeSize);
+            AppUtils.sa(cboC1NippleFamily);
             SetFocus();
             MakeRequest(RequestId.TwoLevelSmart_OK);
+        }
+
+        private void ckbNippleCreating_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckbNippleCreating.Checked)
+                ckbC1ElbowConnection.Enabled = false;
+            else
+                ckbC1ElbowConnection.Enabled = true;
+        }
+
+        private void ckbC1ElbowConnection_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckbC1ElbowConnection.Checked)
+            {
+                ckbNippleCreating.Enabled = false;
+                cboC1PipeSize.Enabled = false;
+                cboC1NippleFamily.Enabled = false;
+            }
+            else
+            {
+                ckbNippleCreating.Enabled = true;
+                cboC1PipeSize.Enabled = true;
+                cboC1NippleFamily.Enabled = true;
+            }
         }
 
         #endregion Event

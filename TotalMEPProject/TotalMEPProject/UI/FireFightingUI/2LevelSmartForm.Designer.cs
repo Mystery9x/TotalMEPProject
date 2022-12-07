@@ -100,6 +100,7 @@
             this.ckbNippleCreating.Size = new System.Drawing.Size(15, 14);
             this.ckbNippleCreating.TabIndex = 9;
             this.ckbNippleCreating.UseVisualStyleBackColor = true;
+            this.ckbNippleCreating.CheckedChanged += new System.EventHandler(this.ckbNippleCreating_CheckedChanged);
             // 
             // cboC1PipeSize
             // 
@@ -194,6 +195,7 @@
             this.ckbC1ElbowConnection.Size = new System.Drawing.Size(15, 14);
             this.ckbC1ElbowConnection.TabIndex = 8;
             this.ckbC1ElbowConnection.UseVisualStyleBackColor = true;
+            this.ckbC1ElbowConnection.CheckedChanged += new System.EventHandler(this.ckbC1ElbowConnection_CheckedChanged);
             // 
             // tableLayoutPanel3
             // 
