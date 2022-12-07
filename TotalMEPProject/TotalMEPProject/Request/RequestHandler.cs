@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.UI;
+using TotalMEPProject.Commands.FireFighting;
 using TotalMEPProject.Commands.TotalMEP;
 
 namespace TotalMEPProject.Request
@@ -66,6 +67,12 @@ namespace TotalMEPProject.Request
                 case RequestId.HolyUpDown_DownElbowControl:
                     {
                         CmdHolyUpdown.Run_UpdownElbowControl1(true);
+                    }
+                    break;
+
+                case RequestId.TwoLevelSmart_OK:
+                    {
+                        Cmd2LevelSmart.Process();
                     }
                     break;
 

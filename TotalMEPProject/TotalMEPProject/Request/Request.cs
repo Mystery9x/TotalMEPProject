@@ -17,6 +17,8 @@ namespace TotalMEPProject.Request
         HolyUpDown_DownStep,
         HolyUpDown_UpElbowControl,
         HolyUpDown_DownElbowControl,
+        TwoLevelSmart_OK,
+        TwoLevelSmart_Cancel,
     }
 
     public class Request

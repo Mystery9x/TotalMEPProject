@@ -16,7 +16,7 @@ namespace TotalMEPProject.Commands.FireFighting
     [Transaction(TransactionMode.Manual)]
     public class Cmd2LevelSmart : IExternalCommand
     {
-        private List<ElementId> _MainPipes = new List<ElementId>();
+        private static List<ElementId> _MainPipes = new List<ElementId>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -28,11 +28,17 @@ namespace TotalMEPProject.Commands.FireFighting
             Global.UIDoc = commandData.Application.ActiveUIDocument;
             Global.AppCreation = commandData.Application.Application.Create;
 
-            _MainPipes.Clear();
-
             //Show form
             if (App.Show2LevelSmartForm() == false)
                 return Result.Cancelled;
+
+            return Result.Succeeded;
+        }
+
+        public static Result Process()
+        {
+            _MainPipes.Clear();
+            var diameter = App._2LevelSmartForm.PipeSize * Common.mmToFT;
 
             //Pick pipe chinh
             //var pipe_main = PickPipe();
@@ -61,6 +67,21 @@ namespace TotalMEPProject.Commands.FireFighting
 
             _MainPipes.AddRange(ids);
 
+            Transaction t = new Transaction(Global.UIDoc.Document, "Two Level Smart");
+            t.Start();
+
+            var pipeType = Global.UIDoc.Document.GetElement(App._2LevelSmartForm.FamilyType) as PipeType;
+
+            foreach (pp pair in pairs)
+            {
+                var pipe1 = pair._Pipe1;
+                var pipe2 = pair._Pipe2;
+
+                ps(pipe1, pipe2, diameter, pipeType);
+            }
+
+            t.Commit();
+
             return Result.Succeeded;
         }
 
@@ -87,7 +108,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipes;
         }
 
-        private List<pp> pp(List<Pipe> pipes)
+        private static List<pp> pp(List<Pipe> pipes)
         {
             //             if (pipes.Count < 2)
             //                 return null;
@@ -156,7 +177,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return pairs;
         }
 
-        private bool ce(pp pair, Pipe pipe1, Pipe pipe2)
+        private static bool ce(pp pair, Pipe pipe1, Pipe pipe2)
         {
             if (pair._Pipe1.Id == pipe1.Id && pair._Pipe2.Id == pipe2.Id)
                 return true;
@@ -166,7 +187,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        private bool ps(Pipe pipe1, Pipe pipe2, double diameter, PipeType typePipe)
+        private static bool ps(Pipe pipe1, Pipe pipe2, double diameter, PipeType typePipe)
         {
             SubTransaction sub = new SubTransaction(Global.UIDoc.Document);
             sub.Start();
@@ -488,7 +509,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        private void ll(Pipe pipe, XYZ pOn, XYZ pOther)
+        private static void ll(Pipe pipe, XYZ pOn, XYZ pOther)
         {
             var p0 = pipe.GetCurve().GetEndPoint(0);
             var p1 = pipe.GetCurve().GetEndPoint(1);
@@ -503,7 +524,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        private Pipe ee(ConnectorSet cs)
+        private static Pipe ee(ConnectorSet cs)
         {
             foreach (Connector c in cs)
             {
@@ -518,7 +539,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
-        private bool g(double d1, double d2)
+        private static bool g(double d1, double d2)
         {
             if (Math.Abs(d1 - d2) < 0.001)
                 return true;
@@ -526,14 +547,14 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        private PreferredJunctionType gr(Pipe pipe)
+        private static PreferredJunctionType gr(Pipe pipe)
         {
             var pipeType = pipe.PipeType as PipeType;
 
             return pipeType.RoutingPreferenceManager.PreferredJunctionType;
         }
 
-        private bool dv(Pipe main, Pipe pipeSub, bool twoPipes, out XYZ inters_main, out XYZ p0_sub, out XYZ p1_sub, out XYZ inters_sub)
+        private static bool dv(Pipe main, Pipe pipeSub, bool twoPipes, out XYZ inters_main, out XYZ p0_sub, out XYZ p1_sub, out XYZ inters_sub)
         {
             inters_main = null;
             p0_sub = null;

@@ -172,6 +172,7 @@
             this.cboC1FamilyType.Name = "cboC1FamilyType";
             this.cboC1FamilyType.Size = new System.Drawing.Size(208, 21);
             this.cboC1FamilyType.TabIndex = 5;
+            this.cboC1FamilyType.SelectedIndexChanged += new System.EventHandler(this.cboC1FamilyType_SelectedIndexChanged);
             // 
             // cboC1NippleFamily
             // 
@@ -220,6 +221,7 @@
             this.btnCancel.TabIndex = 1;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnOK
             // 
@@ -230,6 +232,7 @@
             this.btnOK.TabIndex = 0;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
+            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
             // _2LevelSmartForm
             // 
@@ -241,6 +244,7 @@
             this.MinimizeBox = false;
             this.Name = "_2LevelSmartForm";
             this.Text = "Two Level Smart";
+            this.Load += new System.EventHandler(this._2LevelSmartForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();

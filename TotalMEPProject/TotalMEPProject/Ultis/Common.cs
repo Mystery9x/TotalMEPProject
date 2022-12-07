@@ -499,6 +499,11 @@ namespace TotalMEPProject.Ultis
             return null;
         }
 
+        public static string FeetToMmString(double a)
+        {
+            return (a / Common.mmToFT).ToString("0.##");
+        }
+
         public static List<Solid> GetSolid(Pipe pipe)
         {
             var options = new Options();
