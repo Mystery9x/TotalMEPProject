@@ -1181,6 +1181,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                             }
                         }
                     }
+
+                    App.isApply = false;
                 }
             }
             catch (Exception)
