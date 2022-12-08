@@ -8,6 +8,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -1209,6 +1210,15 @@ namespace TotalMEPProject.Commands.TotalMEP
                 if (App.m_HolyUpDownForm == null)
                     return Result.Cancelled;
 
+                var allDuctInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctCurves)
+                                                                                        .OfClass(typeof(Autodesk.Revit.DB.Mechanical.Duct))
+                                                                                        .Cast<Autodesk.Revit.DB.Mechanical.Duct>()
+                                                                                        .ToList();
+
+                var allDuctFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctFitting)
+                                                                                               .OfClass(typeof(FamilyInstance))
+                                                                                               .Cast<FamilyInstance>()
+                                                                                               .ToList();
                 List<MEPCurve> mepCurveSelects = GetSelectedMEP();
                 if (mepCurveSelects == null || mepCurveSelects.Count == 0)
                     return Result.Cancelled;
@@ -1217,8 +1227,16 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                 foreach (MEPCurve mepCurve in mepCurveSelects)
                 {
-                    double dOldOffsetParamVal = GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
-                                                != null ? (double)GetBuiltInParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
+                    MEPCurve processMepCurve = mepCurve;
+
+                    if (mepCurve is Autodesk.Revit.DB.Mechanical.Duct duct)
+                    {
+                        SourceDuctData ductData = new SourceDuctData(mepCurve, allDuctInModel, allDuctFittingInModel);
+                        processMepCurve = ductData.ProcessDuct != null ? ductData.ProcessDuct : mepCurve;
+                    }
+
+                    double dOldOffsetParamVal = GetBuiltInParameterValue(processMepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
+                                                != null ? (double)GetBuiltInParameterValue(processMepCurve, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
 
                     if (dOldOffsetParamVal == double.MinValue)
                         continue;
@@ -1230,7 +1248,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                             try
                             {
                                 double dNewOffsetParamVal = downStep == false ? dOldOffsetParamVal + dStepValue : dOldOffsetParamVal - dStepValue;
-                                SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, dNewOffsetParamVal);
+                                SetBuiltinParameterValue(processMepCurve, BuiltInParameter.RBS_OFFSET_PARAM, dNewOffsetParamVal);
 
                                 GetInfoWarning supWarning = new GetInfoWarning(true);
                                 fhOpts.SetFailuresPreprocessor(supWarning);
@@ -2192,6 +2210,8 @@ namespace TotalMEPProject.Commands.TotalMEP
         private Connector m_connector1 = null;
         private Connector m_connector2 = null;
 
+        private List<Connector> m_connectors = new List<Connector>();
+
         public MEPCurve MEPCurveMain { get => m_MEPCurve; set => m_MEPCurve = value; }
         public double Slope { get => m_slope; set => m_slope = value; }
         public XYZ StartPoint { get => m_startPoint; set => m_startPoint = value; }
@@ -2234,6 +2254,8 @@ namespace TotalMEPProject.Commands.TotalMEP
         public Connector Connector1 { get => m_connector1; set => m_connector1 = value; }
         public Connector Connector2 { get => m_connector2; set => m_connector2 = value; }
 
+        public List<Connector> Connectors { get => m_connectors; set => m_connectors = value; }
+
         public MEPCurveData(MEPCurve mEPCurve)
         {
             MEPCurveMain = mEPCurve;
@@ -2269,6 +2291,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                 if (m_MEPCurve.ConnectorManager != null)
                 {
                     List<Connector> cntorOfElbow = GetConnectorFromPipe(m_MEPCurve.ConnectorManager.Connectors);
+                    Connectors = GetAllConnectorFromMEPCurve(m_MEPCurve.ConnectorManager.Connectors);
                     if (cntorOfElbow != null && cntorOfElbow.Count == 2)
                     {
                         Connector1 = cntorOfElbow[0];
@@ -2287,6 +2310,22 @@ namespace TotalMEPProject.Commands.TotalMEP
                 {
                     if (connector.ConnectorType != ConnectorType.End)
                         continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        public List<Connector> GetAllConnectorFromMEPCurve(ConnectorSet connectorSet)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
                     retVal.Add(connector);
                 }
                 return retVal;
@@ -2327,6 +2366,195 @@ namespace TotalMEPProject.Commands.TotalMEP
             }
             return null;
         }
+    }
+
+    public class SourceDuctData
+    {
+        private Autodesk.Revit.DB.Mechanical.Duct m_mainDuct = null;
+        public Autodesk.Revit.DB.Mechanical.Duct MainDuct { get => m_mainDuct; set => m_mainDuct = value; }
+
+        private List<Autodesk.Revit.DB.Mechanical.Duct> m_allDucts = new List<Autodesk.Revit.DB.Mechanical.Duct>();
+        public List<Autodesk.Revit.DB.Mechanical.Duct> AllDucts { get => m_allDucts; set => m_allDucts = value; }
+
+        private List<FamilyInstance> m_allDuctFittings = new List<FamilyInstance>();
+        public List<FamilyInstance> AllDuctFittings { get => m_allDuctFittings; set => m_allDuctFittings = value; }
+
+        private Autodesk.Revit.DB.Mechanical.Duct m_processDuct = null;
+        public Autodesk.Revit.DB.Mechanical.Duct ProcessDuct { get => m_processDuct; set => m_processDuct = value; }
+
+        private List<Connector> m_connectorsOfDuct = new List<Connector>();
+        public List<Connector> ConnectorOfDutct { get => m_connectorsOfDuct; set => m_connectorsOfDuct = value; }
+
+        private SourceDuctType m_ductType = SourceDuctType.Nothing;
+        public SourceDuctType DuctType { get => m_ductType; set => m_ductType = value; }
+
+        private List<SourceTagData> m_tags = new List<SourceTagData>();
+        public List<SourceTagData> Tags { get => m_tags; set => m_tags = value; }
+        public Connector FirstConnector { get; set; }
+        public Connector SecondConnector { get; set; }
+
+        public SourceDuctData(MEPCurve mepCurve,
+                              List<Autodesk.Revit.DB.Mechanical.Duct> allDuctInModel,
+                              List<FamilyInstance> allDuctFittingInModel)
+        {
+            if (mepCurve is Autodesk.Revit.DB.Mechanical.Duct duct
+                && allDuctInModel != null
+                && allDuctInModel.Count > 0
+                && allDuctFittingInModel != null
+                && allDuctFittingInModel.Count > 0)
+            {
+                MainDuct = duct;
+                AllDucts = allDuctInModel;
+                AllDuctFittings = allDuctFittingInModel;
+                Tags = allDuctFittingInModel.Select(item => new SourceTagData(item, AllDucts)).ToList();
+                Initialize();
+            }
+        }
+
+        private void Initialize()
+        {
+            GetAllConnectorOfDuct();
+            List<SourceTagData> tagsConnect = new List<SourceTagData>();
+            if (ConnectorOfDutct.Count > 2)
+                DuctType = SourceDuctType.MainDuct;
+            else if (ConnectorOfDutct.Count == 2)
+            {
+                tagsConnect = GetTagsConnect();
+                if (tagsConnect.Count <= 0)
+                    DuctType = SourceDuctType.MainDuct;
+                else
+                {
+                    SourceTagData firstTagConnect = tagsConnect[0];
+                    if (FirstConnector.IsConnectedTo(firstTagConnect.SecondConnector) || SecondConnector.IsConnectedTo(firstTagConnect.SecondConnector))
+                    {
+                        DuctType = SourceDuctType.BranchDuct;
+                    }
+                    else
+                        DuctType = SourceDuctType.MainDuct;
+                }
+            }
+            if (DuctType == SourceDuctType.BranchDuct)
+            {
+                SourceTagData firstTagConnect = tagsConnect[0];
+                var ductConnectTag = firstTagConnect.DuctsConnect.Where(item => item.Id != MainDuct.Id).FirstOrDefault();
+
+                if (ductConnectTag != null) { ProcessDuct = ductConnectTag; }
+            }
+            else
+                ProcessDuct = MainDuct;
+        }
+
+        public void GetAllConnectorOfDuct()
+        {
+            if (MainDuct != null)
+            {
+                if (MainDuct.ConnectorManager != null)
+                {
+                    List<Connector> cntorOfDuct = GetConnectors(MainDuct.ConnectorManager.Connectors);
+                    ConnectorOfDutct = cntorOfDuct;
+
+                    FirstConnector = cntorOfDuct.Where(item => item.ConnectorType == ConnectorType.End).FirstOrDefault();
+                    SecondConnector = cntorOfDuct.Where(item => item.ConnectorType == ConnectorType.End).LastOrDefault();
+                }
+            }
+        }
+
+        public List<Connector> GetConnectors(ConnectorSet connectorSet, bool filter = false)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End && filter == true)
+                        continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        private List<SourceTagData> GetTagsConnect()
+        {
+            try
+            {
+                List<SourceTagData> filterTags = Tags.Where(item => item.FirstConnector != null && item.SecondConnector != null)
+                                                        .Where(item => item.FirstConnector.IsConnectedTo(FirstConnector)
+                                                                       || item.FirstConnector.IsConnectedTo(SecondConnector)
+                                                                       || item.SecondConnector.IsConnectedTo(FirstConnector)
+                                                                       || item.SecondConnector.IsConnectedTo(SecondConnector))
+                                                        .ToList();
+                return filterTags;
+            }
+            catch (Exception)
+            { }
+            return new List<SourceTagData>();
+        }
+    }
+
+    public class SourceTagData
+    {
+        public FamilyInstance TagData { get; set; }
+        public Connector FirstConnector { get; set; }
+        public Connector SecondConnector { get; set; }
+        public List<Autodesk.Revit.DB.Mechanical.Duct> AllDuct { get; set; }
+
+        public List<Autodesk.Revit.DB.Mechanical.Duct> DuctsConnect { get; set; }
+
+        public SourceTagData(FamilyInstance tagData, List<Autodesk.Revit.DB.Mechanical.Duct> allDuctInModel)
+        {
+            TagData = tagData;
+            AllDuct = allDuctInModel;
+            if (TagData != null && TagData.MEPModel != null && TagData.MEPModel.ConnectorManager != null)
+            {
+                List<Connector> cntOfTags = GetConnectors(TagData.MEPModel.ConnectorManager.Connectors, true);
+                if (cntOfTags.Count >= 2)
+                {
+                    FirstConnector = cntOfTags.Where(item => item.Id == 1).FirstOrDefault();
+                    SecondConnector = cntOfTags.Where(item => item.Id == 2).FirstOrDefault();
+                    GetDuctsConnect();
+                }
+            }
+        }
+
+        private List<Connector> GetConnectors(ConnectorSet connectorSet, bool filter = false)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End && filter == true)
+                        continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        private void GetDuctsConnect()
+        {
+            DuctsConnect = new List<Autodesk.Revit.DB.Mechanical.Duct>();
+            List<MEPCurveData> allDucts = AllDuct.Select(item => new MEPCurveData(item as MEPCurve)).ToList();
+
+            List<MEPCurveData> filterMEPCurve = allDucts.Where(item => item.Connector1 != null && item.Connector2 != null).Where(item => item.Connectors.Any(item1 => item1.IsConnectedTo(FirstConnector) == true)).ToList();
+
+            if (filterMEPCurve.Count > 0)
+                DuctsConnect = filterMEPCurve.Select(item => item.MEPCurveMain as Autodesk.Revit.DB.Mechanical.Duct).ToList();
+        }
+    }
+
+    public enum SourceDuctType : int
+    {
+        Nothing = -1,
+        MainDuct,
+        BranchDuct
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
