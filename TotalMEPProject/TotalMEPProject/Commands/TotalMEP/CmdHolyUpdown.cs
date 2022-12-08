@@ -2221,6 +2221,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                 List<Connector> retVal = new List<Connector>();
                 foreach (Connector connector in connectorSet)
                 {
+                    if (connector.ConnectorType != ConnectorType.End)
+                        continue;
                     retVal.Add(connector);
                 }
                 return retVal;
