@@ -35,6 +35,8 @@ namespace TotalMEPProject.Ultis.HolyUltis
         public MEPCurve _Other01 = null;
         public MEPCurve _Other02 = null;
 
+        public bool isCapleTray = false;
+
         public double _OldOffset = 0;
         public double _OldOffsetApply = 0;
 
