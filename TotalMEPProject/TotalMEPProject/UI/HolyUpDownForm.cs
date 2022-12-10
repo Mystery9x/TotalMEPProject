@@ -168,7 +168,7 @@ namespace TotalMEPProject.UI
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            if (UpStepValue == double.MinValue)
+            if (Distance == double.MinValue && NotApply == false)
                 return;
 
             m_runMode = RunMode.Apply;

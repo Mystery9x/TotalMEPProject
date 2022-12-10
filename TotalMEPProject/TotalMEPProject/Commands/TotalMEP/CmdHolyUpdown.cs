@@ -912,7 +912,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                 foreach (ElementId id in ids)
                 {
                     var element = Global.UIDoc.Document.GetElement(id) as FamilyInstance;
-                    if (element != null)
+                    if (element != null && element is FamilyInstance)
                         lstElbow.Add(element);
                 }
                 return lstElbow;
