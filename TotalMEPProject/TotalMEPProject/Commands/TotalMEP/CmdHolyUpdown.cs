@@ -316,15 +316,36 @@ namespace TotalMEPProject.Commands.TotalMEP
                         isDeleteWarning = true;
                         var lstSel = GetSelectedMEP();
 
-                        var allDuctInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctCurves)
+                        List<Autodesk.Revit.DB.Mechanical.Duct> allDuctInModel = new List<Autodesk.Revit.DB.Mechanical.Duct>();
+                        List<FamilyInstance> allDuctFittingInModel = new List<FamilyInstance>();
+                        List<Pipe> allPipeInModel = new List<Pipe>();
+                        List<FamilyInstance> allPipeFittingInModel = new List<FamilyInstance>();
+
+                        if (lstSel.Any(item => item is Autodesk.Revit.DB.Mechanical.Duct))
+                        {
+                            allDuctInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctCurves)
                                                                                         .OfClass(typeof(Autodesk.Revit.DB.Mechanical.Duct))
                                                                                         .Cast<Autodesk.Revit.DB.Mechanical.Duct>()
                                                                                         .ToList();
 
-                        var allDuctFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctFitting)
-                                                                                                       .OfClass(typeof(FamilyInstance))
-                                                                                                       .Cast<FamilyInstance>()
+                            allDuctFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctFitting)
+                                                                                                           .OfClass(typeof(FamilyInstance))
+                                                                                                           .Cast<FamilyInstance>()
+                                                                                                           .ToList();
+                        }
+
+                        if (lstSel.Any(item => item is Pipe))
+                        {
+                            allPipeInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_PipeCurves)
+                                                                                    .OfClass(typeof(Autodesk.Revit.DB.Plumbing.Pipe))
+                                                                                    .Cast<Autodesk.Revit.DB.Plumbing.Pipe>()
+                                                                                    .ToList();
+
+                            allPipeFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_PipeFitting)
+                                                                                                           .OfClass(typeof(FamilyInstance))
+                                                                                                           .Cast<FamilyInstance>()
                                                                                                        .ToList();
+                        }
 
                         foreach (MEPCurve mepCurve in lstSel)
                         {
@@ -334,6 +355,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                             {
                                 SourceDuctData ductData = new SourceDuctData(mepCurve, allDuctInModel, allDuctFittingInModel);
                                 processMepCurve = ductData.ProcessDuct != null ? ductData.ProcessDuct : mepCurve;
+                            }
+
+                            if (mepCurve is Autodesk.Revit.DB.Plumbing.Pipe pipe)
+                            {
+                                SourcePipeData pipeData = new SourcePipeData(mepCurve, allPipeInModel, allPipeFittingInModel);
+                                processMepCurve = pipeData.ProcessPipe != null ? pipeData.ProcessPipe : mepCurve;
                             }
 
                             double dOldOffsetParamVal = GetBuiltInParameterValue(processMepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
@@ -1246,18 +1273,40 @@ namespace TotalMEPProject.Commands.TotalMEP
                 if (App.m_HolyUpDownForm == null)
                     return Result.Cancelled;
 
-                var allDuctInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctCurves)
-                                                                                        .OfClass(typeof(Autodesk.Revit.DB.Mechanical.Duct))
-                                                                                        .Cast<Autodesk.Revit.DB.Mechanical.Duct>()
-                                                                                        .ToList();
-
-                var allDuctFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctFitting)
-                                                                                               .OfClass(typeof(FamilyInstance))
-                                                                                               .Cast<FamilyInstance>()
-                                                                                               .ToList();
                 List<MEPCurve> mepCurveSelects = GetSelectedMEP();
                 if (mepCurveSelects == null || mepCurveSelects.Count == 0)
                     return Result.Cancelled;
+
+                List<Autodesk.Revit.DB.Mechanical.Duct> allDuctInModel = new List<Autodesk.Revit.DB.Mechanical.Duct>();
+                List<FamilyInstance> allDuctFittingInModel = new List<FamilyInstance>();
+                List<Pipe> allPipeInModel = new List<Pipe>();
+                List<FamilyInstance> allPipeFittingInModel = new List<FamilyInstance>();
+
+                if (mepCurveSelects.Any(item => item is Autodesk.Revit.DB.Mechanical.Duct))
+                {
+                    allDuctInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctCurves)
+                                                                                .OfClass(typeof(Autodesk.Revit.DB.Mechanical.Duct))
+                                                                                .Cast<Autodesk.Revit.DB.Mechanical.Duct>()
+                                                                                .ToList();
+
+                    allDuctFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_DuctFitting)
+                                                                                                   .OfClass(typeof(FamilyInstance))
+                                                                                                   .Cast<FamilyInstance>()
+                                                                                                   .ToList();
+                }
+
+                if (mepCurveSelects.Any(item => item is Pipe))
+                {
+                    allPipeInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_PipeCurves)
+                                                                            .OfClass(typeof(Autodesk.Revit.DB.Plumbing.Pipe))
+                                                                            .Cast<Autodesk.Revit.DB.Plumbing.Pipe>()
+                                                                            .ToList();
+
+                    allPipeFittingInModel = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_PipeFitting)
+                                                                                                   .OfClass(typeof(FamilyInstance))
+                                                                                                   .Cast<FamilyInstance>()
+                                                                                               .ToList();
+                }
 
                 double dStepValue = UnitUtils.ConvertToInternalUnits(Math.Abs(App.m_HolyUpDownForm.UpStepValue), DisplayUnitType.DUT_MILLIMETERS);
 
@@ -1269,6 +1318,12 @@ namespace TotalMEPProject.Commands.TotalMEP
                     {
                         SourceDuctData ductData = new SourceDuctData(mepCurve, allDuctInModel, allDuctFittingInModel);
                         processMepCurve = ductData.ProcessDuct != null ? ductData.ProcessDuct : mepCurve;
+                    }
+
+                    if (mepCurve is Autodesk.Revit.DB.Plumbing.Pipe pipe)
+                    {
+                        SourcePipeData pipeData = new SourcePipeData(mepCurve, allPipeInModel, allPipeFittingInModel);
+                        processMepCurve = pipeData.ProcessPipe != null ? pipeData.ProcessPipe : mepCurve;
                     }
 
                     double dOldOffsetParamVal = GetBuiltInParameterValue(processMepCurve, BuiltInParameter.RBS_OFFSET_PARAM)
@@ -2192,6 +2247,195 @@ namespace TotalMEPProject.Commands.TotalMEP
         Nothing = -1,
         MainDuct,
         BranchDuct
+    }
+
+    public class SourcePipeData
+    {
+        private Autodesk.Revit.DB.Plumbing.Pipe m_mainPipe = null;
+        public Autodesk.Revit.DB.Plumbing.Pipe MainPipe { get => m_mainPipe; set => m_mainPipe = value; }
+
+        private List<Autodesk.Revit.DB.Plumbing.Pipe> m_allPipes = new List<Autodesk.Revit.DB.Plumbing.Pipe>();
+        public List<Autodesk.Revit.DB.Plumbing.Pipe> AllPipes { get => m_allPipes; set => m_allPipes = value; }
+
+        private List<FamilyInstance> m_allPipeFittings = new List<FamilyInstance>();
+        public List<FamilyInstance> AllPipeFittings { get => m_allPipeFittings; set => m_allPipeFittings = value; }
+
+        private Autodesk.Revit.DB.Plumbing.Pipe m_processPipe = null;
+        public Autodesk.Revit.DB.Plumbing.Pipe ProcessPipe { get => m_processPipe; set => m_processPipe = value; }
+
+        private List<Connector> m_connectorsOfPipe = new List<Connector>();
+        public List<Connector> ConnectorOfDutct { get => m_connectorsOfPipe; set => m_connectorsOfPipe = value; }
+
+        private SourcePipeType m_PipeType = SourcePipeType.Nothing;
+        public SourcePipeType PipeType { get => m_PipeType; set => m_PipeType = value; }
+
+        private List<SourceTagPipeData> m_tags = new List<SourceTagPipeData>();
+        public List<SourceTagPipeData> Tags { get => m_tags; set => m_tags = value; }
+        public Connector FirstConnector { get; set; }
+        public Connector SecondConnector { get; set; }
+
+        public SourcePipeData(MEPCurve mepCurve,
+                              List<Autodesk.Revit.DB.Plumbing.Pipe> allPipeInModel,
+                              List<FamilyInstance> allPipeFittingInModel)
+        {
+            if (mepCurve is Autodesk.Revit.DB.Plumbing.Pipe Pipe
+                && allPipeInModel != null
+                && allPipeInModel.Count > 0
+                && allPipeFittingInModel != null
+                && allPipeFittingInModel.Count > 0)
+            {
+                MainPipe = Pipe;
+                AllPipes = allPipeInModel;
+                AllPipeFittings = allPipeFittingInModel;
+                Tags = allPipeFittingInModel.Select(item => new SourceTagPipeData(item, AllPipes)).ToList();
+                Initialize();
+            }
+        }
+
+        private void Initialize()
+        {
+            GetAllConnectorOfPipe();
+            List<SourceTagPipeData> tagsConnect = new List<SourceTagPipeData>();
+            if (ConnectorOfDutct.Count > 2)
+                PipeType = SourcePipeType.MainPipe;
+            else if (ConnectorOfDutct.Count == 2)
+            {
+                tagsConnect = GetTagsConnect();
+                if (tagsConnect.Count <= 0)
+                    PipeType = SourcePipeType.MainPipe;
+                else
+                {
+                    SourceTagPipeData firstTagConnect = tagsConnect[0];
+                    if (FirstConnector.IsConnectedTo(firstTagConnect.SecondConnector) || SecondConnector.IsConnectedTo(firstTagConnect.SecondConnector))
+                    {
+                        PipeType = SourcePipeType.BranchPipe;
+                    }
+                    else
+                        PipeType = SourcePipeType.MainPipe;
+                }
+            }
+            if (PipeType == SourcePipeType.BranchPipe)
+            {
+                SourceTagPipeData firstTagConnect = tagsConnect[0];
+                var PipeConnectTag = firstTagConnect.PipesConnect.Where(item => item.Id != MainPipe.Id).FirstOrDefault();
+
+                if (PipeConnectTag != null) { ProcessPipe = PipeConnectTag; }
+            }
+            else
+                ProcessPipe = MainPipe;
+        }
+
+        public void GetAllConnectorOfPipe()
+        {
+            if (MainPipe != null)
+            {
+                if (MainPipe.ConnectorManager != null)
+                {
+                    List<Connector> cntorOfPipe = GetConnectors(MainPipe.ConnectorManager.Connectors);
+                    ConnectorOfDutct = cntorOfPipe;
+
+                    FirstConnector = cntorOfPipe.Where(item => item.ConnectorType == ConnectorType.End).FirstOrDefault();
+                    SecondConnector = cntorOfPipe.Where(item => item.ConnectorType == ConnectorType.End).LastOrDefault();
+                }
+            }
+        }
+
+        public List<Connector> GetConnectors(ConnectorSet connectorSet, bool filter = false)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End && filter == true)
+                        continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        private List<SourceTagPipeData> GetTagsConnect()
+        {
+            try
+            {
+                List<SourceTagPipeData> filterTags = Tags.Where(item => item.FirstConnector != null && item.SecondConnector != null)
+                                                        .Where(item => item.FirstConnector.IsConnectedTo(FirstConnector)
+                                                                       || item.FirstConnector.IsConnectedTo(SecondConnector)
+                                                                       || item.SecondConnector.IsConnectedTo(FirstConnector)
+                                                                       || item.SecondConnector.IsConnectedTo(SecondConnector))
+                                                        .ToList();
+                return filterTags;
+            }
+            catch (Exception)
+            { }
+            return new List<SourceTagPipeData>();
+        }
+    }
+
+    public class SourceTagPipeData
+    {
+        public FamilyInstance TagData { get; set; }
+        public Connector FirstConnector { get; set; }
+        public Connector SecondConnector { get; set; }
+        public List<Autodesk.Revit.DB.Plumbing.Pipe> AllPipe { get; set; }
+
+        public List<Autodesk.Revit.DB.Plumbing.Pipe> PipesConnect { get; set; }
+
+        public SourceTagPipeData(FamilyInstance tagData, List<Autodesk.Revit.DB.Plumbing.Pipe> allPipeInModel)
+        {
+            TagData = tagData;
+            AllPipe = allPipeInModel;
+            if (TagData != null && TagData.MEPModel != null && TagData.MEPModel.ConnectorManager != null)
+            {
+                List<Connector> cntOfTags = GetConnectors(TagData.MEPModel.ConnectorManager.Connectors, true);
+                if (cntOfTags.Count >= 2)
+                {
+                    FirstConnector = cntOfTags.Where(item => item.Id == 1).FirstOrDefault();
+                    SecondConnector = cntOfTags.Where(item => item.Id == 2).FirstOrDefault();
+                    GetPipesConnect();
+                }
+            }
+        }
+
+        private List<Connector> GetConnectors(ConnectorSet connectorSet, bool filter = false)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End && filter == true)
+                        continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        private void GetPipesConnect()
+        {
+            PipesConnect = new List<Autodesk.Revit.DB.Plumbing.Pipe>();
+            List<MEPCurveData> allPipes = AllPipe.Select(item => new MEPCurveData(item as MEPCurve)).ToList();
+
+            List<MEPCurveData> filterMEPCurve = allPipes.Where(item => item.Connector1 != null && item.Connector2 != null).Where(item => item.Connectors.Any(item1 => item1.IsConnectedTo(FirstConnector) == true)).ToList();
+
+            if (filterMEPCurve.Count > 0)
+                PipesConnect = filterMEPCurve.Select(item => item.MEPCurveMain as Autodesk.Revit.DB.Plumbing.Pipe).ToList();
+        }
+    }
+
+    public enum SourcePipeType : int
+    {
+        Nothing = -1,
+        MainPipe,
+        BranchPipe
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
