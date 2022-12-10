@@ -912,7 +912,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                 foreach (ElementId id in ids)
                 {
                     var element = Global.UIDoc.Document.GetElement(id) as FamilyInstance;
-                    if (element != null && element is FamilyInstance)
+                    if (element != null && element is FamilyInstance && element.MEPModel != null)
                         lstElbow.Add(element);
                 }
                 return lstElbow;
@@ -1532,9 +1532,11 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                         foreach (List<ElbowControlData> elbows in filterElbows)
                         {
-                            if (elbows.Count > 1)
+                            List<ElbowControlData> processElbow = elbows.Distinct(new DistinctItemComparer()).ToList();
+
+                            if (processElbow.Count > 1)
                             {
-                                var twoElbow = GetTwoPointFurthest(elbows);
+                                var twoElbow = GetTwoPointFurthest(processElbow);
                                 ElbowControlData elbow_1 = twoElbow.Item1;
                                 ElbowControlData elbow_2 = twoElbow.Item2;
 
@@ -1641,9 +1643,9 @@ namespace TotalMEPProject.Commands.TotalMEP
                                     }
                                 }
                             }
-                            else if (elbows.Count > 0)
+                            else if (processElbow.Count > 0)
                             {
-                                ElbowControlData elbow = elbows[0];
+                                ElbowControlData elbow = processElbow[0];
 
                                 if (downElbowControl)
                                 {
@@ -1791,6 +1793,7 @@ namespace TotalMEPProject.Commands.TotalMEP
         private Connector m_connector1 = null;
         private Connector m_connector2 = null;
         private MEPCurveData m_MEPCurveDataMain = null;
+        private MEPCurve m_MEPCurveDataOutOfThread = null;
         private Tuple<double, double> m_linearEquations = new Tuple<double, double>(double.MinValue, double.MinValue);
         private XYZ m_locationPoint = null;
 
@@ -1802,7 +1805,11 @@ namespace TotalMEPProject.Commands.TotalMEP
         public List<MEPCurveData> AllMEPCurveDataInModels = new List<MEPCurveData>();
 
         public List<MEPCurveData> MEPCurveConnects = new List<MEPCurveData>();
+
+        public List<MEPCurve> MEPCurveConnectsOutOfThread = new List<MEPCurve>();
         public MEPCurveData MEPCurveDataMain { get => m_MEPCurveDataMain; set => m_MEPCurveDataMain = value; }
+
+        public MEPCurve MEPCurveDataOutOfThread { get => m_MEPCurveDataOutOfThread; set => m_MEPCurveDataOutOfThread = value; }
         public XYZ LocationPoint { get => m_locationPoint; set => m_locationPoint = value; }
 
         public ElbowControlData(FamilyInstance elbow, List<MEPCurveData> allMEPCurveModels)
@@ -1858,10 +1865,14 @@ namespace TotalMEPProject.Commands.TotalMEP
                                                     .ToList();
 
             MEPCurveConnects = filterMEPCurve.Where(item => item.Slope <= 0.00021).ToList();
-
+            MEPCurveConnectsOutOfThread = filterMEPCurve.Where(item => item.Slope > 0.00021).Select(item => item.MEPCurveMain).ToList();
             if (MEPCurveConnects.Count > 0)
             {
                 MEPCurveDataMain = MEPCurveConnects[0];
+            }
+            if (MEPCurveConnectsOutOfThread.Count > 0)
+            {
+                MEPCurveDataOutOfThread = MEPCurveConnectsOutOfThread[0];
             }
         }
 
@@ -2436,6 +2447,19 @@ namespace TotalMEPProject.Commands.TotalMEP
         Nothing = -1,
         MainPipe,
         BranchPipe
+    }
+
+    internal class DistinctItemComparer : IEqualityComparer<ElbowControlData>
+    {
+        public bool Equals(ElbowControlData x, ElbowControlData y)
+        {
+            return x.MEPCurveDataOutOfThread.Id == y.MEPCurveDataOutOfThread.Id;
+        }
+
+        public int GetHashCode(ElbowControlData obj)
+        {
+            return obj.MEPCurveDataOutOfThread.Id.GetHashCode();
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
