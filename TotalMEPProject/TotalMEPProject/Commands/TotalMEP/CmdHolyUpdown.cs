@@ -239,7 +239,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                             XYZ p1New = new XYZ();
                             if (!App.m_HolyUpDownForm.NotApply)
                             {
-                                if (mepCurve is CableTray && App.m_HolyUpDownForm.Elbow90)
+                                if ((mepCurve is CableTray || mepCurve is Conduit) && App.m_HolyUpDownForm.Elbow90)
                                 {
                                     double offset1 = dicParaElevationBegin[mepCurve.Id] + offsetMain;
                                     SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, offset1);
@@ -404,7 +404,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                             if (dataMep._Vertical01 != null && dataMep._Vertical01.IsValidObject == true)
                             {
-                                if (mepCurve is CableTray)
+                                if (mepCurve is CableTray || mepCurve is Conduit)
                                     dataMep.isCapleTray = true;
                                 else
                                 {
@@ -415,7 +415,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                             if (dataMep._Vertical02 != null && dataMep._Vertical02.IsValidObject == true)
                             {
-                                if (mepCurve is CableTray)
+                                if (mepCurve is CableTray || mepCurve is Conduit)
                                     dataMep.isCapleTray = true;
                                 else
                                 {
@@ -426,7 +426,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                             if (dataMep._Elbow01 != null && dataMep._Elbow01.IsValidObject == true)
                             {
-                                if (mepCurve is CableTray)
+                                if (mepCurve is CableTray || mepCurve is Conduit)
                                     dataMep.isCapleTray = true;
                                 else
                                 {
@@ -437,7 +437,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                             if (dataMep._Elbow02 != null && dataMep._Elbow02.IsValidObject == true)
                             {
-                                if (mepCurve is CableTray)
+                                if (mepCurve is CableTray || mepCurve is Conduit)
                                     dataMep.isCapleTray = true;
                                 else
                                 {
@@ -448,7 +448,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                             if (dataMep._Elbow03 != null && dataMep._Elbow03.IsValidObject == true)
                             {
-                                if (mepCurve is CableTray)
+                                if (mepCurve is CableTray || mepCurve is Conduit)
                                     dataMep.isCapleTray = true;
                                 else
                                 {
@@ -459,7 +459,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                             if (dataMep._Elbow04 != null && dataMep._Elbow04.IsValidObject == true)
                             {
-                                if (mepCurve is CableTray)
+                                if (mepCurve is CableTray || mepCurve is Conduit)
                                     dataMep.isCapleTray = true;
                                 else
                                 {
@@ -614,7 +614,7 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                                 if (exist == true)
                                 {
-                                    if (mepCurve is CableTray && dataMep.isCapleTray)
+                                    if ((mepCurve is CableTray || mepCurve is Conduit) && dataMep.isCapleTray)
                                     {
                                         double offset = dicParaElevationBegin[mepCurve.Id] + offsetMain;
                                         SetBuiltinParameterValue(mepCurve, BuiltInParameter.RBS_OFFSET_PARAM, offset);
@@ -1407,7 +1407,8 @@ namespace TotalMEPProject.Commands.TotalMEP
                 return retVal;
             XYZ min = new XYZ(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z);
             XYZ max = new XYZ(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z);
-            retVal = new Outline(min, max);
+            XYZ vectorMinMax = (max - min).Normalize();
+            retVal = new Outline(min + vectorMinMax.Negate() * 0.01, max + vectorMinMax * 0.01);
             return retVal;
         }
 
@@ -2370,6 +2371,10 @@ namespace TotalMEPProject.Commands.TotalMEP
                     {
                         PipeType = SourcePipeType.BranchPipe;
                     }
+                    else if (FirstConnector.IsConnectedTo(firstTagConnect.FirstConnector) || SecondConnector.IsConnectedTo(firstTagConnect.FirstConnector))
+                    {
+                        PipeType = SourcePipeType.BranchPipe;
+                    }
                     else
                         PipeType = SourcePipeType.MainPipe;
                 }
@@ -2484,7 +2489,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             PipesConnect = new List<Autodesk.Revit.DB.Plumbing.Pipe>();
             List<MEPCurveData> allPipes = AllPipe.Select(item => new MEPCurveData(item as MEPCurve)).ToList();
 
-            List<MEPCurveData> filterMEPCurve = allPipes.Where(item => item.Connector1 != null && item.Connector2 != null).Where(item => item.Connectors.Any(item1 => item1.IsConnectedTo(FirstConnector) == true)).ToList();
+            List<MEPCurveData> filterMEPCurve = allPipes.Where(item => item.Connector1 != null && item.Connector2 != null).Where(item => item.Connectors.Any(item1 => item1.IsConnectedTo(FirstConnector) == true) || item.Connectors.Any(item1 => item1.IsConnectedTo(SecondConnector) == true)).ToList();
 
             if (filterMEPCurve.Count > 0)
                 PipesConnect = filterMEPCurve.Select(item => item.MEPCurveMain as Autodesk.Revit.DB.Plumbing.Pipe).ToList();
