@@ -2347,7 +2347,7 @@ namespace TotalMEPProject.Commands.TotalMEP
                 MainPipe = Pipe;
                 AllPipes = allPipeInModel;
                 AllPipeFittings = allPipeFittingInModel;
-                Tags = allPipeFittingInModel.Select(item => new SourceTagPipeData(item, AllPipes)).ToList();
+                Tags = allPipeFittingInModel.Where(item => item.MEPModel != null && item.MEPModel is MechanicalFitting fitting && fitting.PartType != Autodesk.Revit.DB.PartType.Elbow).Select(item => new SourceTagPipeData(item, AllPipes)).ToList();
                 Initialize();
             }
         }
