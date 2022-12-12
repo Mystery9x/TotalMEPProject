@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Xml;
 using TotalMEPProject.UI;
@@ -1316,13 +1317,41 @@ namespace TotalMEPProject.Commands.TotalMEP
 
                     if (mepCurve is Autodesk.Revit.DB.Mechanical.Duct duct)
                     {
-                        SourceDuctData ductData = new SourceDuctData(mepCurve, allDuctInModel, allDuctFittingInModel);
+                        List<ElementId> allElementIds = allDuctFittingInModel.Select(item => item.Id).ToList();
+
+                        // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline.
+                        Outline myOutLn = CreateOutLineFromBoundingBox(duct);
+                        if (myOutLn == null || myOutLn.IsEmpty)
+                            continue;
+
+                        // Create a BoundingBoxIntersects filter with this Outline
+                        BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
+
+                        FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document, allElementIds);
+
+                        List<FamilyInstance> allFittingConnected = collector.WherePasses(filter).Cast<FamilyInstance>().ToList();
+
+                        SourceDuctData ductData = new SourceDuctData(mepCurve, allDuctInModel, allFittingConnected);
                         processMepCurve = ductData.ProcessDuct != null ? ductData.ProcessDuct : mepCurve;
                     }
 
                     if (mepCurve is Autodesk.Revit.DB.Plumbing.Pipe pipe)
                     {
-                        SourcePipeData pipeData = new SourcePipeData(mepCurve, allPipeInModel, allPipeFittingInModel);
+                        List<ElementId> allElementIds = allPipeFittingInModel.Select(item => item.Id).ToList();
+
+                        // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline.
+                        Outline myOutLn = CreateOutLineFromBoundingBox(pipe);
+                        if (myOutLn == null || myOutLn.IsEmpty)
+                            continue;
+
+                        // Create a BoundingBoxIntersects filter with this Outline
+                        BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
+
+                        FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document, allElementIds);
+
+                        List<FamilyInstance> allFittingConnected = collector.WherePasses(filter).Cast<FamilyInstance>().ToList();
+
+                        SourcePipeData pipeData = new SourcePipeData(mepCurve, allPipeInModel, allFittingConnected);
                         processMepCurve = pipeData.ProcessPipe != null ? pipeData.ProcessPipe : mepCurve;
                     }
 
@@ -1360,6 +1389,26 @@ namespace TotalMEPProject.Commands.TotalMEP
             {
             }
             return Result.Cancelled;
+        }
+
+        /// <summary>
+        /// CreateOutLineFromBoundingBox
+        /// </summary>
+        /// <param name="ele"></param>
+        /// <returns></returns>
+
+        public static Outline CreateOutLineFromBoundingBox(Element ele)
+        {
+            Outline retVal = null;
+            if (ele == null)
+                return retVal;
+            BoundingBoxXYZ boundingBox = ele.get_BoundingBox(null);
+            if (boundingBox == null)
+                return retVal;
+            XYZ min = new XYZ(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z);
+            XYZ max = new XYZ(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z);
+            retVal = new Outline(min, max);
+            return retVal;
         }
 
         public static MEPCurve GetMepSame(List<FamilyInstance> lstElbow)
@@ -2246,7 +2295,7 @@ namespace TotalMEPProject.Commands.TotalMEP
             DuctsConnect = new List<Autodesk.Revit.DB.Mechanical.Duct>();
             List<MEPCurveData> allDucts = AllDuct.Select(item => new MEPCurveData(item as MEPCurve)).ToList();
 
-            List<MEPCurveData> filterMEPCurve = allDucts.Where(item => item.Connector1 != null && item.Connector2 != null).Where(item => item.Connectors.Any(item1 => item1.IsConnectedTo(FirstConnector) == true)).ToList();
+            List<MEPCurveData> filterMEPCurve = FirstConnector != null ? allDucts.Where(item => item.Connector1 != null && item.Connector2 != null).Where(item => item.Connectors.Any(item1 => item1.IsConnectedTo(FirstConnector) == true)).ToList() : new List<MEPCurveData>();
 
             if (filterMEPCurve.Count > 0)
                 DuctsConnect = filterMEPCurve.Select(item => item.MEPCurveMain as Autodesk.Revit.DB.Mechanical.Duct).ToList();
