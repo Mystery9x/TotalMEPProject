@@ -379,7 +379,6 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "HolyUpDownForm";
             this.Text = "Holy Up/Down";
             this.Load += new System.EventHandler(this.HolyUpDownForm_Load);
