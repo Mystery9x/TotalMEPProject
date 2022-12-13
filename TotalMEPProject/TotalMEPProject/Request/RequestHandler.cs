@@ -76,6 +76,12 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.SprinklerUp_Aplly:
+                    {
+                        CmdSprinklerUpright.Process();
+                    }
+                    break;
+
                 default:
                     {
                         break;

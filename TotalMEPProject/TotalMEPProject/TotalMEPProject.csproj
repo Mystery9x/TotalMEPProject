@@ -189,6 +189,12 @@
     <Compile Include="UI\FireFightingUI\2LevelSmartForm.Designer.cs">
       <DependentUpon>2LevelSmartForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\FireFightingUI\SprinkerUpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FireFightingUI\SprinkerUpForm.Designer.cs">
+      <DependentUpon>SprinkerUpForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\FrmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -237,6 +243,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FireFightingUI\2LevelSmartForm.resx">
       <DependentUpon>2LevelSmartForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FireFightingUI\SprinkerUpForm.resx">
+      <DependentUpon>SprinkerUpForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FrmLogin.resx">
       <DependentUpon>FrmLogin.cs</DependentUpon>

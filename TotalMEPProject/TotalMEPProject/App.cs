@@ -29,6 +29,7 @@ namespace TotalMEPProject
         public static _2LevelSmartForm _2LevelSmartForm = null;
         public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
+        public static SprinkerUpForm m_SprinkerUpForm = null;
 
         public static HolySplitUpdown _HolyUpdown = null;
         public static bool isApply = true;
@@ -677,6 +678,45 @@ namespace TotalMEPProject
                 }
 
                 DisplayService.SetFocus(new HandleRef(null, App._2LevelSmartForm.Handle));
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static bool ShowSprinklerUpForm()
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (m_SprinkerUpForm == null || m_SprinkerUpForm.IsDisposed)
+                {
+                    RequestHandler handler = new RequestHandler();
+
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    m_SprinkerUpForm = new SprinkerUpForm(exEvent, handler);
+
+                    m_SprinkerUpForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App.m_SprinkerUpForm.Handle));
 
                 return true;
             }

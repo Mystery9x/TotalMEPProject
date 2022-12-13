@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using System;
 using System.Collections.Generic;
@@ -1800,6 +1801,228 @@ namespace TotalMEPProject.Ultis
         public static bool IsZero(double a)
         {
             return IsZero(a, _eps);
+        }
+
+        public static View3D Get3DView(Document doc)
+        {
+            FilteredElementCollector collector
+              = new FilteredElementCollector(doc);
+
+            collector.OfClass(typeof(View3D));
+
+            foreach (View3D v in collector)
+            {
+                // skip view templates here because they
+                // are invisible in project browsers:
+
+                if (v != null && !v.IsTemplate && v.Name == "{3D}")
+                {
+                    return v;
+                }
+            }
+
+            return NewView3D(doc);
+        }
+
+        public static View3D NewView3D(Document doc)
+        {
+            FilteredElementCollector collector
+              = new FilteredElementCollector(doc);
+
+            collector.OfClass(typeof(View3D));
+            if (collector.ToElementIds().Count == 0)
+                return null;
+
+            ElementId viewTypeId = collector.ToElementIds().First();
+
+            View3D view = View3D.CreateIsometric(doc, viewTypeId);
+
+            return view;
+        }
+
+        public static List<Element> FindElementsByDirection(Document doc, ElementId ognoreId, ElementId elementTypeId, ElementId systemTypeId, XYZ point, XYZ direction, BuiltInCategory built, bool checkMin, Type type)
+        {
+            var view3d = Get3DView(doc);
+
+            if (view3d == null)
+                return null;
+
+            double fsilon = 5000;
+            //Change section box: Extend section box to see all object////////////////////////////////////////////////////////////////////////
+            var box = view3d.GetSectionBox();
+
+            var max = new XYZ(box.Max.X + fsilon, box.Max.Y + fsilon, box.Max.Z + fsilon);
+            var min = new XYZ(box.Min.X - fsilon, box.Min.Y - fsilon, box.Min.Z - fsilon);
+
+            BoundingBoxXYZ newBox = new BoundingBoxXYZ();
+            newBox.Min = min;
+            newBox.Max = max;
+            view3d.SetSectionBox(newBox);
+            Global.UIDoc.Document.Regenerate();
+
+            //////////////////////////////////////////////////////////////////////////
+            ElementClassFilter filter = new ElementClassFilter(type);
+            ReferenceIntersector referenceIntersector = new ReferenceIntersector(filter, FindReferenceTarget.Face, view3d);
+            referenceIntersector.FindReferencesInRevitLinks = true;
+
+            List<Element> elements = new List<Element>();
+            Dictionary<Element, double> proximities = new Dictionary<Element, double>();
+
+            var mepCurve = Global.UIDoc.Document.GetElement(ognoreId) as MEPCurve;
+
+            IList<ReferenceWithContext> intersectedReferences = referenceIntersector.Find(point, direction);
+
+            double maxFT = 1000 * Common.mmToFT;
+
+            foreach (ReferenceWithContext referenceWithContext in intersectedReferences)
+            {
+                Autodesk.Revit.DB.Element referenceElement = null;
+
+                Reference reference = referenceWithContext.GetReference();
+                if (reference.LinkedElementId != ElementId.InvalidElementId)
+                {
+                    continue;
+                }
+                else
+                    referenceElement = Global.UIDoc.Document.GetElement(reference);
+
+                if (referenceElement != null && referenceElement as MEPCurve != null)
+                {
+                    var mep = referenceElement as MEPCurve;
+
+                    if (CheckValid(mep, mepCurve, elementTypeId, systemTypeId) == false)
+                        continue;
+
+                    if (referenceElement.Category != null && referenceElement.Category.Id.IntegerValue == (int)built)
+                    {
+                        var exist = elements.Find(item => item.Id == referenceElement.Id);
+                        if (exist == null && ognoreId != referenceElement.Id)
+                        {
+                            double distance = referenceWithContext.Proximity;
+
+                            if (checkMin)
+                            {
+                                //Kiêm tra connector
+                                List<Connector> connectors = Common.GetConnectionNearest(referenceElement, mepCurve);
+                                if (connectors != null && connectors.Count == 2)
+                                {
+                                    var c1 = connectors[0];
+                                    var c2 = connectors[1];
+                                    if (c1 != null && c2 != null)
+                                    {
+                                        distance = Common.ToPoint2D(c1.Origin).DistanceTo(Common.ToPoint2D(c2.Origin));
+                                    }
+                                }
+
+                                if (distance > maxFT)
+                                    continue;
+                            }
+
+                            elements.Add(referenceElement);
+
+                            proximities.Add(referenceElement, distance);
+                        }
+                    }
+                }
+            }
+            elements.Sort(delegate (Element e1, Element e2)
+            {
+                var d1 = proximities[e1];
+                var d2 = proximities[e2];
+
+                return d1.CompareTo(d2);
+            }
+            );
+
+            //////////////////////////////////////////////////////////////////////////
+            view3d.SetSectionBox(box);
+            Global.UIDoc.Document.Regenerate();
+            //////////////////////////////////////////////////////////////////////////
+
+            return elements;
+        }
+
+        private static bool CheckValid(MEPCurve mep, MEPCurve mepCurve, ElementId elementTypeId, ElementId systemTypeId)
+        {
+            //Check offset////////////////////////////////////////////////////////////////////////
+            if (mep as Duct != null || mep as CableTray != null)
+            {
+                if (mepCurve != null)
+                {
+                    var para = mepCurve.get_Parameter(BuiltInParameter.RBS_CURVE_VERT_OFFSET_PARAM);
+                    if (para != null)
+                    {
+                        var value = para.AsInteger();
+                        if (value == 1) //Bottom
+                        {
+                            var offset1 = mepCurve.LookupParameter("Bottom Elevation").AsDouble();
+                            var offset2 = mep.LookupParameter("Bottom Elevation").AsDouble();
+
+                            if (Math.Abs(offset1 - offset2) > 0.01)
+                            {
+                                return false;
+                            }
+                        }
+                        else if (value == 2) //Top
+                        {
+                            var offset1 = mepCurve.LookupParameter("Top Elevation").AsDouble();
+                            var offset2 = mep.LookupParameter("Top Elevation").AsDouble();
+
+                            if (Math.Abs(offset1 - offset2) > 0.01)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            var offset1 = GetOffset(mepCurve);// mepCurve.LookupParameter("Offset").AsDouble();
+                            var offset2 = GetOffset(mep);// mep.LookupParameter("Offset").AsDouble();
+
+                            if (Math.Abs(offset1 - offset2) > 0.01)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //////////////////////////////////////////////////////////////////////////
+
+            //Check element type and system type
+
+            if (mepCurve != null)
+            {
+                if (mep.GetTypeId() != mepCurve.GetTypeId())
+                    return false;
+            }
+
+            if (systemTypeId != ElementId.InvalidElementId)
+            {
+                ElementId systemId = ElementId.InvalidElementId;
+                if (mep as Pipe != null)
+                {
+                    systemId = mep.get_Parameter(BuiltInParameter.RBS_PIPING_SYSTEM_TYPE_PARAM).AsElementId();
+                }
+                else if (mep as Duct != null)
+                {
+                    systemId = mep.get_Parameter(BuiltInParameter.RBS_DUCT_SYSTEM_TYPE_PARAM).AsElementId();
+                }
+                else
+                {
+                    systemId = mep.get_Parameter(BuiltInParameter.RBS_CTC_SERVICE_TYPE).AsElementId();
+                }
+
+                if (systemId != systemTypeId)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static double GetOffset(Element element)
+        {
+            return element.LookupParameter("Middle Elevation").AsDouble();
         }
 
         /// <summary>
