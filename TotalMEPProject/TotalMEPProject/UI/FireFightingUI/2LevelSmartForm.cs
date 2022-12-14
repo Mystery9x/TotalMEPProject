@@ -35,6 +35,30 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
+        public FamilySymbol SelectedNippleFamily
+        {
+            get
+            {
+                return (cboC1NippleFamily.SelectedItem as FamilySymbol);
+            }
+        }
+
+        public bool OptionAddNipple
+        {
+            get
+            {
+                return ckbNippleCreating.Checked;
+            }
+        }
+
+        public bool OptionAddElbowConnection
+        {
+            get
+            {
+                return ckbC1ElbowConnection.Checked;
+            }
+        }
+
         public double PipeSize
         {
             get
