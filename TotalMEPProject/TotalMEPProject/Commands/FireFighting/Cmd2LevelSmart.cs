@@ -496,6 +496,11 @@ namespace TotalMEPProject.Commands.FireFighting
             return true;
         }
 
+        /// <summary>
+        /// Get Preferred Junction Type
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <returns></returns>
         private static PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
         {
             var pipeType = pipe.PipeType as PipeType;
@@ -503,6 +508,14 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipeType.RoutingPreferenceManager.PreferredJunctionType;
         }
 
+        /// <summary>
+        /// Create Tee Fitting
+        /// </summary>
+        /// <param name="pipeMain"></param>
+        /// <param name="pipeCurrent"></param>
+        /// <param name="splitPoint"></param>
+        /// <param name="main2"></param>
+        /// <returns></returns>
         public static FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
         {
             var curve = (pipeMain.Location as LocationCurve).Curve;
@@ -541,6 +554,14 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
+        /// <summary>
+        /// Create Elbow Fitting
+        /// </summary>
+        /// <param name="pipeMain"></param>
+        /// <param name="pipeCurrent"></param>
+        /// <param name="splitPoint"></param>
+        /// <param name="main2"></param>
+        /// <returns></returns>
         public static FamilyInstance CreateElbowFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
         {
             main2 = null;
@@ -597,6 +618,12 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static Connector GetConnectorClosestTo(Element e,
                                                       XYZ p)
         {
@@ -607,6 +634,12 @@ namespace TotalMEPProject.Commands.FireFighting
               : GetConnectorClosestTo(cm.Connectors, p);
         }
 
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="connectors"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         private static Connector GetConnectorClosestTo(ConnectorSet connectors,
                                                        XYZ p)
         {
@@ -626,6 +659,12 @@ namespace TotalMEPProject.Commands.FireFighting
             return targetConnector;
         }
 
+        /// <summary>
+        /// GetConnectorManager
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private static ConnectorManager GetConnectorManager(Element e)
         {
             MEPCurve mc = e as MEPCurve;
