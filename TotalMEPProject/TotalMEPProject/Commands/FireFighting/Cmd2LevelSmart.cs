@@ -178,6 +178,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                         // Connect vertical pipe with main pipe
                         FamilyInstance bottomTee = null;
+                        FamilyInstance bottomElbow = null;
 
                         if (GetPreferredJunctionType(mainPipe) == PreferredJunctionType.Tee)
                         {
@@ -185,15 +186,34 @@ namespace TotalMEPProject.Commands.FireFighting
                             {
                                 Pipe main2 = null;
 
-                                bottomTee = CreateTeeFitting(mainPipe as Pipe, verticalPipe as Pipe, intsMain1_pnt, out main2);
-                                if (main2 != null && bottomTee != null)
+                                if (!App._2LevelSmartForm.OptionAddElbowConnection)
                                 {
-                                    m_mainPipes.Add(main2.Id);
+                                    bottomTee = CreateTeeFitting(mainPipe as Pipe, verticalPipe as Pipe, intsMain1_pnt, out main2);
+                                    if (main2 != null && bottomTee != null)
+                                    {
+                                        m_mainPipes.Add(main2.Id);
+                                    }
+                                    else
+                                    {
+                                        reSubTrans.RollBack();
+                                        return false;
+                                    }
                                 }
                                 else
                                 {
-                                    reSubTrans.RollBack();
-                                    return false;
+                                    bottomElbow = CreateElbowFitting(mainPipe as Pipe, verticalPipe as Pipe, intsMain1_pnt, out main2);
+                                    if (main2.IsValidObject == true && bottomElbow != null)
+                                    {
+                                        m_mainPipes.Add(main2.Id);
+                                    }
+                                    else if ((main2.IsValidObject != true && bottomElbow != null))
+                                    {
+                                    }
+                                    else
+                                    {
+                                        reSubTrans.RollBack();
+                                        return false;
+                                    }
                                 }
                             }
                         }
@@ -521,6 +541,62 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
+        public static FamilyInstance CreateElbowFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        {
+            main2 = null;
+            try
+            {
+                var curve = (pipeMain.Location as LocationCurve).Curve;
+
+                var p0 = curve.GetEndPoint(0);
+                var p1 = curve.GetEndPoint(1);
+
+                var pipeTempMain1 = pipeMain;
+
+                var line1 = Line.CreateBound(p0, splitPoint);
+                (pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+                var newPlace = new XYZ(0, 0, 0);
+                var elemIds = ElementTransformUtils.CopyElement(
+                   Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+                main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+                var line2 = Line.CreateBound(splitPoint, p1);
+                (main2.Location as LocationCurve).Curve = line2;
+
+                //Connect
+                var c3 = GetConnectorClosestTo(pipeTempMain1, splitPoint);
+                var c4 = GetConnectorClosestTo(main2, splitPoint);
+                var c5 = GetConnectorClosestTo(pipeCurrent, splitPoint);
+
+                try
+                {
+                    FamilyInstance retFitting = null;
+                    if (main2.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() < pipeTempMain1.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble())
+                    {
+                        retFitting = Global.UIDoc.Document.Create.NewElbowFitting(c3, c5);
+
+                        Global.UIDoc.Document.Delete(main2.Id);
+                        //main2 = null;
+                    }
+                    else
+                    {
+                        retFitting = Global.UIDoc.Document.Create.NewElbowFitting(c4, c5);
+                        Global.UIDoc.Document.Delete(pipeTempMain1.Id);
+                    }
+                    return retFitting;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            catch (Exception)
+            { }
+            return null;
+        }
+
         public static Connector GetConnectorClosestTo(Element e,
                                                       XYZ p)
         {
@@ -834,6 +910,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     List<Connector> temp3 = GetConnectors(nipple.MEPModel.ConnectorManager.Connectors, true);
                     List<Connector> temp3_tee = GetConnectors(tee.MEPModel.ConnectorManager.Connectors, true);
+                    temp3_tee.Remove(temp3_tee.OrderBy(item => item.Origin.Z).FirstOrDefault());
                     List<Connector> temp3_reducer = GetConnectors(reducer_1.MEPModel.ConnectorManager.Connectors, true);
                     foreach (Connector cnt in temp3_tee)
                     {
@@ -1500,6 +1577,40 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             _Pipe1 = p1;
             _Pipe2 = p2;
+        }
+    }
+
+    public class SourcePipesData
+    {
+        private Pipe m_firstPipe = null;
+        private Pipe m_secondPipe = null;
+        private Pipe m_mainPipe = null;
+        private double m_diameter = double.MinValue;
+        private bool m_addNipple = false;
+        private FamilySymbol m_nippleFamily = null;
+        private bool m_addElbowConnection = false;
+        private List<ElementId> m_mainPipes = new List<ElementId>();
+
+        public Pipe FirstPipe { get => m_firstPipe; set => m_firstPipe = value; }
+        public Pipe SecondPipe { get => m_secondPipe; set => m_secondPipe = value; }
+        public Pipe MainPipe { get => m_mainPipe; set => m_mainPipe = value; }
+        public List<ElementId> MainPipes { get => m_mainPipes; set => m_mainPipes = value; }
+        public double Diameter { get => m_diameter; set => m_diameter = value; }
+        public bool FlagAddNipple { get => m_addNipple; set => m_addNipple = value; }
+        public FamilySymbol NippleFamily { get => m_nippleFamily; set => m_nippleFamily = value; }
+        public bool FlagAddElbowConnection { get => m_addElbowConnection; set => m_addElbowConnection = value; }
+
+        public SourcePipesData(List<ElementId> mainPipes, Pipe firstPipe, Pipe secondPipe)
+        {
+            if (mainPipes != null)
+                MainPipes = mainPipes;
+
+            FirstPipe = firstPipe;
+            SecondPipe = secondPipe;
+        }
+
+        private void Initialize()
+        {
         }
     }
 }
