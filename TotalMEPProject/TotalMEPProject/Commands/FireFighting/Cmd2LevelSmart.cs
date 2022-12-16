@@ -81,7 +81,6 @@ namespace TotalMEPProject.Commands.FireFighting
                 var pipe1 = pair._Pipe1;
                 var pipe2 = pair._Pipe2;
                 SourcePipesData sourcePipesData = new SourcePipesData(m_mainPipes, pipe1, pipe2, pipeType, diameter, App._2LevelSmartForm.OptionAddNipple, App._2LevelSmartForm.SelectedNippleFamily, App._2LevelSmartForm.OptionAddElbowConnection);
-                //HandlerWithPipes(pipe1, pipe2, diameter, pipeType);
             }
 
             t.Commit();
@@ -329,7 +328,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        public bool BeforeProcess()
+        private bool BeforeProcess()
         {
             try
             {
@@ -392,7 +391,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandleVerticalPipe()
+        private bool HandleVerticalPipe()
         {
             try
             {
@@ -408,12 +407,20 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandleBranchPipePerpendiculerMainPipe()
+        private bool HandleBranchPipePerpendiculerMainPipe()
         {
             try
             {
-                if (FirstPipe == null || MainPipe == null)
-                    return false;
+                //if (FirstPipe == null || MainPipe == null)
+                //    return false;
+
+                // Check has two pipe valid
+                bool flagTwoPipe = SecondPipe != null ? true : false;
+
+                if (flagTwoPipe == false)
+                {
+                    List<Element> allComponentConnectFirstPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, FirstPipe.Id, true);
+                }
 
                 return true;
             }
@@ -422,7 +429,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandleFlagElbowConnection()
+        private bool HandleFlagElbowConnection()
         {
             try
             {
@@ -463,7 +470,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandlerBottomTee()
+        private bool HandlerBottomTee()
         {
             try
             {
@@ -498,7 +505,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandlerTopTee()
+        private bool HandlerTopTee()
         {
             try
             {
@@ -666,7 +673,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandleAccessoryPairing()
+        private bool HandleAccessoryPairing()
         {
             try
             {
@@ -793,7 +800,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <param name="splitPoint"></param>
         /// <param name="main2"></param>
         /// <returns></returns>
-        public FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        private FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
         {
             var curve = (pipeMain.Location as LocationCurve).Curve;
 
@@ -839,7 +846,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <param name="splitPoint"></param>
         /// <param name="main2"></param>
         /// <returns></returns>
-        public FamilyInstance CreateElbowFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        private FamilyInstance CreateElbowFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
         {
             main2 = null;
             try
@@ -901,7 +908,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <param name="e"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-        public Connector GetConnectorClosestTo(Element e,
+        private Connector GetConnectorClosestTo(Element e,
                                                       XYZ p)
         {
             ConnectorManager cm = GetConnectorManager(e);
@@ -958,6 +965,12 @@ namespace TotalMEPProject.Commands.FireFighting
               : mc.ConnectorManager;
         }
 
+        /// <summary>
+        /// s e
+        /// </summary>
+        /// <param name="mepCurveSplit1"></param>
+        /// <param name="mepCurveSplit2"></param>
+        /// <returns></returns>
         public bool se(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
         {
             try
@@ -999,6 +1012,13 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
+        /// <summary>
+        /// Create Tee
+        /// </summary>
+        /// <param name="c3"></param>
+        /// <param name="c4"></param>
+        /// <param name="c5"></param>
+        /// <returns></returns>
         public FamilyInstance CreatTee(Connector c3, Connector c4, Connector c5)
         {
             if (c3 == null || c4 == null || c5 == null)
@@ -1015,6 +1035,12 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
+        /// <summary>
+        /// g
+        /// </summary>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <returns></returns>
         private bool g(double d1, double d2)
         {
             if (Math.Abs(d1 - d2) < 0.001)
@@ -1023,6 +1049,11 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
+        /// <summary>
+        /// Get pipe connect
+        /// </summary>
+        /// <param name="cs"></param>
+        /// <returns></returns>
         private Pipe GetPipeConnect(ConnectorSet cs)
         {
             foreach (Connector c in cs)
@@ -1038,7 +1069,25 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
-        public bool HandlerConnectTopReducer(Pipe firstPipe,
+        /// <summary>
+        /// Handler Connect Top Reducer
+        /// </summary>
+        /// <param name="firstPipe"></param>
+        /// <param name="primerPipe_1"></param>
+        /// <param name="checkPrimerTemp1"></param>
+        /// <param name="checkPrimerTemp2"></param>
+        /// <param name="main1_p"></param>
+        /// <param name="v_m_1"></param>
+        /// <param name="main2_p"></param>
+        /// <param name="v_m_2"></param>
+        /// <param name="diameter_10"></param>
+        /// <param name="sub1Ints_pnt"></param>
+        /// <param name="sub1_pnt0"></param>
+        /// <param name="sub1_pnt1"></param>
+        /// <param name="tee"></param>
+        /// <param name="reducer_1"></param>
+        /// <returns></returns>
+        private bool HandlerConnectTopReducer(Pipe firstPipe,
                                              Pipe primerPipe_1,
                                              Pipe checkPrimerTemp1,
                                              Pipe checkPrimerTemp2,
@@ -1096,6 +1145,12 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
+        /// <summary>
+        /// Set Location Line
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <param name="pOn"></param>
+        /// <param name="pOther"></param>
         private void SetLocationLine(Pipe pipe, XYZ pOn, XYZ pOther)
         {
             var p0 = pipe.GetCurve().GetEndPoint(0);
@@ -1111,7 +1166,14 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        public FamilyInstance CreatTransitionFitting(MEPCurve mep1, MEPCurve mep2, bool checkDistance = false)
+        /// <summary>
+        /// Creat Transition Fitting
+        /// </summary>
+        /// <param name="mep1"></param>
+        /// <param name="mep2"></param>
+        /// <param name="checkDistance"></param>
+        /// <returns></returns>
+        private FamilyInstance CreatTransitionFitting(MEPCurve mep1, MEPCurve mep2, bool checkDistance = false)
         {
             if (mep1 == null || mep2 == null)
                 return null;
@@ -1149,7 +1211,13 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
-        public bool iss(MEPCurve mep1, MEPCurve mep2)
+        /// <summary>
+        /// Is Same
+        /// </summary>
+        /// <param name="mep1"></param>
+        /// <param name="mep2"></param>
+        /// <returns></returns>
+        private bool iss(MEPCurve mep1, MEPCurve mep2)
         {
             //Check same type
             var shape1 = Common.GetShape(mep1);
@@ -1219,7 +1287,15 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public bool HandlerConnectAccessoryNipple(bool addNipple, Pipe primerPipe_1, FamilyInstance reducer_1, FamilyInstance tee)
+        /// <summary>
+        /// Handler Connect Accessory Nipple
+        /// </summary>
+        /// <param name="addNipple"></param>
+        /// <param name="primerPipe_1"></param>
+        /// <param name="reducer_1"></param>
+        /// <param name="tee"></param>
+        /// <returns></returns>
+        private bool HandlerConnectAccessoryNipple(bool addNipple, Pipe primerPipe_1, FamilyInstance reducer_1, FamilyInstance tee)
         {
             try
             {
@@ -1327,7 +1403,14 @@ namespace TotalMEPProject.Commands.FireFighting
             return false;
         }
 
-        public Tuple<Connector, Connector> PipeToPairConnector(Pipe pipe, FamilyInstance reducer, FamilyInstance tee)
+        /// <summary>
+        /// Pipe To Pair Connector
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <param name="reducer"></param>
+        /// <param name="tee"></param>
+        /// <returns></returns>
+        private Tuple<Connector, Connector> PipeToPairConnector(Pipe pipe, FamilyInstance reducer, FamilyInstance tee)
         {
             try
             {
@@ -1375,9 +1458,9 @@ namespace TotalMEPProject.Commands.FireFighting
             return new List<Connector>();
         }
 
-        public XYZ MiddlePoint(XYZ xYZ_1, XYZ xYZ_2) => new XYZ((xYZ_1.X + xYZ_2.X) * 0.5, (xYZ_1.Y + xYZ_2.Y) * 0.5, (xYZ_1.Z + xYZ_2.Z) * 0.5);
+        private XYZ MiddlePoint(XYZ xYZ_1, XYZ xYZ_2) => new XYZ((xYZ_1.X + xYZ_2.X) * 0.5, (xYZ_1.Y + xYZ_2.Y) * 0.5, (xYZ_1.Z + xYZ_2.Z) * 0.5);
 
-        public void RotateLine(Document doc, FamilyInstance wye, Line axisLine)
+        private void RotateLine(Document doc, FamilyInstance wye, Line axisLine)
         {
             var lst = Common.ToList(wye.MEPModel.ConnectorManager.Connectors);
 
@@ -1400,7 +1483,7 @@ namespace TotalMEPProject.Commands.FireFighting
             doc.Regenerate();
         }
 
-        public XYZ GetUnBoundIntersection(Line Line1, Line Line2)
+        private XYZ GetUnBoundIntersection(Line Line1, Line Line2)
         {
             if (Line1 != null && Line2 != null)
             {
@@ -1431,7 +1514,7 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
-        public bool SetBuiltinParameterValue(Element elem, BuiltInParameter paramId, object value)
+        private bool SetBuiltinParameterValue(Element elem, BuiltInParameter paramId, object value)
         {
             Parameter param = elem.get_Parameter(paramId);
             return SetParameterValue(param, value);
@@ -1476,7 +1559,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <summary>
         /// Get builtin parameter value based on its storage type
         /// </summary>
-        public dynamic GetBuiltInParameterValue(Element elem, BuiltInParameter paramId)
+        private dynamic GetBuiltInParameterValue(Element elem, BuiltInParameter paramId)
         {
             if (elem != null)
             {
@@ -1514,7 +1597,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <summary>
         /// Get parameter value by name
         /// </summary>
-        public dynamic GetParameterValueByName(Element elem, string paramName)
+        private dynamic GetParameterValueByName(Element elem, string paramName)
         {
             if (elem != null)
             {
@@ -1522,6 +1605,78 @@ namespace TotalMEPProject.Commands.FireFighting
                 return GetParameterValue(parameter);
             }
             return null;
+        }
+
+        /// <summary>
+        /// All Components On Pipe Truss
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="elementMainId"></param>
+        /// <param name="addFirst"></param>
+        /// <param name="rmvElement"></param>
+        /// <returns></returns>
+        private List<Element> AllComponentsOnPipeTruss(Document document, ElementId elementMainId, bool addFirst = false, List<Element> rmvElement = null)
+        {
+            List<Element> components = new List<Element>();
+            Element eleMain = document.GetElement(elementMainId);
+            List<Element> rmvElement_1 = null;
+            if (addFirst == true)
+            {
+                rmvElement_1 = new List<Element> { eleMain };
+                components.Add(eleMain);
+            }
+            else
+            {
+                rmvElement_1 = new List<Element>(rmvElement);
+            }
+            if (eleMain != null)
+            {
+                List<Connector> connectors = new List<Connector>();
+                if (eleMain is MEPCurve processMEPCurve && processMEPCurve.ConnectorManager != null)
+                {
+                    foreach (Connector connector in processMEPCurve.ConnectorManager.Connectors)
+                    {
+                        if (connector.ConnectorType != ConnectorType.End)
+                            continue;
+                        connectors.Add(connector);
+                    }
+                }
+                else if (eleMain is FamilyInstance fmlIns && fmlIns.MEPModel.ConnectorManager != null)
+                {
+                    foreach (Connector connector in fmlIns.MEPModel.ConnectorManager.Connectors)
+                    {
+                        if (connector.ConnectorType != ConnectorType.End && connector.IsConnected == true)
+                            continue;
+                        connectors.Add(connector);
+                    }
+                }
+
+                if (connectors.Count > 0)
+                {
+                    foreach (Connector cnt1 in connectors)
+                    {
+                        foreach (Connector cnt2 in cnt1.AllRefs)
+                        {
+                            Element eleCheck = cnt2.Owner;
+                            if (null != eleCheck && (eleCheck is MEPCurve || eleCheck is FamilyInstance))
+                            {
+                                if (rmvElement_1 != null && rmvElement_1.Any(item => item.Id == eleCheck.Id))
+                                    continue;
+                                else
+                                {
+                                    components.Add(eleCheck);
+                                    List<Element> rmvElement_2 = new List<Element>(rmvElement_1);
+                                    rmvElement_2.Add(eleCheck);
+
+                                    components.AddRange(AllComponentsOnPipeTruss(document, eleCheck.Id, false, rmvElement_2));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return components;
         }
 
         #endregion Method
