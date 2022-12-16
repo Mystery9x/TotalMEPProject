@@ -225,24 +225,30 @@ namespace TotalMEPProject.UI.FireFightingUI
         private void ckbNippleCreating_CheckedChanged(object sender, EventArgs e)
         {
             if (ckbNippleCreating.Checked)
+            {
+                ckbC1ElbowConnection.Enabled = false;
                 cboC1NippleFamily.Enabled = true;
+            }
             else
+            {
+                ckbC1ElbowConnection.Enabled = true;
                 cboC1NippleFamily.Enabled = false;
+            }
         }
 
         private void ckbC1ElbowConnection_CheckedChanged(object sender, EventArgs e)
         {
             if (ckbC1ElbowConnection.Checked)
             {
-                //ckbNippleCreating.Enabled = false;
+                ckbNippleCreating.Enabled = false;
                 cboC1PipeSize.Enabled = false;
-                //cboC1NippleFamily.Enabled = false;
+                cboC1NippleFamily.Enabled = false;
             }
             else
             {
-                //ckbNippleCreating.Enabled = true;
+                ckbNippleCreating.Enabled = true;
                 cboC1PipeSize.Enabled = true;
-                //cboC1NippleFamily.Enabled = true;
+                cboC1NippleFamily.Enabled = true;
             }
         }
 
