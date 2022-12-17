@@ -27,6 +27,12 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private ExternalEvent m_exEvent;
 
+        public bool isD15 = false;
+        public bool isConnectTee = false;
+        public bool isConnectNipple = false;
+
+        public FamilySymbol fmlNipple = null;
+
         public ElementId FamilyType
         {
             get
@@ -179,8 +185,17 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private void btnApply_Click(object sender, EventArgs e)
         {
+            //fmlNipple = null;
             if (PipeSize == double.MaxValue)
                 return;
+
+            isD15 = rdnC2SprinklerD15.Checked;
+            isConnectTee = chkC2ConnectTee.Checked;
+            isConnectNipple = chkC2Nipple.Checked;
+            if (chkC2Nipple.Checked)
+            {
+                fmlNipple = cboC2Nipple.SelectedItem as FamilySymbol;
+            }
 
             AppUtils.sa(cboC2PipeType);
             AppUtils.sa(cboC2PypeSize);

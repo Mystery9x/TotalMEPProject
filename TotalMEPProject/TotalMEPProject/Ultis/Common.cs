@@ -96,6 +96,44 @@ namespace TotalMEPProject.Ultis
             return result < 10e-5;
         }
 
+        public static void RotateLineC2(Document doc, FamilyInstance wye, Line axisLine)
+        {
+            var lst = Common.ToList(wye.MEPModel.ConnectorManager.Connectors);
+
+            Connector connector2 = lst[0];
+            Connector connector3 = lst[1];
+
+            Line rotateLine = Line.CreateBound(connector2.Origin, connector3.Origin);
+
+            if (IsParallel(axisLine.Direction, rotateLine.Direction))
+                return;
+
+            XYZ vector = rotateLine.Direction.CrossProduct(axisLine.Direction);
+            XYZ intersection = GetUnBoundIntersection(rotateLine, axisLine);
+
+            double angle = rotateLine.Direction.AngleTo(axisLine.Direction);
+
+            Line line = Line.CreateUnbound(intersection, vector);
+
+            ElementTransformUtils.RotateElement(doc, wye.Id, line, angle);
+            doc.Regenerate();
+        }
+
+        public static void RotateLine(Document doc, FamilyInstance wye, Line axisLine)
+        {
+            Line rotateLine = Line.CreateBound(wye.MEPModel.ConnectorManager.Lookup(1).Origin, (wye.Location as LocationPoint).Point);
+
+            XYZ vector = rotateLine.Direction.CrossProduct(axisLine.Direction);
+            XYZ intersection = GetUnBoundIntersection(rotateLine, axisLine);
+
+            double angle = rotateLine.Direction.AngleTo(axisLine.Direction);
+
+            Line line = Line.CreateUnbound(intersection, vector);
+
+            ElementTransformUtils.RotateElement(doc, wye.Id, line, angle);
+            doc.Regenerate();
+        }
+
         public static void NumberCheck(object sender, KeyPressEventArgs e, bool allowNegativeValue = false) // < 0
         {
             if (allowNegativeValue == false)
@@ -1254,21 +1292,6 @@ namespace TotalMEPProject.Ultis
                 }
             }
             return null;
-        }
-
-        private static void RotateLine(Document doc, FamilyInstance wye, Line axisLine)
-        {
-            Line rotateLine = Line.CreateBound(wye.MEPModel.ConnectorManager.Lookup(1).Origin, (wye.Location as LocationPoint).Point);
-
-            XYZ vector = rotateLine.Direction.CrossProduct(axisLine.Direction);
-            XYZ intersection = GetUnBoundIntersection(rotateLine, axisLine);
-
-            double angle = rotateLine.Direction.AngleTo(axisLine.Direction);
-
-            Line line = Line.CreateUnbound(intersection, vector);
-
-            ElementTransformUtils.RotateElement(doc, wye.Id, line, angle);
-            doc.Regenerate();
         }
 
         /// <summary>

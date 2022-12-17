@@ -38,12 +38,12 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.rdnC2SprinklerD20 = new System.Windows.Forms.RadioButton();
             this.rdnC2SprinklerD15 = new System.Windows.Forms.RadioButton();
-            this.chkC2ConnectTee = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.cboC2Nipple = new System.Windows.Forms.ComboBox();
             this.cboC2PipeType = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.cboC2PypeSize = new System.Windows.Forms.ComboBox();
+            this.chkC2ConnectTee = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
@@ -78,16 +78,16 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.label3, 0, 3);
             this.tableLayoutPanel2.Controls.Add(this.label4, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this.chkC2Nipple, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.chkC2Nipple, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.chkC2ConnectTee, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.label5, 2, 2);
             this.tableLayoutPanel2.Controls.Add(this.cboC2Nipple, 3, 2);
             this.tableLayoutPanel2.Controls.Add(this.cboC2PipeType, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.label6, 2, 1);
             this.tableLayoutPanel2.Controls.Add(this.cboC2PypeSize, 3, 1);
+            this.tableLayoutPanel2.Controls.Add(this.chkC2ConnectTee, 1, 3);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,7 +122,7 @@
             // chkC2Nipple
             // 
             this.chkC2Nipple.AutoSize = true;
-            this.chkC2Nipple.Location = new System.Drawing.Point(165, 110);
+            this.chkC2Nipple.Location = new System.Drawing.Point(165, 75);
             this.chkC2Nipple.Margin = new System.Windows.Forms.Padding(5);
             this.chkC2Nipple.Name = "chkC2Nipple";
             this.chkC2Nipple.Size = new System.Drawing.Size(15, 14);
@@ -189,16 +189,6 @@
             this.rdnC2SprinklerD15.Text = "D15";
             this.rdnC2SprinklerD15.UseVisualStyleBackColor = true;
             // 
-            // chkC2ConnectTee
-            // 
-            this.chkC2ConnectTee.AutoSize = true;
-            this.chkC2ConnectTee.Location = new System.Drawing.Point(165, 75);
-            this.chkC2ConnectTee.Margin = new System.Windows.Forms.Padding(5);
-            this.chkC2ConnectTee.Name = "chkC2ConnectTee";
-            this.chkC2ConnectTee.Size = new System.Drawing.Size(15, 14);
-            this.chkC2ConnectTee.TabIndex = 6;
-            this.chkC2ConnectTee.UseVisualStyleBackColor = true;
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -249,6 +239,16 @@
             this.cboC2PypeSize.Name = "cboC2PypeSize";
             this.cboC2PypeSize.Size = new System.Drawing.Size(145, 21);
             this.cboC2PypeSize.TabIndex = 12;
+            // 
+            // chkC2ConnectTee
+            // 
+            this.chkC2ConnectTee.AutoSize = true;
+            this.chkC2ConnectTee.Location = new System.Drawing.Point(165, 110);
+            this.chkC2ConnectTee.Margin = new System.Windows.Forms.Padding(5);
+            this.chkC2ConnectTee.Name = "chkC2ConnectTee";
+            this.chkC2ConnectTee.Size = new System.Drawing.Size(15, 14);
+            this.chkC2ConnectTee.TabIndex = 6;
+            this.chkC2ConnectTee.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel5
             // 
