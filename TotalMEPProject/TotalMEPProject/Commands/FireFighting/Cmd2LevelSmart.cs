@@ -45,58 +45,76 @@ namespace TotalMEPProject.Commands.FireFighting
 
         public static Result Process()
         {
-            m_mainPipes.Clear();
-            var diameter = App._2LevelSmartForm.PipeSize * Common.mmToFT;
-
-            //Pick pipe chinh
-            //var pipe_main = PickPipe();
-            List<Pipe> pipe_mains = Cmd2LevelSmart.PickPipe();
-
-            if (pipe_mains == null || pipe_mains.Count == 0)
-                return Result.Cancelled;
-
-            List<Pipe> pipes = Cmd2LevelSmart.PickPipe();
-            if (pipes == null || pipes.Count == 0)
-                return Result.Cancelled;
-
-            pipes = (from Pipe p in pipes
-                     where /*p.Id != pipe_main.Id*/ pipe_mains.Find(item => item.Id == p.Id) == null
-                     select p).ToList();
-
-            var pairs = PairPipe(pipes);
-            if (pairs == null || pairs.Count == 0)
-                return Result.Cancelled;
-
-            //m_mainPipes.Add(pipe_main.Id);
-
-            var ids = (from Pipe p in pipe_mains
-                       where p.Id != ElementId.InvalidElementId
-                       select p.Id).ToList();
-
-            m_mainPipes.AddRange(ids);
-
-            TransactionGroup t = new TransactionGroup(Global.UIDoc.Document, "Two Level Smart");
-            t.Start();
-
-            var pipeType = Global.UIDoc.Document.GetElement(App._2LevelSmartForm.FamilyType) as PipeType;
-
-            foreach (PairPipes pair in pairs)
+            try
             {
-                var pipe1 = pair._Pipe1;
-                var pipe2 = pair._Pipe2;
-                SourcePipesData sourcePipesData = new SourcePipesData(m_mainPipes,
-                                                                      pipe1,
-                                                                      pipe2,
-                                                                      pipeType,
-                                                                      diameter,
-                                                                      App._2LevelSmartForm.OptionAddNipple,
-                                                                      App._2LevelSmartForm.SelectedNippleFamily,
-                                                                      App._2LevelSmartForm.OptionAddElbowConnection);
+                if (App._2LevelSmartForm != null && Common.IsFormSameOpen(App._2LevelSmartForm.Name))
+                    App._2LevelSmartForm.Hide();
+                m_mainPipes.Clear();
+                var diameter = App._2LevelSmartForm.PipeSize * Common.mmToFT;
+
+                //Pick pipe chinh
+                //var pipe_main = PickPipe();
+                List<Pipe> pipe_mains = Cmd2LevelSmart.PickPipe();
+
+                if (pipe_mains == null || pipe_mains.Count == 0)
+                    return Result.Cancelled;
+
+                List<Pipe> pipes = Cmd2LevelSmart.PickPipe();
+                if (pipes == null || pipes.Count == 0)
+                    return Result.Cancelled;
+
+                pipes = (from Pipe p in pipes
+                         where /*p.Id != pipe_main.Id*/ pipe_mains.Find(item => item.Id == p.Id) == null
+                         select p).ToList();
+
+                var pairs = PairPipe(pipes);
+                if (pairs == null || pairs.Count == 0)
+                    return Result.Cancelled;
+
+                //m_mainPipes.Add(pipe_main.Id);
+
+                var ids = (from Pipe p in pipe_mains
+                           where p.Id != ElementId.InvalidElementId
+                           select p.Id).ToList();
+
+                m_mainPipes.AddRange(ids);
+
+                TransactionGroup t = new TransactionGroup(Global.UIDoc.Document, "Two Level Smart");
+                t.Start();
+
+                var pipeType = Global.UIDoc.Document.GetElement(App._2LevelSmartForm.FamilyType) as PipeType;
+
+                foreach (PairPipes pair in pairs)
+                {
+                    var pipe1 = pair._Pipe1;
+                    var pipe2 = pair._Pipe2;
+                    SourcePipesData sourcePipesData = new SourcePipesData(m_mainPipes,
+                                                                          pipe1,
+                                                                          pipe2,
+                                                                          pipeType,
+                                                                          diameter,
+                                                                          App._2LevelSmartForm.OptionAddNipple,
+                                                                          App._2LevelSmartForm.SelectedNippleFamily,
+                                                                          App._2LevelSmartForm.OptionAddElbowConnection);
+                }
+
+                t.Assimilate();
+
+                return Result.Succeeded;
             }
-
-            t.Assimilate();
-
-            return Result.Succeeded;
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                if (App._2LevelSmartForm != null && Common.IsFormSameOpen(App._2LevelSmartForm.Name))
+                {
+                    App._2LevelSmartForm.TopMost = true;
+                    App._2LevelSmartForm.Show();
+                    Global.UIDoc.RefreshActiveView();
+                }
+            }
         }
 
         public static List<Pipe> PickPipe()
@@ -199,6 +217,23 @@ namespace TotalMEPProject.Commands.FireFighting
                 return true;
 
             return false;
+        }
+
+        public static bool IsFormSameOpen(string nameForm)
+        {
+            bool checkIsOpen = false;
+
+            foreach (System.Windows.Forms.Form openedForm in Application.OpenForms)
+            {
+                if (openedForm.GetType().Name == nameForm)
+                {
+                    openedForm.WindowState = FormWindowState.Normal;
+                    checkIsOpen = true;
+                    break;
+                }
+            }
+
+            return checkIsOpen;
         }
     }
 
@@ -531,6 +566,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         reSubTrans.Start();
                         ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectFirstPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1);
+                        Global.UIDoc.Document.Regenerate();
                         var curve_sub_Temp = FirstPipe.GetCurve();
                         var curve_sub_2d_Temp = Line.CreateUnbound(Common.ToPoint2D(curve_sub_Temp.GetEndPoint(0)), Common.ToPoint2D(curve_sub_Temp.GetEndPoint(1)) - Common.ToPoint2D(curve_sub_Temp.GetEndPoint(0)));
                         double angle = (curve_sub_2d_Temp as Line).Direction.AngleTo(mainPipe_dir_2d);
@@ -549,15 +585,18 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
                                     ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1);
+                                    Global.UIDoc.Document.Regenerate();
                                 }
                             }
                             else
                             {
                                 ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectFirstPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), -Math.PI);
+                                Global.UIDoc.Document.Regenerate();
                                 if (SecondPipe != null)
                                 {
                                     List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
                                     ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1 - Math.PI);
+                                    Global.UIDoc.Document.Regenerate();
                                 }
                             }
 
@@ -1676,9 +1715,10 @@ namespace TotalMEPProject.Commands.FireFighting
                     XYZ translation_2 = minDistanceCntReducer.Item1.Item1.Origin - minDistanceCntReducer.Item1.Item2.Origin;
                     ElementTransformUtils.MoveElement(Global.UIDoc.Document, reducer_1.Id, translation_2);
 
-                    List<Connector> temp3 = GetConnectors(nipple.MEPModel.ConnectorManager.Connectors, true);
+                    List<Connector> temp3 = GetConnectors(nipple.MEPModel.ConnectorManager.Connectors, true).Where(item => item.IsConnected == false).ToList();
                     List<Connector> temp3_tee = GetConnectors(tee.MEPModel.ConnectorManager.Connectors, true).ToList();
                     temp3_tee.Remove(temp3_tee.OrderBy(item => item.Origin.Z).FirstOrDefault());
+                    temp3_tee = temp3_tee.Where(item => item.IsConnected == false).ToList();
                     List<Connector> temp3_reducer = GetConnectors(reducer_1.MEPModel.ConnectorManager.Connectors, true).Where(item => item.IsConnected == false).ToList();
 
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1686,27 +1726,32 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     foreach (Connector cnt in temp3_reducer)
                     {
-                        if (Common.IsEqual(temp3[0].Origin, cnt.Origin))
+                        bool flag = false;
+                        foreach (Connector cnt1 in temp3)
                         {
-                            temp3[0].ConnectTo(cnt);
-                            temp3.Remove(temp3[0]);
+                            if (Common.IsEqual(cnt1.Origin, cnt.Origin) && cnt.IsConnected == false)
+                            {
+                                cnt1.ConnectTo(cnt);
+                                flag = true;
+                            }
                         }
-                        else
-                        {
-                            temp3[1].ConnectTo(cnt);
-                            temp3.Remove(temp3[1]);
-                        }
-                        break;
+                        if (flag == true)
+                            break;
                     }
 
                     foreach (Connector cnt in temp3_tee)
                     {
-                        if (Common.IsEqual(temp3[0].Origin, cnt.Origin))
+                        bool flag = false;
+                        foreach (Connector cnt1 in temp3)
                         {
-                            temp3[0].ConnectTo(cnt);
+                            if (Common.IsEqual(cnt1.Origin, cnt.Origin) && cnt.IsConnected == false)
+                            {
+                                cnt1.ConnectTo(cnt);
+                                flag = true;
+                            }
                         }
-
-                        break;
+                        if (flag == true)
+                            break;
                     }
 
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
