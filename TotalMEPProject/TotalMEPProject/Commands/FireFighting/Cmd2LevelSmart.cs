@@ -1677,35 +1677,35 @@ namespace TotalMEPProject.Commands.FireFighting
                     ElementTransformUtils.MoveElement(Global.UIDoc.Document, reducer_1.Id, translation_2);
 
                     List<Connector> temp3 = GetConnectors(nipple.MEPModel.ConnectorManager.Connectors, true);
-                    List<Connector> temp3_tee = GetConnectors(tee.MEPModel.ConnectorManager.Connectors, true);
+                    List<Connector> temp3_tee = GetConnectors(tee.MEPModel.ConnectorManager.Connectors, true).ToList();
                     temp3_tee.Remove(temp3_tee.OrderBy(item => item.Origin.Z).FirstOrDefault());
-                    List<Connector> temp3_reducer = GetConnectors(reducer_1.MEPModel.ConnectorManager.Connectors, true);
+                    List<Connector> temp3_reducer = GetConnectors(reducer_1.MEPModel.ConnectorManager.Connectors, true).Where(item => item.IsConnected == false).ToList();
 
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    // Error
-                    foreach (Connector cnt in temp3_tee)
-                    {
-                        if (Common.IsEqual(temp3[0].Origin, cnt.Origin))
-                        {
-                            temp3[0].ConnectTo(cnt);
-                        }
-                        else
-                        {
-                            temp3[1].ConnectTo(cnt);
-                        }
-                        break;
-                    }
+                    //// Error
 
                     foreach (Connector cnt in temp3_reducer)
                     {
                         if (Common.IsEqual(temp3[0].Origin, cnt.Origin))
                         {
                             temp3[0].ConnectTo(cnt);
+                            temp3.Remove(temp3[0]);
                         }
                         else
                         {
                             temp3[1].ConnectTo(cnt);
+                            temp3.Remove(temp3[1]);
                         }
+                        break;
+                    }
+
+                    foreach (Connector cnt in temp3_tee)
+                    {
+                        if (Common.IsEqual(temp3[0].Origin, cnt.Origin))
+                        {
+                            temp3[0].ConnectTo(cnt);
+                        }
+
                         break;
                     }
 
