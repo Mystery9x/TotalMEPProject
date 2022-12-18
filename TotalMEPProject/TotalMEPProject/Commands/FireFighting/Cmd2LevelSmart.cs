@@ -399,6 +399,10 @@ namespace TotalMEPProject.Commands.FireFighting
                     SourceRotatePipe sourceRotatePipe = new SourceRotatePipe(pipeLoop, FirstPipe, SecondPipe);
                     if (sourceRotatePipe.IsValid)
                     {
+                        if (sourceRotatePipe.FlagExtendPipe)
+                        {
+                            (pipeLoop.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveMainPipe;
+                        }
                         if (sourceRotatePipe.FlagCreateElbow)
                         {
                             (FirstPipe.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveFirstPipe;
@@ -2053,6 +2057,10 @@ namespace TotalMEPProject.Commands.FireFighting
         public Line NewCurveFirstPipe { get; set; }
 
         public Line NewCurveFirstPipe_2d { get; set; }
+
+        public Line NewCurveMainPipe { get; set; }
+        public Line NewCurveMainPipe_2d { get; set; }
+
         public Pipe SecondPipe { get; set; }
         public Line CurveSecondPipe { get; set; }
         public Line CurveSecondPipe_2d { get; set; }
@@ -2062,6 +2070,8 @@ namespace TotalMEPProject.Commands.FireFighting
 
         public XYZ IntsMain { get; set; }
         public XYZ SubMain { get; set; }
+
+        public bool FlagExtendPipe { get; set; }
 
         public SourceRotatePipe(Pipe mainPipe, Pipe firstPipe, Pipe secondPipe)
         {
@@ -2097,7 +2107,53 @@ namespace TotalMEPProject.Commands.FireFighting
                     if (RealityIntersect(CurveMainPipe_2d, CurveFirstPipe_2d) && RealityIntersect(CurveMainPipe_2d, CurveSecondPipe_2d))
                         return true;
                     else if (!RealityIntersect(CurveMainPipe_2d, CurveFirstPipe_2d) && !RealityIntersect(CurveMainPipe_2d, CurveSecondPipe_2d))
+                    {
+                        var expandFirstPipe = Line.CreateBound(ToPoint2D(CurveFirstPipe_2d.GetEndPoint(0)), ToPoint2D(CurveFirstPipe_2d.GetEndPoint(1)) - ToPoint2D(CurveFirstPipe_2d.GetEndPoint(0)));
+                        List<Connector> cntMainPipe = new List<Connector>();
+                        foreach (Connector connector in MainPipe.ConnectorManager.Connectors)
+                        {
+                            if (connector.ConnectorType != ConnectorType.End)
+                                continue;
+                            cntMainPipe.Add(connector);
+                        }
+
+                        if (cntMainPipe.Any(item => item.IsConnected == true) == false)
+                        {
+                            return true;
+                        }
+                        if (cntMainPipe.Count >= 2)
+                        {
+                            var directionExpandPipe_2d = ToPoint2D(cntMainPipe[1].Origin) - ToPoint2D(cntMainPipe[0].Origin);
+
+                            if (cntMainPipe[0].IsConnected == false)
+                            {
+                                NewCurveMainPipe_2d = Line.CreateBound(ToPoint2D(cntMainPipe[0].Origin - directionExpandPipe_2d * 100 * mmToFT), ToPoint2D(cntMainPipe[1].Origin));
+                            }
+                            else if (cntMainPipe[1].IsConnected == false)
+                            {
+                                NewCurveMainPipe_2d = Line.CreateBound(ToPoint2D(cntMainPipe[0].Origin), ToPoint2D(cntMainPipe[1].Origin + directionExpandPipe_2d * 100 * mmToFT));
+                            }
+                            else
+                                return true;
+
+                            if (RealityIntersect(NewCurveMainPipe_2d, expandFirstPipe))
+                            {
+                                FlagExtendPipe = true;
+                                var directionExpandPipe = cntMainPipe[1].Origin - cntMainPipe[0].Origin;
+                                if (cntMainPipe[0].IsConnected == false)
+                                {
+                                    NewCurveMainPipe = Line.CreateBound(cntMainPipe[0].Origin - directionExpandPipe * 200 * mmToFT, cntMainPipe[1].Origin);
+                                }
+                                else if (cntMainPipe[1].IsConnected == false)
+                                {
+                                    NewCurveMainPipe_2d = Line.CreateBound(cntMainPipe[0].Origin, cntMainPipe[1].Origin + directionExpandPipe * 200 * mmToFT);
+                                }
+                                return true;
+                            }
+                        }
+
                         return true;
+                    }
                 }
                 else if (FirstPipe != null && SecondPipe == null)
                 {
@@ -2185,6 +2241,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     if (flag)
                     {
                         NewCurveFirstPipe = Line.CreateBound(CurveFirstPipe.GetEndPoint(0), newPnt);
+
                         //Find 3d
                         double temp = 200;
 
@@ -2215,7 +2272,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         //Find 3d
                         double temp = 200;
 
-                        var lineZ = Line.CreateBound(new XYZ(newPnt.X, newPnt.Y, newPnt.Z - temp), new XYZ(newPnt.X, newPnt.Y, newPnt.Z + temp));
+                        var lineZ = Line.CreateBound(new XYZ(newPnt.X, newPnt.Y, newPnt.Z), new XYZ(newPnt.X, newPnt.Y, newPnt.Z + temp));
 
                         var arr = new IntersectionResultArray();
                         var result = lineZ.Intersect(CurveMainPipe, out arr);
@@ -2238,6 +2295,35 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
                 else
                 {
+                    // Case 2 Expand mainpipe
+                    //cntOfPipe.Clear();
+                    //foreach (Connector connector in FirstPipe.ConnectorManager.Connectors)
+                    //{
+                    //    if (connector.ConnectorType != ConnectorType.End)
+                    //        continue;
+
+                    //    cntOfPipe.Add(connector);
+                    //}
+
+                    //directionExpand = (ToPoint2D(CurveMainPipe.GetEndPoint(1)) - ToPoint2D(CurveMainPipe.GetEndPoint(0))).Normalize();
+
+                    //if (cntOfPipe[0].IsConnected == false)
+                    //{
+                    //    NewCurveMainPipe = Line.CreateBound(ToPoint2D(cntOfPipe[0].Origin - directionExpand * 200 * mmToFT), ToPoint2D(cntOfPipe[1].Origin));
+                    //}
+                    //else if (cntOfPipe[1].IsConnected == false)
+                    //{
+                    //    NewCurveMainPipe = Line.CreateBound(ToPoint2D(cntOfPipe[0].Origin), ToPoint2D(cntOfPipe[1].Origin + directionExpand * 200 * mmToFT));
+                    //}
+                    //else
+                    //    return false;
+
+                    //if (RealityIntersect(NewCurveMainPipe, NewCurveFirstPipe_2d))
+                    //{
+                    //    FlagExtendPipe = true;
+                    //    return true;
+                    //}
+
                     return false;
                 }
             }
