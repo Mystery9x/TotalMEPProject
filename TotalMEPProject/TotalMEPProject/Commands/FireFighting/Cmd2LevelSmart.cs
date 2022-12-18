@@ -557,7 +557,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 if (SecondPipe != null)
                                 {
                                     List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
-                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), -Math.PI);
+                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1 - Math.PI);
                                 }
                             }
 
@@ -600,7 +600,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 if (SecondPipe != null)
                                 {
                                     List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
-                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), -Math.PI);
+                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_2 - Math.PI);
                                 }
                             }
 
