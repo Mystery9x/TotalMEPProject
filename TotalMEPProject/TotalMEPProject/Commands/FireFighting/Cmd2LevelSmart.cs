@@ -2272,7 +2272,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         //Find 3d
                         double temp = 200;
 
-                        var lineZ = Line.CreateBound(new XYZ(newPnt.X, newPnt.Y, newPnt.Z), new XYZ(newPnt.X, newPnt.Y, newPnt.Z + temp));
+                        var lineZ = Line.CreateBound(new XYZ(newPnt.X, newPnt.Y, newPnt.Z - temp), new XYZ(newPnt.X, newPnt.Y, newPnt.Z + temp));
 
                         var arr = new IntersectionResultArray();
                         var result = lineZ.Intersect(CurveMainPipe, out arr);
