@@ -2240,15 +2240,21 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     if (flag)
                     {
-                        NewCurveFirstPipe = Line.CreateBound(CurveFirstPipe.GetEndPoint(0), newPnt);
-
                         //Find 3d
                         double temp = 200;
 
-                        var lineZ = Line.CreateBound(new XYZ(newPnt.X, newPnt.Y, newPnt.Z - temp), new XYZ(newPnt.X, newPnt.Y, newPnt.Z + temp));
-
+                        var lineZ = Line.CreateBound(new XYZ(intsPnt_2d.X, intsPnt_2d.Y, intsPnt_2d.Z - temp), new XYZ(intsPnt_2d.X, intsPnt_2d.Y, intsPnt_2d.Z + temp));
                         var arr = new IntersectionResultArray();
-                        var result = lineZ.Intersect(CurveMainPipe, out arr);
+                        var result = lineZ.Intersect(temp_Direction, out arr);
+                        if (result != SetComparisonResult.Overlap)
+                            return false;
+
+                        newPnt = arr.get_Item(0).XYZPoint;
+
+                        NewCurveFirstPipe = Line.CreateBound(CurveFirstPipe.GetEndPoint(0), newPnt);
+
+                        arr = new IntersectionResultArray();
+                        result = lineZ.Intersect(CurveMainPipe, out arr);
                         if (result != SetComparisonResult.Overlap)
                             return false;
 
@@ -2267,15 +2273,21 @@ namespace TotalMEPProject.Commands.FireFighting
                     }
                     else
                     {
-                        NewCurveFirstPipe = Line.CreateBound(newPnt, CurveFirstPipe.GetEndPoint(1));
-
                         //Find 3d
                         double temp = 200;
 
-                        var lineZ = Line.CreateBound(new XYZ(newPnt.X, newPnt.Y, newPnt.Z - temp), new XYZ(newPnt.X, newPnt.Y, newPnt.Z + temp));
-
+                        var lineZ = Line.CreateBound(new XYZ(intsPnt_2d.X, intsPnt_2d.Y, intsPnt_2d.Z - temp), new XYZ(intsPnt_2d.X, intsPnt_2d.Y, intsPnt_2d.Z + temp));
                         var arr = new IntersectionResultArray();
-                        var result = lineZ.Intersect(CurveMainPipe, out arr);
+                        var result = lineZ.Intersect(temp_Direction, out arr);
+                        if (result != SetComparisonResult.Overlap)
+                            return false;
+
+                        newPnt = arr.get_Item(0).XYZPoint;
+
+                        NewCurveFirstPipe = Line.CreateBound(newPnt, CurveFirstPipe.GetEndPoint(1));
+
+                        arr = new IntersectionResultArray();
+                        result = lineZ.Intersect(CurveMainPipe, out arr);
                         if (result != SetComparisonResult.Overlap)
                             return false;
 
