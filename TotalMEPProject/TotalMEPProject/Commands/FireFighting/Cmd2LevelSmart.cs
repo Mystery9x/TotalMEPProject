@@ -742,10 +742,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
                 else
                 {
-                    if (se(MainPipe, VerticalPipe) == false)
-                    {
-                        return false;
-                    }
+                    return se(MainPipe, VerticalPipe);
                 }
             }
             catch (Exception)
