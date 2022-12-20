@@ -2144,11 +2144,11 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var directionExpandPipe = cntMainPipe[1].Origin - cntMainPipe[0].Origin;
                                 if (cntMainPipe[0].IsConnected == false)
                                 {
-                                    NewCurveMainPipe = Line.CreateBound(cntMainPipe[0].Origin - directionExpandPipe * 200 * mmToFT, cntMainPipe[1].Origin);
+                                    NewCurveMainPipe = Line.CreateBound(cntMainPipe[0].Origin - directionExpandPipe * 100 * mmToFT, cntMainPipe[1].Origin);
                                 }
                                 else if (cntMainPipe[1].IsConnected == false)
                                 {
-                                    NewCurveMainPipe = Line.CreateBound(cntMainPipe[0].Origin, cntMainPipe[1].Origin + directionExpandPipe * 200 * mmToFT);
+                                    NewCurveMainPipe = Line.CreateBound(cntMainPipe[0].Origin, cntMainPipe[1].Origin + directionExpandPipe * 100 * mmToFT);
                                 }
                                 return true;
                             }
