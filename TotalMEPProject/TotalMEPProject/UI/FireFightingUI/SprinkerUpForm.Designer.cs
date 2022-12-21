@@ -44,18 +44,18 @@
             this.label6 = new System.Windows.Forms.Label();
             this.cboC2PypeSize = new System.Windows.Forms.ComboBox();
             this.chkC2ConnectTee = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rdnC2Tee = new System.Windows.Forms.RadioButton();
+            this.rdnC2Elbow = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.rdnC2Elbow = new System.Windows.Forms.RadioButton();
-            this.rdnC2Tee = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -136,7 +136,6 @@
             this.chkC2Nipple.Size = new System.Drawing.Size(15, 14);
             this.chkC2Nipple.TabIndex = 7;
             this.chkC2Nipple.UseVisualStyleBackColor = true;
-            this.chkC2Nipple.CheckedChanged += new System.EventHandler(this.chkC2Nipple_CheckedChanged);
             // 
             // label1
             // 
@@ -172,7 +171,7 @@
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(387, 28);
             this.tableLayoutPanel3.TabIndex = 4;
             // 
@@ -260,6 +259,51 @@
             this.chkC2ConnectTee.UseVisualStyleBackColor = true;
             this.chkC2ConnectTee.CheckedChanged += new System.EventHandler(this.chkC2ConnectTee_CheckedChanged);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label7.Location = new System.Drawing.Point(5, 73);
+            this.label7.Margin = new System.Windows.Forms.Padding(5);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(150, 24);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "Fitting at the end of route";
+            // 
+            // panel1
+            // 
+            this.tableLayoutPanel2.SetColumnSpan(this.panel1, 3);
+            this.panel1.Controls.Add(this.rdnC2Tee);
+            this.panel1.Controls.Add(this.rdnC2Elbow);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(163, 71);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(387, 28);
+            this.panel1.TabIndex = 16;
+            // 
+            // rdnC2Tee
+            // 
+            this.rdnC2Tee.AutoSize = true;
+            this.rdnC2Tee.Location = new System.Drawing.Point(153, 3);
+            this.rdnC2Tee.Name = "rdnC2Tee";
+            this.rdnC2Tee.Size = new System.Drawing.Size(68, 17);
+            this.rdnC2Tee.TabIndex = 1;
+            this.rdnC2Tee.TabStop = true;
+            this.rdnC2Tee.Text = "Tee/Tap";
+            this.rdnC2Tee.UseVisualStyleBackColor = true;
+            // 
+            // rdnC2Elbow
+            // 
+            this.rdnC2Elbow.AutoSize = true;
+            this.rdnC2Elbow.Location = new System.Drawing.Point(3, 3);
+            this.rdnC2Elbow.Name = "rdnC2Elbow";
+            this.rdnC2Elbow.Size = new System.Drawing.Size(54, 17);
+            this.rdnC2Elbow.TabIndex = 0;
+            this.rdnC2Elbow.TabStop = true;
+            this.rdnC2Elbow.Text = "Elbow";
+            this.rdnC2Elbow.UseVisualStyleBackColor = true;
+            this.rdnC2Elbow.CheckedChanged += new System.EventHandler(this.rdnC2Elbow_CheckedChanged);
+            // 
             // tableLayoutPanel5
             // 
             this.tableLayoutPanel5.ColumnCount = 3;
@@ -299,51 +343,6 @@
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label7.Location = new System.Drawing.Point(5, 73);
-            this.label7.Margin = new System.Windows.Forms.Padding(5);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(150, 24);
-            this.label7.TabIndex = 15;
-            this.label7.Text = "Fitting at the end of route";
-            // 
-            // panel1
-            // 
-            this.tableLayoutPanel2.SetColumnSpan(this.panel1, 3);
-            this.panel1.Controls.Add(this.rdnC2Tee);
-            this.panel1.Controls.Add(this.rdnC2Elbow);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(163, 71);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(387, 28);
-            this.panel1.TabIndex = 16;
-            // 
-            // rdnC2Elbow
-            // 
-            this.rdnC2Elbow.AutoSize = true;
-            this.rdnC2Elbow.Location = new System.Drawing.Point(3, 3);
-            this.rdnC2Elbow.Name = "rdnC2Elbow";
-            this.rdnC2Elbow.Size = new System.Drawing.Size(54, 17);
-            this.rdnC2Elbow.TabIndex = 0;
-            this.rdnC2Elbow.TabStop = true;
-            this.rdnC2Elbow.Text = "Elbow";
-            this.rdnC2Elbow.UseVisualStyleBackColor = true;
-            this.rdnC2Elbow.CheckedChanged += new System.EventHandler(this.rdnC2Elbow_CheckedChanged);
-            // 
-            // rdnC2Tee
-            // 
-            this.rdnC2Tee.AutoSize = true;
-            this.rdnC2Tee.Location = new System.Drawing.Point(153, 3);
-            this.rdnC2Tee.Name = "rdnC2Tee";
-            this.rdnC2Tee.Size = new System.Drawing.Size(68, 17);
-            this.rdnC2Tee.TabIndex = 1;
-            this.rdnC2Tee.TabStop = true;
-            this.rdnC2Tee.Text = "Tee/Tap";
-            this.rdnC2Tee.UseVisualStyleBackColor = true;
-            // 
             // SprinkerUpForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -361,9 +360,9 @@
             this.tableLayoutPanel2.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
-            this.tableLayoutPanel5.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.tableLayoutPanel5.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

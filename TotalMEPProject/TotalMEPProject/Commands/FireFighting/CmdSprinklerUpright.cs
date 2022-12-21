@@ -822,11 +822,16 @@ namespace TotalMEPProject.Commands.FireFighting
 
             var cSprinkle = Common.ToList(instance.MEPModel.ConnectorManager.Connectors).FirstOrDefault();
 
-            var tee = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            FamilyInstance fitting = null;
+
+            if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                fitting = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            else
+                fitting = se(pipe as MEPCurve, newPipeZ as MEPCurve);
 
             Global.UIDoc.Document.Delete(newPipeZ.Id);
 
-            var cTee = Common.ToList(tee.MEPModel.ConnectorManager.Connectors).OrderBy(x => x.Origin.Z).LastOrDefault();
+            var cTee = Common.ToList(fitting.MEPModel.ConnectorManager.Connectors).OrderBy(x => x.Origin.Z).LastOrDefault();
 
             var vector = cTee.Origin - cSprinkle.Origin;
 

@@ -176,6 +176,9 @@ namespace TotalMEPProject.UI.FireFightingUI
             AddNipple();
 
             rdnC2Tee.Checked = true;
+            chkC2ConnectTee.Checked = false;
+            chkC2Nipple.Enabled = false;
+            cboC2Nipple.Enabled = false;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -217,22 +220,14 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             if (chkC2ConnectTee.Checked)
             {
-                chkC2Nipple.Enabled = false;
-                cboC2Nipple.Enabled = false;
-            }
-            else
-            {
                 chkC2Nipple.Enabled = true;
                 cboC2Nipple.Enabled = true;
             }
-        }
-
-        private void chkC2Nipple_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkC2Nipple.Checked)
-                chkC2ConnectTee.Enabled = false;
             else
-                chkC2ConnectTee.Enabled = true;
+            {
+                chkC2Nipple.Enabled = false;
+                cboC2Nipple.Enabled = false;
+            }
         }
 
         private void rdnC2Elbow_CheckedChanged(object sender, EventArgs e)
