@@ -8,6 +8,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -2364,4 +2365,240 @@ namespace TotalMEPProject.Commands.FireFighting
                 && IsEqual(first.Z, second.Z);
         }
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public class PlaceBottomElbowData
+    {
+        public SourcePipeData MainPipe { get; set; }
+        public List<ServicePlaceBottomElbow> ServicePlaceBottomElbows { get; set; }
+        public SourcePipeData Pipe1_Final { get; set; }
+        public SourcePipeData Pipe2_Final { get; set; }
+
+        public PlaceBottomElbowData(Pipe mainPipe, List<PairPipes> pairPipes)
+        {
+            ServicePlaceBottomElbows = new List<ServicePlaceBottomElbow>();
+            if (mainPipe != null && pairPipes != null && pairPipes.Count > 0)
+            {
+                MainPipe = new SourcePipeData(mainPipe);
+
+                foreach (PairPipes pairPipe in pairPipes)
+                {
+                    ServicePlaceBottomElbow servicePlaceBottomElbow = new ServicePlaceBottomElbow(mainPipe, pairPipe._Pipe1, pairPipe._Pipe2);
+                    if (servicePlaceBottomElbow.IsValidPlaceBottomElbow)
+                    {
+                        ServicePlaceBottomElbows.Add(servicePlaceBottomElbow);
+                    }
+                }
+
+                if (ServicePlaceBottomElbows.Count > 0)
+                {
+                    Pipe1_Final = ServicePlaceBottomElbows.OrderByDescending(item => item.DistanceValid).FirstOrDefault().Pipe1;
+                    Pipe1_Final = ServicePlaceBottomElbows.OrderByDescending(item => item.DistanceValid).FirstOrDefault().Pipe2;
+                }
+            }
+        }
+    }
+
+    public class ServicePlaceBottomElbow
+    {
+        public SourcePipeData Pipe1 { get; set; }
+        public SourcePipeData Pipe2 { get; set; }
+        public SourcePipeData MainPipe { get; set; }
+        public bool IsValidPlaceBottomElbow { get; set; }
+        public IntesectCase IntesectCase { get; set; }
+        public XYZ IntsectPoint_2d { get; set; }
+        public double DistanceValid { get; set; }
+
+        public ServicePlaceBottomElbow(Pipe mainPipe, Pipe pipe1, Pipe pipe2)
+        {
+            IsValidPlaceBottomElbow = false;
+            DistanceValid = double.MinValue;
+
+            if (MainPipe != null && pipe1 != null)
+            {
+                MainPipe = new SourcePipeData(mainPipe);
+                Pipe1 = new SourcePipeData(pipe1);
+                Pipe2 = new SourcePipeData(pipe2);
+                XYZ intersectPnt_2d = null;
+
+                if (MainPipe.DirectionPipe == ProcessDirectionPipe.FirstToSecond || MainPipe.DirectionPipe == ProcessDirectionPipe.SecondToFirst)
+
+                {
+                    if (RealityIntersect(MainPipe.CurvePipe_2d, Pipe1.CurvePipe_2d, out intersectPnt_2d))
+                    {
+                        IsValidPlaceBottomElbow = true;
+                        IntesectCase = IntesectCase.RealIntersect;
+                    }
+                    else if (RealityIntersect(MainPipe.CurvePipe_2d, Pipe1.CurvePipe_Unbound_2d, out intersectPnt_2d))
+                    {
+                        IsValidPlaceBottomElbow = true;
+                        IntesectCase = IntesectCase.RealMain_VirtualBranch;
+                    }
+                    else if (RealityIntersect(MainPipe.CurvePipe_Unbound_2d, Pipe1.CurvePipe_2d, out intersectPnt_2d))
+                    {
+                        IsValidPlaceBottomElbow = true;
+                        IntesectCase = IntesectCase.VirtualMain_RealBranch;
+                    }
+                    else if (RealityIntersect(MainPipe.CurvePipe_Unbound_2d, Pipe1.CurvePipe_Unbound_2d, out intersectPnt_2d))
+                    {
+                        IsValidPlaceBottomElbow = true;
+                        IntesectCase = IntesectCase.VirtualMain_VirtualBranch;
+                    }
+
+                    IntsectPoint_2d = intersectPnt_2d;
+
+                    if (IsValidPlaceBottomElbow = true && IntsectPoint_2d != null)
+                    {
+                        if (MainPipe.DirectionPipe == ProcessDirectionPipe.FirstToSecond)
+                        {
+                            DistanceValid = IntsectPoint_2d.DistanceTo(ToPoint2D(MainPipe.FirstConnector.Origin));
+                        }
+                        else if (MainPipe.DirectionPipe == ProcessDirectionPipe.SecondToFirst)
+                        {
+                            DistanceValid = IntsectPoint_2d.DistanceTo(ToPoint2D(MainPipe.SecondConnector.Origin));
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool RealityIntersect(Line mainLine, Line checkLine, out XYZ intersectPoint)
+        {
+            intersectPoint = null;
+            try
+            {
+                IntersectionResultArray intsRetArr = new IntersectionResultArray();
+                var intsRet = mainLine.Intersect(checkLine, out intsRetArr);
+                if (intsRet == SetComparisonResult.Overlap)
+                {
+                    intersectPoint = intsRetArr.get_Item(0).XYZPoint;
+                    return true;
+                }
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private XYZ ToPoint2D(XYZ point3d, double z = 0)
+        {
+            return new XYZ(point3d.X, point3d.Y, z);
+        }
+    }
+
+    public enum IntesectCase : int
+    {
+        None = -1,
+        RealIntersect,
+        RealMain_VirtualBranch,
+        VirtualMain_RealBranch,
+        VirtualMain_VirtualBranch
+    }
+
+    public class SourcePipeData
+    {
+        public Pipe ProcessPipe { get; set; }
+        public Connector FirstConnector { get; set; }
+        public Connector SecondConnector { get; set; }
+        public ProcessDirectionPipe DirectionPipe { get; set; }
+        public Line CurvePipe_Reality { get; set; }
+        public Line CurvePipe_Unbound { get; set; }
+        public Line CurvePipe_2d { get; set; }
+        public Line CurvePipe_Unbound_2d { get; set; }
+
+        public SourcePipeData(Pipe processPipe)
+        {
+            DirectionPipe = DirectionPipe = ProcessDirectionPipe.None;
+            if (processPipe != null)
+            {
+                ProcessPipe = processPipe;
+                Initialize();
+            }
+        }
+
+        private void Initialize()
+        {
+            if (ProcessPipe != null && ProcessPipe.ConnectorManager != null)
+            {
+                List<Connector> cntOfPipe = GetConnectors(ProcessPipe.ConnectorManager.Connectors);
+                if (cntOfPipe.Count >= 2)
+                {
+                    FirstConnector = cntOfPipe[0];
+                    SecondConnector = cntOfPipe[1];
+
+                    if (FirstConnector.IsConnected == true && SecondConnector.IsConnected == false)
+                    {
+                        DirectionPipe = ProcessDirectionPipe.FirstToSecond;
+                    }
+                    else if (FirstConnector.IsConnected == false && SecondConnector.IsConnected == true)
+                    {
+                        DirectionPipe = ProcessDirectionPipe.SecondToFirst;
+                    }
+                    else if (FirstConnector.IsConnected == false && SecondConnector.IsConnected == false)
+                    {
+                        DirectionPipe = ProcessDirectionPipe.BothExpand;
+                    }
+                    else
+                    {
+                        DirectionPipe = ProcessDirectionPipe.None;
+                    }
+
+                    if (DirectionPipe != ProcessDirectionPipe.None)
+                    {
+                        XYZ direction = null;
+                        XYZ direction_2d = null;
+                        CurvePipe_Reality = Line.CreateBound(FirstConnector.Origin, SecondConnector.Origin);
+                        CurvePipe_2d = Line.CreateBound(ToPoint2D(FirstConnector.Origin), ToPoint2D(SecondConnector.Origin));
+                        direction = (SecondConnector.Origin - FirstConnector.Origin).Normalize();
+                        direction_2d = (ToPoint2D(SecondConnector.Origin) - ToPoint2D(FirstConnector.Origin)).Normalize();
+
+                        if (DirectionPipe == ProcessDirectionPipe.FirstToSecond)
+                        {
+                            CurvePipe_Unbound = Line.CreateBound(FirstConnector.Origin, SecondConnector.Origin + direction * 100);
+                            CurvePipe_Unbound_2d = Line.CreateBound(ToPoint2D(FirstConnector.Origin), ToPoint2D(SecondConnector.Origin) + direction_2d * 100);
+                        }
+                        else if (DirectionPipe == ProcessDirectionPipe.SecondToFirst)
+                        {
+                            CurvePipe_Unbound = Line.CreateBound(FirstConnector.Origin - direction * 100, SecondConnector.Origin);
+                            CurvePipe_Unbound_2d = Line.CreateBound(ToPoint2D(FirstConnector.Origin) - direction_2d * 100, ToPoint2D(SecondConnector.Origin));
+                        }
+                    }
+                }
+            }
+        }
+
+        private XYZ ToPoint2D(XYZ point3d, double z = 0)
+        {
+            return new XYZ(point3d.X, point3d.Y, z);
+        }
+
+        private List<Connector> GetConnectors(ConnectorSet connectorSet)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End)
+                        continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+    }
+
+    public enum ProcessDirectionPipe : int
+    {
+        None = -1,
+        FirstToSecond,
+        SecondToFirst,
+        BothExpand
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
