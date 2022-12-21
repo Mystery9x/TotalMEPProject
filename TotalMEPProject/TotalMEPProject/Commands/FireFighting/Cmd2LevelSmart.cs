@@ -422,7 +422,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 // Rotate sub pipe by main pipe
-                HandleBranchPipePerpendiculerMainPipe();
+                //HandleBranchPipePerpendiculerMainPipe();
 
                 if (m_flagTopElbowConnect == false)
                 {
@@ -2101,7 +2101,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 if (FirstPipe != null && SecondPipe != null)
                 {
-                    if (RealityIntersect(CurveMainPipe_2d, CurveFirstPipe_2d) && RealityIntersect(CurveMainPipe_2d, CurveSecondPipe_2d))
+                    if (RealityIntersect(CurveMainPipe_2d, CurveFirstPipe_2d) || RealityIntersect(CurveMainPipe_2d, CurveSecondPipe_2d))
                         return true;
                     else if (!RealityIntersect(CurveMainPipe_2d, CurveFirstPipe_2d) && !RealityIntersect(CurveMainPipe_2d, CurveSecondPipe_2d))
                     {
