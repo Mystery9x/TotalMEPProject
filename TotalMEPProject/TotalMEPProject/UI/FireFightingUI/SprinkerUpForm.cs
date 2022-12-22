@@ -30,6 +30,7 @@ namespace TotalMEPProject.UI.FireFightingUI
         public bool isD15 = false;
         public bool isConnectTee = false;
         public bool isConnectNipple = false;
+        public bool isElbow = false;
 
         public FamilySymbol fmlNipple = null;
 
@@ -173,6 +174,11 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             AddFamilyType();
             AddNipple();
+
+            rdnC2Tee.Checked = true;
+            chkC2ConnectTee.Checked = false;
+            chkC2Nipple.Enabled = false;
+            cboC2Nipple.Enabled = false;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -185,13 +191,19 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private void btnApply_Click(object sender, EventArgs e)
         {
+            isConnectTee = false;
+            isConnectNipple = false;
             //fmlNipple = null;
             if (PipeSize == double.MaxValue)
                 return;
 
             isD15 = rdnC2SprinklerD15.Checked;
-            isConnectTee = chkC2ConnectTee.Checked;
-            isConnectNipple = chkC2Nipple.Checked;
+            if (chkC2ConnectTee.Enabled)
+                isConnectTee = chkC2ConnectTee.Checked;
+
+            if (chkC2Nipple.Enabled)
+                isConnectNipple = chkC2Nipple.Checked;
+            isElbow = rdnC2Elbow.Checked;
             if (chkC2Nipple.Checked)
             {
                 fmlNipple = cboC2Nipple.SelectedItem as FamilySymbol;
@@ -202,6 +214,28 @@ namespace TotalMEPProject.UI.FireFightingUI
             AppUtils.sa(cboC2Nipple);
             SetFocus();
             MakeRequest(RequestId.SprinklerUp_Aplly);
+        }
+
+        private void chkC2ConnectTee_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkC2ConnectTee.Checked)
+            {
+                chkC2Nipple.Enabled = true;
+                cboC2Nipple.Enabled = true;
+            }
+            else
+            {
+                chkC2Nipple.Enabled = false;
+                cboC2Nipple.Enabled = false;
+            }
+        }
+
+        private void rdnC2Elbow_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdnC2Elbow.Checked)
+                chkC2ConnectTee.Enabled = false;
+            else
+                chkC2ConnectTee.Enabled = true;
         }
     }
 }

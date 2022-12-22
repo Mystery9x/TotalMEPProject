@@ -44,12 +44,17 @@
             this.label6 = new System.Windows.Forms.Label();
             this.cboC2PypeSize = new System.Windows.Forms.ComboBox();
             this.chkC2ConnectTee = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rdnC2Tee = new System.Windows.Forms.RadioButton();
+            this.rdnC2Elbow = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,7 +71,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(559, 186);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(559, 220);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -76,33 +81,36 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 144F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 98F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Controls.Add(this.label3, 0, 3);
-            this.tableLayoutPanel2.Controls.Add(this.label4, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this.chkC2Nipple, 1, 2);
+            this.tableLayoutPanel2.Controls.Add(this.label3, 0, 4);
+            this.tableLayoutPanel2.Controls.Add(this.label4, 0, 3);
+            this.tableLayoutPanel2.Controls.Add(this.chkC2Nipple, 1, 3);
             this.tableLayoutPanel2.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.label5, 2, 2);
-            this.tableLayoutPanel2.Controls.Add(this.cboC2Nipple, 3, 2);
+            this.tableLayoutPanel2.Controls.Add(this.label5, 2, 3);
+            this.tableLayoutPanel2.Controls.Add(this.cboC2Nipple, 3, 3);
             this.tableLayoutPanel2.Controls.Add(this.cboC2PipeType, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.label6, 2, 1);
             this.tableLayoutPanel2.Controls.Add(this.cboC2PypeSize, 3, 1);
-            this.tableLayoutPanel2.Controls.Add(this.chkC2ConnectTee, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.chkC2ConnectTee, 1, 4);
+            this.tableLayoutPanel2.Controls.Add(this.label7, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this.panel1, 1, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 4;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(553, 140);
+            this.tableLayoutPanel2.RowCount = 5;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(553, 174);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(5, 110);
+            this.label3.Location = new System.Drawing.Point(5, 141);
             this.label3.Margin = new System.Windows.Forms.Padding(5);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(81, 13);
@@ -112,7 +120,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(5, 75);
+            this.label4.Location = new System.Drawing.Point(5, 107);
             this.label4.Margin = new System.Windows.Forms.Padding(5);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(90, 13);
@@ -122,7 +130,7 @@
             // chkC2Nipple
             // 
             this.chkC2Nipple.AutoSize = true;
-            this.chkC2Nipple.Location = new System.Drawing.Point(165, 75);
+            this.chkC2Nipple.Location = new System.Drawing.Point(165, 107);
             this.chkC2Nipple.Margin = new System.Windows.Forms.Padding(5);
             this.chkC2Nipple.Name = "chkC2Nipple";
             this.chkC2Nipple.Size = new System.Drawing.Size(15, 14);
@@ -143,10 +151,10 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Location = new System.Drawing.Point(5, 40);
+            this.label2.Location = new System.Drawing.Point(5, 39);
             this.label2.Margin = new System.Windows.Forms.Padding(5);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(150, 25);
+            this.label2.Size = new System.Drawing.Size(150, 24);
             this.label2.TabIndex = 1;
             this.label2.Text = "Pipe Type";
             // 
@@ -163,8 +171,8 @@
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(387, 29);
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(387, 28);
             this.tableLayoutPanel3.TabIndex = 4;
             // 
             // rdnC2SprinklerD20
@@ -192,7 +200,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(314, 75);
+            this.label5.Location = new System.Drawing.Point(314, 107);
             this.label5.Margin = new System.Windows.Forms.Padding(10, 5, 5, 5);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(72, 13);
@@ -204,7 +212,7 @@
             this.cboC2Nipple.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cboC2Nipple.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboC2Nipple.FormattingEnabled = true;
-            this.cboC2Nipple.Location = new System.Drawing.Point(405, 73);
+            this.cboC2Nipple.Location = new System.Drawing.Point(405, 105);
             this.cboC2Nipple.Name = "cboC2Nipple";
             this.cboC2Nipple.Size = new System.Drawing.Size(145, 21);
             this.cboC2Nipple.TabIndex = 9;
@@ -214,7 +222,7 @@
             this.cboC2PipeType.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cboC2PipeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboC2PipeType.FormattingEnabled = true;
-            this.cboC2PipeType.Location = new System.Drawing.Point(163, 38);
+            this.cboC2PipeType.Location = new System.Drawing.Point(163, 37);
             this.cboC2PipeType.Name = "cboC2PipeType";
             this.cboC2PipeType.Size = new System.Drawing.Size(138, 21);
             this.cboC2PipeType.TabIndex = 10;
@@ -223,7 +231,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(314, 40);
+            this.label6.Location = new System.Drawing.Point(314, 39);
             this.label6.Margin = new System.Windows.Forms.Padding(10, 5, 5, 5);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(51, 13);
@@ -235,7 +243,7 @@
             this.cboC2PypeSize.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cboC2PypeSize.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboC2PypeSize.FormattingEnabled = true;
-            this.cboC2PypeSize.Location = new System.Drawing.Point(405, 38);
+            this.cboC2PypeSize.Location = new System.Drawing.Point(405, 37);
             this.cboC2PypeSize.Name = "cboC2PypeSize";
             this.cboC2PypeSize.Size = new System.Drawing.Size(145, 21);
             this.cboC2PypeSize.TabIndex = 12;
@@ -243,12 +251,58 @@
             // chkC2ConnectTee
             // 
             this.chkC2ConnectTee.AutoSize = true;
-            this.chkC2ConnectTee.Location = new System.Drawing.Point(165, 110);
+            this.chkC2ConnectTee.Location = new System.Drawing.Point(165, 141);
             this.chkC2ConnectTee.Margin = new System.Windows.Forms.Padding(5);
             this.chkC2ConnectTee.Name = "chkC2ConnectTee";
             this.chkC2ConnectTee.Size = new System.Drawing.Size(15, 14);
             this.chkC2ConnectTee.TabIndex = 6;
             this.chkC2ConnectTee.UseVisualStyleBackColor = true;
+            this.chkC2ConnectTee.CheckedChanged += new System.EventHandler(this.chkC2ConnectTee_CheckedChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label7.Location = new System.Drawing.Point(5, 73);
+            this.label7.Margin = new System.Windows.Forms.Padding(5);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(150, 24);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "Fitting at the end of route";
+            // 
+            // panel1
+            // 
+            this.tableLayoutPanel2.SetColumnSpan(this.panel1, 3);
+            this.panel1.Controls.Add(this.rdnC2Tee);
+            this.panel1.Controls.Add(this.rdnC2Elbow);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(163, 71);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(387, 28);
+            this.panel1.TabIndex = 16;
+            // 
+            // rdnC2Tee
+            // 
+            this.rdnC2Tee.AutoSize = true;
+            this.rdnC2Tee.Location = new System.Drawing.Point(153, 3);
+            this.rdnC2Tee.Name = "rdnC2Tee";
+            this.rdnC2Tee.Size = new System.Drawing.Size(68, 17);
+            this.rdnC2Tee.TabIndex = 1;
+            this.rdnC2Tee.TabStop = true;
+            this.rdnC2Tee.Text = "Tee/Tap";
+            this.rdnC2Tee.UseVisualStyleBackColor = true;
+            // 
+            // rdnC2Elbow
+            // 
+            this.rdnC2Elbow.AutoSize = true;
+            this.rdnC2Elbow.Location = new System.Drawing.Point(3, 3);
+            this.rdnC2Elbow.Name = "rdnC2Elbow";
+            this.rdnC2Elbow.Size = new System.Drawing.Size(54, 17);
+            this.rdnC2Elbow.TabIndex = 0;
+            this.rdnC2Elbow.TabStop = true;
+            this.rdnC2Elbow.Text = "Elbow";
+            this.rdnC2Elbow.UseVisualStyleBackColor = true;
+            this.rdnC2Elbow.CheckedChanged += new System.EventHandler(this.rdnC2Elbow_CheckedChanged);
             // 
             // tableLayoutPanel5
             // 
@@ -259,7 +313,7 @@
             this.tableLayoutPanel5.Controls.Add(this.btnCancel, 2, 0);
             this.tableLayoutPanel5.Controls.Add(this.btnApply, 1, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 149);
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 183);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -293,10 +347,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(559, 186);
+            this.ClientSize = new System.Drawing.Size(559, 220);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(575, 225);
+            this.MaximumSize = new System.Drawing.Size(575, 259);
             this.MinimumSize = new System.Drawing.Size(575, 225);
             this.Name = "SprinkerUpForm";
             this.Text = "SprinkerUp";
@@ -306,6 +360,8 @@
             this.tableLayoutPanel2.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.tableLayoutPanel5.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -332,5 +388,9 @@
         private System.Windows.Forms.ComboBox cboC2PypeSize;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.RadioButton rdnC2Tee;
+        private System.Windows.Forms.RadioButton rdnC2Elbow;
     }
 }

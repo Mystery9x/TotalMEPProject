@@ -46,16 +46,20 @@ namespace TotalMEPProject.Commands.FireFighting
                            where p.Id != ElementId.InvalidElementId
                            select p.Id).ToList();
 
-            Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
-            tran.Start();
+            TransactionGroup tranGr = new TransactionGroup(Global.UIDoc.Document, "CreateConnector");
+            tranGr.Start();
 
             //Find pipe
             foreach (FamilyInstance instance in sprinklers)
             {
-                sr.cc(instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
+                Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
+                tran.Start();
+                sr.cc(tran, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
+
+                tran.Commit();
             }
 
-            tran.Commit();
+            tranGr.Assimilate();
             return Result.Succeeded;
         }
 
@@ -253,7 +257,7 @@ namespace TotalMEPProject.Commands.FireFighting
             c1 = Common.GetConnectorClosestTo(pipe, p1);
         }
 
-        public static bool cc(FamilyInstance instance, List<ElementId> selectedIds, bool isConnectNipple, bool isConnectTee, FamilySymbol fmlNipple, double pipeSize, ElementId pipeTypeId, bool isUp)
+        public static bool cc(Transaction tran, FamilyInstance instance, List<ElementId> selectedIds, bool isConnectNipple, bool isConnectTee, FamilySymbol fmlNipple, double pipeSize, ElementId pipeTypeId, bool isUp)
         {
             double d = UnitUtils.ConvertToInternalUnits(30, DisplayUnitType.DUT_MILLIMETERS);
 
@@ -424,29 +428,95 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     try
                     {
-                        if (isConnectNipple && isConnectTee)
-                            ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
-                        else if (isConnectNipple && !isConnectTee)
-                            ConnectNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
-                        else if (!isConnectNipple && isConnectTee)
-                            ConnectTee(pipe, newPipeZ, instance, pcenter, sprinkle_point);
+                        if (App.m_SprinkerUpForm.isElbow)
+                        {
+                            if (CheckPipeIsEnd(pipe, sprinkle_point))
+                            {
+                                if (isConnectNipple)
+                                    ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                                else
+                                {
+                                    if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                                    {
+                                        var curvePipeMain = pipe.GetCurve();
+
+                                        var curvePipeDung = newPipeZ.GetCurve();
+
+                                        Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction);
+
+                                        IntersectionResultArray array;
+
+                                        line.Intersect(curvePipeMain, out array);
+                                        var point = array.get_Item(0).XYZPoint;
+
+                                        CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                                    }
+                                    else
+                                        se(pipe as MEPCurve, newPipeZ as MEPCurve);
+
+                                    Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
+                                    Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+
+                                    var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                                }
+                            }
+                            else
+                            {
+                                if (isConnectNipple)
+                                    ConnectNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                                else
+                                {
+                                    Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
+                                    Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+
+                                    var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+
+                                    Connector c1 = Common.GetConnectorClosestTo(pipe, pOn);
+
+                                    Connector c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
+
+                                    var elbow = Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                }
+                            }
+                        }
                         else
                         {
-                            Connector c1 = Common.GetConnectorClosestTo(pipe, pOn);
+                            if (isConnectNipple)
+                                ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                            else if (isConnectTee)
+                                ConnectTee(pipe, newPipeZ, instance, pcenter, sprinkle_point);
+                            else
+                            {
+                                if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                                {
+                                    var curvePipeMain = pipe.GetCurve();
 
-                            Connector c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
+                                    var curvePipeDung = newPipeZ.GetCurve();
 
-                            var elbow = Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                    Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction);
 
-                            Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
-                            Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+                                    IntersectionResultArray array;
 
-                            var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                                    line.Intersect(curvePipeMain, out array);
+                                    var point = array.get_Item(0).XYZPoint;
+
+                                    CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                                }
+                                else
+                                    se(pipe as MEPCurve, newPipeZ as MEPCurve);
+
+                                Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
+                                Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+
+                                var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                            }
                         }
+
                         result = true;
                     }
                     catch (System.Exception ex)
                     {
+                        tran.RollBack();
                     }
                 }
             }
@@ -563,6 +633,56 @@ namespace TotalMEPProject.Commands.FireFighting
             return result;
         }
 
+        public static bool CheckPipeIsEnd(Pipe pipe, XYZ point)
+        {
+            var con = Common.GetConnectorClosestTo(pipe, point);
+
+            return con.IsConnected;
+        }
+
+        public static FamilyInstance se(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
+        {
+            try
+            {
+                FamilyInstance familyInstance = null;
+
+                var locationCurve1 = mepCurveSplit1.GetCurve();
+                var line1 = locationCurve1 as Line;
+
+                var locationCurve2 = mepCurveSplit2.GetCurve();
+                var line2 = locationCurve2 as Line;
+
+                var p10 = line2.GetEndPoint(0);
+                var p11 = line2.GetEndPoint(1);
+
+                var inter1 = locationCurve1.Project(p10);
+                var inter2 = locationCurve1.Project(p11);
+
+                if (inter1 == null || inter2 == null)
+                    return null;
+
+                var d1 = inter1.XYZPoint.DistanceTo(p10);
+                var d2 = inter2.XYZPoint.DistanceTo(p11);
+
+                if (d1 < d2)
+                {
+                    var con = Common.GetConnectorClosestTo(mepCurveSplit2, p10);
+                    familyInstance = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+                else
+                {
+                    var con = Common.GetConnectorClosestTo(mepCurveSplit2, p11);
+                    familyInstance = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+
+                return familyInstance;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
         public static void ConnectNipple(Pipe pipe, Pipe newPipeZ, FamilyInstance instance, FamilySymbol fmlNipple, XYZ pOn, XYZ pcenter, XYZ sprinkle_point)
         {
             var nipple = Global.UIDoc.Document.Create.NewFamilyInstance(Line.CreateBound(pOn, pcenter).Origin, fmlNipple, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
@@ -617,6 +737,13 @@ namespace TotalMEPProject.Commands.FireFighting
                 cReducer.ConnectTo(cConnectReducer);
         }
 
+        private static PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
+        {
+            var pipeType = pipe.PipeType as PipeType;
+
+            return pipeType.RoutingPreferenceManager.PreferredJunctionType;
+        }
+
         public static void ConnectTeeAndNipple(Pipe pipe, Pipe newPipeZ, FamilyInstance instance, FamilySymbol fmlNipple, XYZ pOn, XYZ pcenter, XYZ sprinkle_point)
         {
             var curvePipeMain = pipe.GetCurve();
@@ -630,7 +757,12 @@ namespace TotalMEPProject.Commands.FireFighting
             line.Intersect(curvePipeMain, out array);
             var point = array.get_Item(0).XYZPoint;
 
-            var tee = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            FamilyInstance tee = null;
+
+            if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                tee = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            else
+                tee = se(pipe as MEPCurve, newPipeZ as MEPCurve);
 
             Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
             Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
@@ -688,15 +820,69 @@ namespace TotalMEPProject.Commands.FireFighting
             line.Intersect(curvePipeMain, out array);
             var point = array.get_Item(0).XYZPoint;
 
-            CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            var cSprinkle = Common.ToList(instance.MEPModel.ConnectorManager.Connectors).FirstOrDefault();
 
-            Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
-            Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+            FamilyInstance fitting = null;
 
-            var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+            if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                fitting = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            else
+                fitting = se(pipe as MEPCurve, newPipeZ as MEPCurve);
+
+            Global.UIDoc.Document.Delete(newPipeZ.Id);
+
+            var cTee = Common.ToList(fitting.MEPModel.ConnectorManager.Connectors).OrderBy(x => x.Origin.Z).LastOrDefault();
+
+            var vector = cTee.Origin - cSprinkle.Origin;
+
+            ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector);
+
+            cTee.ConnectTo(cSprinkle);
         }
 
         public static FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        {
+            Line line1 = null;
+            Line line2 = null;
+            var curve = (pipeMain.Location as LocationCurve).Curve;
+
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            var pipeTempMain1 = pipeMain;
+
+            if ((curve as Line).Direction.IsAlmostEqualTo(XYZ.BasisX))
+            {
+                line2 = Line.CreateBound(p0, splitPoint);
+                line1 = Line.CreateBound(splitPoint, p1);
+            }
+            else
+            {
+                line1 = Line.CreateBound(p0, splitPoint);
+                line2 = Line.CreateBound(splitPoint, p1);
+            }
+
+            (pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+            var newPlace = new XYZ(0, 0, 0);
+            var elemIds = ElementTransformUtils.CopyElement(
+               Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+            main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+            (main2.Location as LocationCurve).Curve = line2;
+
+            //Connect
+            var c3 = Common.GetConnectorClosestTo(pipeTempMain1, splitPoint);
+            var c4 = Common.GetConnectorClosestTo(main2, splitPoint);
+            var c5 = Common.GetConnectorClosestTo(pipeCurrent, splitPoint);
+
+            var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+            return fitting;
+        }
+
+        public static FamilyInstance CreateTeeFittingSprinkler(Pipe pipeMain, FamilyInstance instance, XYZ splitPoint, out Pipe main2)
         {
             var curve = (pipeMain.Location as LocationCurve).Curve;
 
@@ -720,7 +906,7 @@ namespace TotalMEPProject.Commands.FireFighting
             //Connect
             var c3 = Common.GetConnectorClosestTo(pipeTempMain1, splitPoint);
             var c4 = Common.GetConnectorClosestTo(main2, splitPoint);
-            var c5 = Common.GetConnectorClosestTo(pipeCurrent, splitPoint);
+            var c5 = Common.GetConnectorClosestTo(instance, splitPoint);
 
             try
             {
