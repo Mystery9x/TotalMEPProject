@@ -2595,6 +2595,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             Pipe main2 = null;
 
                             m_bottomTee = CreateTeeFitting(MainPipe as Pipe, FirstPipe as Pipe, m_intsMain1_pnt, out main2);
+                            MainPipes.Add(main2.Id);
                         }
 
                         if (MainPipe as Pipe != null && SecondPipe as Pipe != null && m_intsMain1_pnt != null)
@@ -2602,6 +2603,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             Pipe main2 = null;
 
                             m_bottomTee = CreateTeeFitting(MainPipe as Pipe, SecondPipe as Pipe, m_intsMain1_pnt, out main2);
+                            MainPipes.Add(main2.Id);
                         }
                     }
                     else if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tap)
