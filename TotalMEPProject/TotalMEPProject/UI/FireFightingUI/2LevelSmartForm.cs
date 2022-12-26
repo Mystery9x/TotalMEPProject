@@ -43,6 +43,38 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
+        public bool OptionMainBranchElevation_SameElevation
+        {
+            get
+            {
+                return rBC1SameElevation.Checked;
+            }
+        }
+
+        public bool OptionMainBranchElevation_ElevationDifference
+        {
+            get
+            {
+                return rBC1ElevationDifference.Checked;
+            }
+        }
+
+        public bool OptionMainBranchConnection_TeeOrTap
+        {
+            get
+            {
+                return rBC1TeeOrTap.Checked;
+            }
+        }
+
+        public bool OptionMainBranchConnection_Elbow
+        {
+            get
+            {
+                return rBC1ElbowConnect.Checked;
+            }
+        }
+
         public bool OptionAddNipple
         {
             get
@@ -85,6 +117,8 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             m_handler = handler;
             m_exEvent = exEvent;
+            rBC1SameElevation.Checked = true;
+            rBC1TeeOrTap.Checked = true;
             ckbC1ElbowConnection.Checked = false;
             ckbNippleCreating.Checked = false;
             cboC1NippleFamily.Enabled = false;
@@ -94,6 +128,10 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             AddFamilyType();
             AddNipple();
+            AppUtils.ff(rBC1SameElevation);
+            AppUtils.ff(rBC1ElevationDifference);
+            AppUtils.ff(rBC1TeeOrTap);
+            AppUtils.ff(rBC1ElbowConnect);
         }
 
         #endregion Constructor
@@ -206,7 +244,13 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             PressCancel();
             App._2LevelSmartForm = null;
-
+            AppUtils.sa(cboC1FamilyType);
+            AppUtils.sa(cboC1PipeSize);
+            AppUtils.sa(cboC1NippleFamily);
+            AppUtils.sa(rBC1SameElevation);
+            AppUtils.sa(rBC1ElevationDifference);
+            AppUtils.sa(rBC1TeeOrTap);
+            AppUtils.sa(rBC1ElbowConnect);
             this.Close();
         }
 
@@ -218,6 +262,10 @@ namespace TotalMEPProject.UI.FireFightingUI
             AppUtils.sa(cboC1FamilyType);
             AppUtils.sa(cboC1PipeSize);
             AppUtils.sa(cboC1NippleFamily);
+            AppUtils.sa(rBC1SameElevation);
+            AppUtils.sa(rBC1ElevationDifference);
+            AppUtils.sa(rBC1TeeOrTap);
+            AppUtils.sa(rBC1ElbowConnect);
             SetFocus();
             MakeRequest(RequestId.TwoLevelSmart_OK);
         }
@@ -250,6 +298,12 @@ namespace TotalMEPProject.UI.FireFightingUI
                 cboC1PipeSize.Enabled = true;
                 cboC1NippleFamily.Enabled = true;
             }
+        }
+
+        private void rBC1ElevationDifference_CheckedChanged(object sender, EventArgs e)
+        {
+            rBC1TeeOrTap.Enabled = !rBC1ElevationDifference.Checked;
+            rBC1ElbowConnect.Enabled = !rBC1ElevationDifference.Checked;
         }
 
         #endregion Event

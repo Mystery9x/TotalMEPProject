@@ -323,6 +323,7 @@
             this.rBC1ElevationDifference.TabStop = true;
             this.rBC1ElevationDifference.Text = "Elevation Difference";
             this.rBC1ElevationDifference.UseVisualStyleBackColor = true;
+            this.rBC1ElevationDifference.CheckedChanged += new System.EventHandler(this.rBC1ElevationDifference_CheckedChanged);
             // 
             // rBC1SameElevation
             // 
