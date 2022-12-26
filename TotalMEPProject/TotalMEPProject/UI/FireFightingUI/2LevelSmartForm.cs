@@ -3,13 +3,8 @@ using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Autodesk.Windows;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TotalMEPProject.Request;
 using TotalMEPProject.Services;
@@ -304,6 +299,10 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             rBC1TeeOrTap.Enabled = !rBC1ElevationDifference.Checked;
             rBC1ElbowConnect.Enabled = !rBC1ElevationDifference.Checked;
+            cboC1PipeSize.Enabled = !rBC1ElevationDifference.Checked;
+            ckbC1ElbowConnection.Enabled = !rBC1ElevationDifference.Checked;
+            ckbNippleCreating.Enabled = !rBC1ElevationDifference.Checked;
+            cboC1NippleFamily.Enabled = !rBC1ElevationDifference.Checked;
         }
 
         #endregion Event

@@ -3,22 +3,13 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Plumbing;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Forms;
-
-using TotalMEPProject.UI.FireFightingUI;
 using TotalMEPProject.Ultis;
-using static System.Windows.Forms.DataFormats;
 
 namespace TotalMEPProject.Commands.FireFighting
 {
@@ -93,13 +84,28 @@ namespace TotalMEPProject.Commands.FireFighting
                         PlaceBottomElbowData placeBottomElbowData = new PlaceBottomElbowData(pipe, pairs, pipeType);
                     }
                 }
-                else
+                else if (App._2LevelSmartForm.OptionMainBranchElevation_SameElevation)
                 {
                     foreach (PairPipes pair in pairs)
                     {
                         var pipe1 = pair._Pipe1;
                         var pipe2 = pair._Pipe2;
-                        SourcePipesData sourcePipesData = new SourcePipesData(m_mainPipes,
+                        SourcePipesDataElevationDifference sourcePipesData = new SourcePipesDataElevationDifference(m_mainPipes,
+                                                                              pipe1,
+                                                                              pipe2,
+                                                                              pipeType,
+                                                                              diameter,
+                                                                              App._2LevelSmartForm.OptionAddNipple,
+                                                                              App._2LevelSmartForm.SelectedNippleFamily);
+                    }
+                }
+                else if (App._2LevelSmartForm.OptionMainBranchElevation_ElevationDifference)
+                {
+                    foreach (PairPipes pair in pairs)
+                    {
+                        var pipe1 = pair._Pipe1;
+                        var pipe2 = pair._Pipe2;
+                        SourcePipesDataSameElevation sourcePipesData = new SourcePipesDataSameElevation(m_mainPipes,
                                                                               pipe1,
                                                                               pipe2,
                                                                               pipeType,
@@ -263,7 +269,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
     #region Add Tee Connection
 
-    public class SourcePipesData
+    public class SourcePipesDataElevationDifference
     {
         #region Variable
 
@@ -321,7 +327,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
         #region Constructor
 
-        public SourcePipesData(List<ElementId> mainPipes, Pipe firstPipe, Pipe secondPipe, PipeType pipeType, double pipeDiameter, bool flagAddNipple, FamilySymbol nippleFamily)
+        public SourcePipesDataElevationDifference(List<ElementId> mainPipes, Pipe firstPipe, Pipe secondPipe, PipeType pipeType, double pipeDiameter, bool flagAddNipple, FamilySymbol nippleFamily)
         {
             if (mainPipes != null)
                 MainPipes = mainPipes;
@@ -2315,6 +2321,1093 @@ namespace TotalMEPProject.Commands.FireFighting
                 && IsEqual(first.Y, second.Y)
                 && IsEqual(first.Z, second.Z);
         }
+    }
+
+    public class SourcePipesDataSameElevation
+    {
+        #region Variable
+
+        private Pipe m_firstPipe = null;
+        private Pipe m_secondPipe = null;
+        private Pipe m_mainPipe = null;
+        private PipeType m_pipeTypeProcess = null;
+        private double m_diameter = double.MinValue;
+        private bool m_addNipple = false;
+        private FamilySymbol m_nippleFamily = null;
+        private bool m_addElbowConnection = false;
+        private List<ElementId> m_mainPipes = new List<ElementId>();
+        private Pipe m_verticalPipe = null;
+
+        private XYZ m_intsMain1_pnt = null;
+        private XYZ m_sub1_pnt0 = null;
+        private XYZ m_sub1_pnt1 = null;
+        private XYZ m_sub1Ints_pnt = null;
+
+        private XYZ m_intsMain2_pnt = null;
+        private XYZ m_sub2_pnt0 = null;
+        private XYZ m_sub2_pnt1 = null;
+        private XYZ m_sub2Ints_pnt = null;
+
+        private FamilyInstance m_bottomTee = null;
+        private FamilyInstance m_bottomElbow = null;
+
+        private FamilyInstance m_topTee = null;
+
+        private FamilyInstance m_topReducer1 = null;
+        private FamilyInstance m_topReducer2 = null;
+
+        private bool m_flagTopElbowConnect = false;
+        private FamilyInstance m_topElbow = null;
+
+        private bool m_twoPipes = false;
+
+        #endregion Variable
+
+        #region Properties
+
+        public Pipe FirstPipe { get => m_firstPipe; set => m_firstPipe = value; }
+        public Pipe SecondPipe { get => m_secondPipe; set => m_secondPipe = value; }
+        public Pipe MainPipe { get => m_mainPipe; set => m_mainPipe = value; }
+        public PipeType PipeTypeProcess { get => m_pipeTypeProcess; set => m_pipeTypeProcess = value; }
+        public List<ElementId> MainPipes { get => m_mainPipes; set => m_mainPipes = value; }
+        public double Diameter { get => m_diameter; set => m_diameter = value; }
+        public bool FlagAddNipple { get => m_addNipple; set => m_addNipple = value; }
+        public FamilySymbol NippleFamily { get => m_nippleFamily; set => m_nippleFamily = value; }
+
+        public Pipe VerticalPipe { get => m_verticalPipe; set => m_verticalPipe = value; }
+
+        #endregion Properties
+
+        #region Constructor
+
+        public SourcePipesDataSameElevation(List<ElementId> mainPipes, Pipe firstPipe, Pipe secondPipe, PipeType pipeType, double pipeDiameter, bool flagAddNipple, FamilySymbol nippleFamily)
+        {
+            if (mainPipes != null)
+                MainPipes = mainPipes;
+
+            FirstPipe = firstPipe;
+            SecondPipe = secondPipe;
+            PipeTypeProcess = pipeType;
+            Diameter = pipeDiameter;
+            FlagAddNipple = flagAddNipple;
+            NippleFamily = nippleFamily;
+
+            if (SecondPipe != null)
+                m_twoPipes = true;
+
+            Initialize();
+        }
+
+        #endregion Constructor
+
+        #region Method
+
+        private void Initialize()
+        {
+            using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "STEP"))
+            {
+                try
+                {
+                    reTrans.Start();
+
+                    if (BeforeProcess() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandleVerticalPipe() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandlerBottom() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandlerTop() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandlerFinal() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    reTrans.Commit();
+                }
+                catch (Exception)
+                {
+                    reTrans.RollBack();
+                }
+            }
+        }
+
+        private bool BeforeProcess()
+        {
+            try
+            {
+                // Check has two pipe valid
+                bool flagTwoPipe = SecondPipe != null ? true : false;
+
+                // Get main pipe
+                MainPipe = null;
+                if (MainPipes == null || MainPipes.Count == 0)
+                    return false;
+
+                foreach (ElementId eId in m_mainPipes)
+                {
+                    Pipe pipeLoop = Global.UIDoc.Document.GetElement(eId) as Pipe;
+                    if (pipeLoop == null)
+                        continue;
+
+                    SourceRotatePipe sourceRotatePipe = new SourceRotatePipe(pipeLoop, FirstPipe, SecondPipe);
+                    if (sourceRotatePipe.IsValid)
+                    {
+                        if (sourceRotatePipe.FlagExtendPipe)
+                        {
+                            (pipeLoop.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveMainPipe;
+                        }
+                        if (sourceRotatePipe.FlagCreateElbow)
+                        {
+                            (FirstPipe.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveFirstPipe;
+                            m_flagTopElbowConnect = true;
+                            MainPipe = pipeLoop;
+                            break;
+                        }
+                        else
+                        {
+                            if (HandlerDivide(pipeLoop, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
+                            {
+                                MainPipe = pipeLoop;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Rotate sub pipe by main pipe
+                //HandleBranchPipePerpendiculerMainPipe();
+
+                if (m_flagTopElbowConnect == false)
+                {
+                    if (HandlerDivide(MainPipe, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
+                    {
+                        // If only 1 pipe
+                        if (m_twoPipes == false)
+                            (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
+                        else
+                        {
+                            if (SecondPipe == null)
+                            {
+                                (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
+                                SecondPipe = Common.Clone(FirstPipe) as Pipe;
+                                (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
+
+                                // Set point value again
+                                m_sub1_pnt1 = m_sub1Ints_pnt;
+                            }
+
+                            if (SecondPipe != null)
+                            {
+                                if (HandlerDivide(MainPipe, SecondPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
+                                {
+                                    return false;
+                                }
+
+                                if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
+                                {
+                                    return false;
+                                }
+
+                                if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    return HandlerDivideOnlyPipe(MainPipe, FirstPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool HandleVerticalPipe()
+        {
+            try
+            {
+                if (m_flagTopElbowConnect == true)
+                {
+                    Diameter = (double)GetParameterValueByName(FirstPipe, "Diameter");
+                }
+
+                VerticalPipe = Common.Clone(FirstPipe) as Pipe;
+                VerticalPipe.PipeType = PipeTypeProcess;
+                VerticalPipe.LookupParameter("Diameter").Set(Diameter);
+                (VerticalPipe.Location as LocationCurve).Curve = Line.CreateBound(m_intsMain1_pnt, m_sub1Ints_pnt);
+
+                return true;
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool HandlerFinal()
+        {
+            try
+            {
+                double middleElevation = double.MinValue;
+                if (MainPipe != null)
+                    middleElevation = GetBuiltInParameterValue(MainPipe, BuiltInParameter.RBS_OFFSET_PARAM)
+                                    != null ? (double)GetBuiltInParameterValue(MainPipe, BuiltInParameter.RBS_OFFSET_PARAM) : double.MinValue;
+
+                if (middleElevation != double.MinValue)
+                {
+                    if (FirstPipe != null)
+                    {
+                        SetBuiltinParameterValue(FirstPipe, BuiltInParameter.RBS_OFFSET_PARAM, middleElevation);
+                    }
+
+                    if (SecondPipe != null)
+                    {
+                        SetBuiltinParameterValue(SecondPipe, BuiltInParameter.RBS_OFFSET_PARAM, middleElevation);
+                    }
+
+                    if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tee)
+                    {
+                        if (MainPipe as Pipe != null && FirstPipe as Pipe != null && m_intsMain1_pnt != null)
+                        {
+                            Pipe main2 = null;
+
+                            m_bottomTee = CreateTeeFitting(MainPipe as Pipe, FirstPipe as Pipe, m_intsMain1_pnt, out main2);
+                        }
+
+                        if (MainPipe as Pipe != null && SecondPipe as Pipe != null && m_intsMain1_pnt != null)
+                        {
+                            Pipe main2 = null;
+
+                            m_bottomTee = CreateTeeFitting(MainPipe as Pipe, SecondPipe as Pipe, m_intsMain1_pnt, out main2);
+                        }
+                    }
+                    else if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tap)
+                    {
+                        if (FirstPipe != null)
+                            se(MainPipe, FirstPipe);
+                        if (SecondPipe != null)
+                            se(MainPipe, SecondPipe);
+                    }
+
+                    if (VerticalPipe != null)
+                        Global.UIDoc.Document.Delete(VerticalPipe.Id);
+
+                    return true;
+                }
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        public int IsLeftMath(XYZ Startpoint, XYZ Endpoint, XYZ P)
+        {
+            double Ans = ((Endpoint.X - Startpoint.X) * (P.Y - Startpoint.Y) -
+              (P.X - Startpoint.X) * (Endpoint.Y - Startpoint.Y));
+            if (Math.Abs(Ans) < 1.0e-8)
+            { return 0; } //P is on the line
+            else
+            {
+                if (Ans > 0)
+                { return 1; } //P is left of the line (CW)
+                else
+                { return -1; } //P is right of the line (CCW)
+            }
+        }
+
+        private bool HandlerBottom()
+        {
+            try
+            {
+                if (MainPipe as Pipe != null && VerticalPipe as Pipe != null && m_intsMain1_pnt != null)
+                {
+                    //Pipe main2 = null;
+
+                    //var curve = (MainPipe.Location as LocationCurve).Curve;
+
+                    //var p0 = curve.GetEndPoint(0);
+                    //var p1 = curve.GetEndPoint(1);
+
+                    //var pipeTempMain1 = MainPipe;
+
+                    //var line1 = Line.CreateBound(p0, m_intsMain1_pnt);
+                    //(pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+                    //var newPlace = new XYZ(0, 0, 0);
+                    //var elemIds = ElementTransformUtils.CopyElement(
+                    //   Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+                    //main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+                    //var line2 = Line.CreateBound(m_intsMain1_pnt, p1);
+                    //(main2.Location as LocationCurve).Curve = line2;
+
+                    //MainPipes.Add(main2.Id);
+
+                    return true;
+                }
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool HandlerTop()
+        {
+            try
+            {
+                // Process with sub pipes
+
+                Connector cntBottom_topTee = GetConnectorClosestTo(VerticalPipe, m_sub1Ints_pnt);
+                double diameter_10 = 10 * Common.mmToFT;
+
+                // If Diameter vertical pipe = Diameter main pipe
+                if (g(Diameter, FirstPipe.Diameter))
+                {
+                    return true;
+                }
+                // If Diameter vertical pipe < Diameter main pipe
+                else
+                {
+                    if (FirstPipe != null)
+                    {
+                        var firstLine = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
+                        (FirstPipe.Location as LocationCurve).Curve = firstLine;
+                    }
+
+                    if (SecondPipe != null)
+                    {
+                        var secondLine = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
+                        (SecondPipe.Location as LocationCurve).Curve = secondLine;
+                    }
+
+                    return true;
+                }
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        /// <summary>
+        /// Handler Divide
+        /// </summary>
+        /// <param name="mainPipe"></param>
+        /// <param name="subPipe"></param>
+        /// <param name="flagTwoPipe"></param>
+        /// <param name="intsMain_pnt"></param>
+        /// <param name="sub_pnt0"></param>
+        /// <param name="sub_pnt1"></param>
+        /// <param name="subInts_pnt"></param>
+        /// <returns></returns>
+        private bool HandlerDivide(Pipe mainPipe, Pipe subPipe, bool flagTwoPipe, out XYZ intsMain_pnt, out XYZ sub_pnt0, out XYZ sub_pnt1, out XYZ subInts_pnt)
+        {
+            Global.UIDoc.Document.Regenerate();
+            intsMain_pnt = null;
+            sub_pnt0 = null;
+            sub_pnt1 = null;
+            subInts_pnt = null;
+
+            var curve_main = mainPipe.GetCurve();
+            var curve_main_2d = Line.CreateBound(Common.ToPoint2D(curve_main.GetEndPoint(0)), Common.ToPoint2D(curve_main.GetEndPoint(1)));
+
+            var curve_sub = subPipe.GetCurve();
+
+            Curve curve2d = null;
+            Curve curve3d = null;
+
+            if (flagTwoPipe)
+            {
+                //Expand
+                double t = 10;
+                var p0_ex1 = curve_sub.Evaluate(curve_sub.GetEndParameter(0) - t, false);
+                var p1_ex2 = curve_sub.Evaluate(curve_sub.GetEndParameter(1) + t, false);
+                curve3d = Line.CreateBound(p0_ex1, p1_ex2);
+
+                var expand_2d = Line.CreateBound(Common.ToPoint2D(p0_ex1), Common.ToPoint2D(p1_ex2));
+
+                curve2d = expand_2d;
+            }
+            else
+            {
+                curve2d = Line.CreateBound(Common.ToPoint2D(curve_sub.GetEndPoint(0)), Common.ToPoint2D(curve_sub.GetEndPoint(1)));
+                curve3d = curve_sub;
+            }
+
+            //Check intersection
+            IntersectionResultArray arr = new IntersectionResultArray();
+            var result = curve_main_2d.Intersect(curve2d, out arr);
+
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            var pInter_2d = arr.get_Item(0).XYZPoint;
+
+            //Find 3d
+            double temp = 200;
+
+            var lineZ = Line.CreateBound(new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z - temp), new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z + temp));
+
+            arr = new IntersectionResultArray();
+            result = lineZ.Intersect(curve_main, out arr);
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            intsMain_pnt = arr.get_Item(0).XYZPoint;
+
+            //Find 3d on two sub pipe
+            arr = new IntersectionResultArray();
+            result = lineZ.Intersect(curve3d, out arr);
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            subInts_pnt = arr.get_Item(0).XYZPoint;
+
+            if (flagTwoPipe)
+            {
+                //Get father point
+                int index = subInts_pnt.DistanceTo(curve_sub.GetEndPoint(0)) > subInts_pnt.DistanceTo(curve_sub.GetEndPoint(1)) ? 0 : 1;
+
+                if (index == 0)
+                {
+                    sub_pnt0 = curve_sub.GetEndPoint(index);
+                    sub_pnt1 = subInts_pnt;
+                }
+                else
+                {
+                    sub_pnt0 = subInts_pnt;
+                    sub_pnt1 = curve_sub.GetEndPoint(index);
+                }
+            }
+            else
+            {
+                sub_pnt0 = curve_sub.GetEndPoint(0);
+                sub_pnt1 = curve_sub.GetEndPoint(1);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Handler Divide
+        /// </summary>
+        /// <param name="mainPipe"></param>
+        /// <param name="subPipe"></param>
+        /// <param name="flagTwoPipe"></param>
+        /// <param name="intsMain_pnt"></param>
+        /// <param name="sub_pnt0"></param>
+        /// <param name="sub_pnt1"></param>
+        /// <param name="subInts_pnt"></param>
+        /// <returns></returns>
+        private bool HandlerDivideOnlyPipe(Pipe mainPipe, Pipe subPipe, out XYZ intsMain_pnt, out XYZ sub_pnt0, out XYZ sub_pnt1, out XYZ subInts_pnt)
+        {
+            Global.UIDoc.Document.Regenerate();
+            intsMain_pnt = null;
+            sub_pnt0 = null;
+            sub_pnt1 = null;
+            subInts_pnt = null;
+
+            var curve_main = mainPipe.GetCurve();
+            var curve_main_2d = Line.CreateBound(Common.ToPoint2D(curve_main.GetEndPoint(0)), Common.ToPoint2D(curve_main.GetEndPoint(1)));
+
+            var curve_sub = subPipe.GetCurve();
+
+            Curve curve2d = null;
+            Curve curve3d = null;
+
+            curve2d = Line.CreateBound(Common.ToPoint2D(curve_sub.GetEndPoint(0)), Common.ToPoint2D(curve_sub.GetEndPoint(1)));
+            curve3d = curve_sub;
+
+            //Check intersection
+            IntersectionResultArray arr = new IntersectionResultArray();
+            var result = curve_main_2d.Intersect(curve2d, out arr);
+
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            var pInter_2d = arr.get_Item(0).XYZPoint;
+
+            //Find 3d
+            double temp = 200;
+
+            var lineZ = Line.CreateBound(new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z - temp), new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z + temp));
+
+            arr = new IntersectionResultArray();
+            result = lineZ.Intersect(curve_main, out arr);
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            intsMain_pnt = arr.get_Item(0).XYZPoint;
+
+            //Find 3d on two sub pipe
+            arr = new IntersectionResultArray();
+            result = lineZ.Intersect(curve3d, out arr);
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            subInts_pnt = arr.get_Item(0).XYZPoint;
+
+            sub_pnt0 = curve_sub.GetEndPoint(0);
+            sub_pnt1 = curve_sub.GetEndPoint(1);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Get Preferred Junction Type
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <returns></returns>
+        private PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
+        {
+            var pipeType = pipe.PipeType as PipeType;
+
+            return pipeType.RoutingPreferenceManager.PreferredJunctionType;
+        }
+
+        /// <summary>
+        /// Create Tee Fitting
+        /// </summary>
+        /// <param name="pipeMain"></param>
+        /// <param name="pipeCurrent"></param>
+        /// <param name="splitPoint"></param>
+        /// <param name="main2"></param>
+        /// <returns></returns>
+        private FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        {
+            var curve = (pipeMain.Location as LocationCurve).Curve;
+
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            var pipeTempMain1 = pipeMain;
+
+            var line1 = Line.CreateBound(p0, splitPoint);
+            (pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+            var newPlace = new XYZ(0, 0, 0);
+            var elemIds = ElementTransformUtils.CopyElement(
+               Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+            main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+            var line2 = Line.CreateBound(splitPoint, p1);
+            (main2.Location as LocationCurve).Curve = line2;
+
+            //Connect
+            var c3 = GetConnectorClosestTo(pipeTempMain1, splitPoint);
+            var c4 = GetConnectorClosestTo(main2, splitPoint);
+            var c5 = GetConnectorClosestTo(pipeCurrent, splitPoint);
+
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Create Elbow Fitting
+        /// </summary>
+        /// <param name="pipeMain"></param>
+        /// <param name="pipeCurrent"></param>
+        /// <param name="splitPoint"></param>
+        /// <param name="main2"></param>
+        /// <returns></returns>
+        private FamilyInstance CreateElbowFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        {
+            main2 = null;
+            try
+            {
+                var curve = (pipeMain.Location as LocationCurve).Curve;
+
+                var p0 = curve.GetEndPoint(0);
+                var p1 = curve.GetEndPoint(1);
+
+                var pipeTempMain1 = pipeMain;
+
+                var line1 = Line.CreateBound(p0, splitPoint);
+                (pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+                var newPlace = new XYZ(0, 0, 0);
+                var elemIds = ElementTransformUtils.CopyElement(
+                   Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+                main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+                var line2 = Line.CreateBound(splitPoint, p1);
+                (main2.Location as LocationCurve).Curve = line2;
+
+                //Connect
+                var c3 = GetConnectorClosestTo(pipeTempMain1, splitPoint);
+                var c4 = GetConnectorClosestTo(main2, splitPoint);
+                var c5 = GetConnectorClosestTo(pipeCurrent, splitPoint);
+
+                try
+                {
+                    FamilyInstance retFitting = null;
+                    if (main2.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() < pipeTempMain1.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble())
+                    {
+                        retFitting = Global.UIDoc.Document.Create.NewElbowFitting(c3, c5);
+
+                        Global.UIDoc.Document.Delete(main2.Id);
+                        //main2 = null;
+                    }
+                    else
+                    {
+                        retFitting = Global.UIDoc.Document.Create.NewElbowFitting(c4, c5);
+                        Global.UIDoc.Document.Delete(pipeTempMain1.Id);
+                    }
+                    return retFitting;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            catch (Exception)
+            { }
+            return null;
+        }
+
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private Connector GetConnectorClosestTo(Element e,
+                                                      XYZ p)
+        {
+            ConnectorManager cm = GetConnectorManager(e);
+
+            return null == cm
+              ? null
+              : GetConnectorClosestTo(cm.Connectors, p);
+        }
+
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="connectors"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private Connector GetConnectorClosestTo(ConnectorSet connectors,
+                                                       XYZ p)
+        {
+            Connector targetConnector = null;
+            double minDist = double.MaxValue;
+
+            foreach (Connector c in connectors)
+            {
+                double d = c.Origin.DistanceTo(p);
+
+                if (d < minDist)
+                {
+                    targetConnector = c;
+                    minDist = d;
+                }
+            }
+            return targetConnector;
+        }
+
+        /// <summary>
+        /// GetConnectorManager
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private ConnectorManager GetConnectorManager(Element e)
+        {
+            MEPCurve mc = e as MEPCurve;
+            FamilyInstance fi = e as FamilyInstance;
+
+            if (null == mc && null == fi)
+            {
+                throw new ArgumentException(
+                  "Element is neither an MEP curve nor a fitting.");
+            }
+
+            return null == mc
+              ? fi.MEPModel.ConnectorManager
+              : mc.ConnectorManager;
+        }
+
+        /// <summary>
+        /// s e
+        /// </summary>
+        /// <param name="mepCurveSplit1"></param>
+        /// <param name="mepCurveSplit2"></param>
+        /// <returns></returns>
+        public bool se(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
+        {
+            try
+            {
+                var locationCurve1 = mepCurveSplit1.GetCurve();
+                var line1 = locationCurve1 as Line;
+
+                var locationCurve2 = mepCurveSplit2.GetCurve();
+                var line2 = locationCurve2 as Line;
+
+                var p10 = line2.GetEndPoint(0);
+                var p11 = line2.GetEndPoint(1);
+
+                var inter1 = locationCurve1.Project(p10);
+                var inter2 = locationCurve1.Project(p11);
+
+                if (inter1 == null || inter2 == null)
+                    return false;
+
+                var d1 = inter1.XYZPoint.DistanceTo(p10);
+                var d2 = inter2.XYZPoint.DistanceTo(p11);
+
+                if (d1 < d2)
+                {
+                    var con = GetConnectorClosestTo(mepCurveSplit2, p10);
+                    var elbow = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+                else
+                {
+                    var con = GetConnectorClosestTo(mepCurveSplit2, p11);
+                    var elbow = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Create Tee
+        /// </summary>
+        /// <param name="c3"></param>
+        /// <param name="c4"></param>
+        /// <param name="c5"></param>
+        /// <returns></returns>
+        public FamilyInstance CreatTee(Connector c3, Connector c4, Connector c5)
+        {
+            if (c3 == null || c4 == null || c5 == null)
+                return null;
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Create Tee
+        /// </summary>
+        /// <param name="c3"></param>
+        /// <param name="c4"></param>
+        /// <param name="c5"></param>
+        /// <returns></returns>
+        public FamilyInstance CreateElbow(Connector c3, Connector c4)
+        {
+            if (c3 == null || c4 == null)
+                return null;
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewElbowFitting(c3, c4);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// g
+        /// </summary>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <returns></returns>
+        private bool g(double d1, double d2)
+        {
+            if (Math.Abs(d1 - d2) < 0.001)
+                return true;
+
+            return false;
+        }
+
+        private List<Connector> GetConnectors(ConnectorSet connectorSet, bool filter = false)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End && filter == true)
+                        continue;
+                    retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        private XYZ MiddlePoint(XYZ xYZ_1, XYZ xYZ_2) => new XYZ((xYZ_1.X + xYZ_2.X) * 0.5, (xYZ_1.Y + xYZ_2.Y) * 0.5, (xYZ_1.Z + xYZ_2.Z) * 0.5);
+
+        private void RotateLine(Document doc, FamilyInstance wye, Line axisLine)
+        {
+            var lst = Common.ToList(wye.MEPModel.ConnectorManager.Connectors);
+
+            Connector connector2 = lst[0];
+            Connector connector3 = lst[1];
+
+            Line rotateLine = Line.CreateBound(connector2.Origin, connector3.Origin);
+
+            if (Common.IsParallel(axisLine.Direction, rotateLine.Direction))
+                return;
+
+            XYZ vector = rotateLine.Direction.CrossProduct(axisLine.Direction);
+            XYZ intersection = GetUnBoundIntersection(rotateLine, axisLine);
+
+            double angle = rotateLine.Direction.AngleTo(axisLine.Direction);
+
+            Line line = Line.CreateUnbound(intersection, vector);
+
+            ElementTransformUtils.RotateElement(doc, wye.Id, line, angle);
+            doc.Regenerate();
+        }
+
+        private XYZ GetUnBoundIntersection(Line Line1, Line Line2)
+        {
+            if (Line1 != null && Line2 != null)
+            {
+                Curve ExtendedLine1 = Line.CreateUnbound(Line1.Origin, Line1.Direction);
+                Curve ExtendedLine2 = Line.CreateUnbound(Line2.Origin, Line2.Direction);
+                SetComparisonResult setComparisonResult = ExtendedLine1.Intersect(ExtendedLine2, out IntersectionResultArray resultArray);
+                if (resultArray != null &&
+                    resultArray.Size > 0)
+                {
+                    foreach (IntersectionResult result in resultArray)
+                        if (result != null)
+                            return result.XYZPoint;
+                }
+                else
+                {
+                    if (Line1.IsBound && Line2.IsBound)
+                    {
+                        if (Line1.GetEndPoint(0).IsAlmostEqualTo(Line2.GetEndPoint(0)) ||
+                  Line1.GetEndPoint(0).IsAlmostEqualTo(Line2.GetEndPoint(1)))
+                            return Line1.GetEndPoint(0);
+                        else
+                   if (Line1.GetEndPoint(1).IsAlmostEqualTo(Line2.GetEndPoint(0)) ||
+                  Line1.GetEndPoint(1).IsAlmostEqualTo(Line2.GetEndPoint(1)))
+                            return Line1.GetEndPoint(1);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private bool SetBuiltinParameterValue(Element elem, BuiltInParameter paramId, object value)
+        {
+            Parameter param = elem.get_Parameter(paramId);
+            return SetParameterValue(param, value);
+        }
+
+        /// <summary>
+        /// Set value to parameter based on its storage type
+        /// </summary>
+        private bool SetParameterValue(Parameter param, object value)
+        {
+            if (param != null
+                && !param.IsReadOnly
+                && value != null)
+            {
+                try
+                {
+                    switch (param.StorageType)
+                    {
+                        case StorageType.Integer:
+                            param.Set((int)value);
+                            break;
+
+                        case StorageType.Double:
+                            param.Set((double)value);
+                            break;
+
+                        case StorageType.String:
+                            param.Set((string)value);
+                            break;
+
+                        case StorageType.ElementId:
+                            param.Set((ElementId)value);
+                            break;
+                    }
+                    return true;
+                }
+                catch (Exception) { }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get builtin parameter value based on its storage type
+        /// </summary>
+        private dynamic GetBuiltInParameterValue(Element elem, BuiltInParameter paramId)
+        {
+            if (elem != null)
+            {
+                Parameter parameter = elem.get_Parameter(paramId);
+                return GetParameterValue(parameter);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// get parameter value based on its storage type
+        /// </summary>
+        private dynamic GetParameterValue(Parameter parameter)
+        {
+            if (parameter != null && parameter.HasValue)
+            {
+                switch (parameter.StorageType)
+                {
+                    case StorageType.Double:
+                        return parameter.AsDouble();
+
+                    case StorageType.ElementId:
+                        return parameter.AsElementId();
+
+                    case StorageType.Integer:
+                        return parameter.AsInteger();
+
+                    case StorageType.String:
+                        return parameter.AsString();
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get parameter value by name
+        /// </summary>
+        private dynamic GetParameterValueByName(Element elem, string paramName)
+        {
+            if (elem != null)
+            {
+                Parameter parameter = elem.LookupParameter(paramName);
+                return GetParameterValue(parameter);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// All Components On Pipe Truss
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="elementMainId"></param>
+        /// <param name="addFirst"></param>
+        /// <param name="rmvElement"></param>
+        /// <returns></returns>
+        private List<Element> AllComponentsOnPipeTruss(Autodesk.Revit.DB.Document document, ElementId elementMainId, bool addFirst = false, List<Element> rmvElement = null)
+        {
+            List<Element> components = new List<Element>();
+            Element eleMain = document.GetElement(elementMainId);
+            List<Element> rmvElement_1 = null;
+            if (addFirst == true)
+            {
+                rmvElement_1 = new List<Element> { eleMain };
+                components.Add(eleMain);
+            }
+            else
+            {
+                rmvElement_1 = new List<Element>(rmvElement);
+            }
+            if (eleMain != null)
+            {
+                List<Connector> connectors = new List<Connector>();
+                if (eleMain is MEPCurve processMEPCurve && processMEPCurve.ConnectorManager != null)
+                {
+                    foreach (Connector connector in processMEPCurve.ConnectorManager.Connectors)
+                    {
+                        if (connector.ConnectorType != ConnectorType.End)
+                            continue;
+                        connectors.Add(connector);
+                    }
+                }
+                else if (eleMain is FamilyInstance fmlIns && fmlIns.MEPModel.ConnectorManager != null)
+                {
+                    foreach (Connector connector in fmlIns.MEPModel.ConnectorManager.Connectors)
+                    {
+                        if (connector.ConnectorType != ConnectorType.End && connector.IsConnected == true)
+                            continue;
+                        connectors.Add(connector);
+                    }
+                }
+
+                if (connectors.Count > 0)
+                {
+                    foreach (Connector cnt1 in connectors)
+                    {
+                        foreach (Connector cnt2 in cnt1.AllRefs)
+                        {
+                            Element eleCheck = cnt2.Owner;
+                            if (null != eleCheck && (eleCheck is MEPCurve || eleCheck is FamilyInstance))
+                            {
+                                if (rmvElement_1 != null && rmvElement_1.Any(item => item.Id == eleCheck.Id))
+                                    continue;
+                                else
+                                {
+                                    components.Add(eleCheck);
+                                    List<Element> rmvElement_2 = new List<Element>(rmvElement_1);
+                                    rmvElement_2.Add(eleCheck);
+
+                                    components.AddRange(AllComponentsOnPipeTruss(document, eleCheck.Id, false, rmvElement_2));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return components;
+        }
+
+        #endregion Method
     }
 
     #endregion Add Tee Connection
