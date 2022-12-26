@@ -90,13 +90,24 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         var pipe1 = pair._Pipe1;
                         var pipe2 = pair._Pipe2;
-                        SourcePipesDataElevationDifference sourcePipesData = new SourcePipesDataElevationDifference(m_mainPipes,
-                                                                              pipe1,
-                                                                              pipe2,
-                                                                              pipeType,
-                                                                              diameter,
-                                                                              App._2LevelSmartForm.OptionAddNipple,
-                                                                              App._2LevelSmartForm.SelectedNippleFamily);
+
+                        if (App._2LevelSmartForm.OptionMainBranchConnection_Elbow)
+                        {
+                            SourcePipesDataElevationDifferenceElbowConnect sourcePipesData = new SourcePipesDataElevationDifferenceElbowConnect(m_mainPipes,
+                                                                                                                                                pipe1,
+                                                                                                                                                pipe2,
+                                                                                                                                                pipeType);
+                        }
+                        else
+                        {
+                            SourcePipesDataElevationDifference sourcePipesData = new SourcePipesDataElevationDifference(m_mainPipes,
+                                                                             pipe1,
+                                                                             pipe2,
+                                                                             pipeType,
+                                                                             diameter,
+                                                                             App._2LevelSmartForm.OptionAddNipple,
+                                                                             App._2LevelSmartForm.SelectedNippleFamily);
+                        }
                     }
                 }
                 else if (App._2LevelSmartForm.OptionMainBranchElevation_ElevationDifference)
@@ -305,7 +316,6 @@ namespace TotalMEPProject.Commands.FireFighting
         private FamilyInstance m_topReducer1 = null;
         private FamilyInstance m_topReducer2 = null;
 
-        private bool m_flagTopElbowConnect = false;
         private FamilyInstance m_topElbow = null;
 
         #endregion Variable
@@ -411,13 +421,6 @@ namespace TotalMEPProject.Commands.FireFighting
                         {
                             (pipeLoop.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveMainPipe;
                         }
-                        if (sourceRotatePipe.FlagCreateElbow)
-                        {
-                            (FirstPipe.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveFirstPipe;
-                            m_flagTopElbowConnect = true;
-                            MainPipe = pipeLoop;
-                            break;
-                        }
                         else
                         {
                             if (HandlerDivide(pipeLoop, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
@@ -432,44 +435,37 @@ namespace TotalMEPProject.Commands.FireFighting
                 // Rotate sub pipe by main pipe
                 //HandleBranchPipePerpendiculerMainPipe();
 
-                if (m_flagTopElbowConnect == false)
+                if (HandlerDivide(MainPipe, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
                 {
-                    if (HandlerDivide(MainPipe, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
+                    // If only 1 pipe
+                    if (SecondPipe == null)
                     {
-                        // If only 1 pipe
-                        if (SecondPipe == null)
+                        (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
+
+                        SecondPipe = Common.Clone(FirstPipe) as Pipe;
+                        (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
+
+                        // Set point value again
+                        m_sub1_pnt1 = m_sub1Ints_pnt;
+                    }
+
+                    if (SecondPipe != null)
+                    {
+                        if (HandlerDivide(MainPipe, SecondPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
                         {
-                            (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
-
-                            SecondPipe = Common.Clone(FirstPipe) as Pipe;
-                            (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
-
-                            // Set point value again
-                            m_sub1_pnt1 = m_sub1Ints_pnt;
+                            return false;
                         }
 
-                        if (SecondPipe != null)
+                        if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
                         {
-                            if (HandlerDivide(MainPipe, SecondPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
-                            {
-                                return false;
-                            }
+                            return false;
+                        }
 
-                            if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
-                            {
-                                return false;
-                            }
-
-                            if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
-                            {
-                                return false;
-                            }
+                        if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
+                        {
+                            return false;
                         }
                     }
-                }
-                else
-                {
-                    return HandlerDivideOnlyPipe(MainPipe, FirstPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt);
                 }
 
                 return true;
@@ -483,11 +479,6 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                if (m_flagTopElbowConnect == true)
-                {
-                    Diameter = (double)GetParameterValueByName(FirstPipe, "Diameter");
-                }
-
                 VerticalPipe = Common.Clone(FirstPipe) as Pipe;
                 VerticalPipe.PipeType = PipeTypeProcess;
                 VerticalPipe.LookupParameter("Diameter").Set(Diameter);
@@ -498,191 +489,6 @@ namespace TotalMEPProject.Commands.FireFighting
             catch (Exception)
             { }
             return false;
-        }
-
-        private bool HandleBranchPipePerpendiculerMainPipe()
-        {
-            try
-            {
-                // MainPipe
-                if (MainPipe == null)
-                    return false;
-                var mainPipe_curve_reality = MainPipe.GetCurve();
-
-                XYZ mainPipe_start_pnt = mainPipe_curve_reality.GetEndPoint(0);
-                XYZ mainPipe_end_pnt = mainPipe_curve_reality.GetEndPoint(1);
-
-                XYZ mainPipe_start_pnt_2d = Common.ToPoint2D(mainPipe_curve_reality.GetEndPoint(0));
-                XYZ mainPipe_end_pnt_2d = Common.ToPoint2D(mainPipe_curve_reality.GetEndPoint(1));
-                XYZ mainPipe_dir_2d = (mainPipe_end_pnt_2d - mainPipe_start_pnt_2d);
-
-                var mainPipe_curve_2d_Unbound = Line.CreateUnbound(mainPipe_start_pnt_2d, mainPipe_dir_2d);
-
-                XYZ mainPipe_dir_2d_rotate = mainPipe_curve_2d_Unbound.Direction.Normalize().CrossProduct(XYZ.BasisZ).Normalize();
-
-                // First Pipe
-                if (FirstPipe == null)
-                    return false;
-                var firstpipe_curve_reality = FirstPipe.GetCurve();
-
-                XYZ firstpipe_start_pnt = firstpipe_curve_reality.GetEndPoint(0);
-                XYZ firstpipe_end_pnt = firstpipe_curve_reality.GetEndPoint(1);
-
-                XYZ firstpipe_start_pnt_2d = Common.ToPoint2D(firstpipe_curve_reality.GetEndPoint(0));
-                XYZ firstpipe_end_pnt_2d = Common.ToPoint2D(firstpipe_curve_reality.GetEndPoint(1));
-                XYZ firstpipe_dir_2d = (firstpipe_end_pnt_2d - firstpipe_start_pnt_2d);
-
-                var firstpipe_curve_2d_Unbound = Line.CreateUnbound(firstpipe_start_pnt_2d, firstpipe_dir_2d);
-
-                List<Element> allComponentConnectFirstPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, FirstPipe.Id, true);
-
-                XYZ ints_pnt_firstPipe_mainPipe_2d = null;
-
-                int isLeft_1 = -1;
-                int isLeft_2 = -1;
-
-                // Second Pipe
-
-                Curve secondpipe_curve_reality = null;
-
-                XYZ secondpipe_start_pnt = null;
-                XYZ secondpipe_end_pnt = null;
-
-                XYZ secondpipe_start_pnt_2d = null;
-                XYZ secondpipe_end_pnt_2d = null;
-                XYZ secondpipe_dir_2d = null;
-
-                Curve secondpipe_curve_2d_Unbound = null;
-
-                // Check intersect main pipe with first pipe
-                IntersectionResultArray intRetArr = new IntersectionResultArray();
-                SetComparisonResult setCompResult = mainPipe_curve_2d_Unbound.Intersect(firstpipe_curve_2d_Unbound, out intRetArr);
-                if (setCompResult != SetComparisonResult.Overlap)
-                    return false;
-
-                ints_pnt_firstPipe_mainPipe_2d = intRetArr.get_Item(0).XYZPoint;
-                var after_firstpipe_curve_rotate = Line.CreateBound(ints_pnt_firstPipe_mainPipe_2d, ints_pnt_firstPipe_mainPipe_2d + mainPipe_dir_2d_rotate * 100);
-
-                var after_firstpipe_curve_case1 = Line.CreateBound(ints_pnt_firstPipe_mainPipe_2d, firstpipe_start_pnt_2d + (firstpipe_start_pnt_2d - firstpipe_end_pnt_2d).Normalize() * 10);
-                var after_firstpipe_curve_case2 = Line.CreateBound(ints_pnt_firstPipe_mainPipe_2d, firstpipe_end_pnt_2d - (firstpipe_start_pnt_2d - firstpipe_end_pnt_2d).Normalize() * 10);
-
-                double rotate_angle_firstPipe_1 = after_firstpipe_curve_rotate.Direction.AngleTo((after_firstpipe_curve_case1 as Line).Direction);
-                double rotate_angle_firstPipe_2 = after_firstpipe_curve_rotate.Direction.AngleTo((after_firstpipe_curve_case2 as Line).Direction);
-
-                isLeft_1 = IsLeftMath(mainPipe_start_pnt_2d, mainPipe_end_pnt_2d, firstpipe_start_pnt_2d + (firstpipe_start_pnt_2d - firstpipe_end_pnt_2d).Normalize() * 10);
-                isLeft_2 = IsLeftMath(mainPipe_start_pnt_2d, mainPipe_end_pnt_2d, firstpipe_end_pnt_2d - (firstpipe_start_pnt_2d - firstpipe_end_pnt_2d).Normalize() * 10);
-
-                try
-                {
-                    bool flag = false;
-                    using (SubTransaction reSubTrans = new SubTransaction(Global.UIDoc.Document))
-                    {
-                        reSubTrans.Start();
-                        ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectFirstPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1);
-                        Global.UIDoc.Document.Regenerate();
-                        var curve_sub_Temp = FirstPipe.GetCurve();
-                        var curve_sub_2d_Temp = Line.CreateUnbound(Common.ToPoint2D(curve_sub_Temp.GetEndPoint(0)), Common.ToPoint2D(curve_sub_Temp.GetEndPoint(1)) - Common.ToPoint2D(curve_sub_Temp.GetEndPoint(0)));
-                        double angle = (curve_sub_2d_Temp as Line).Direction.AngleTo(mainPipe_dir_2d);
-                        if (Math.Abs((angle / (Math.PI) - 0.5)) <= 0.000000001)
-                        {
-                            firstpipe_curve_reality = FirstPipe.GetCurve();
-
-                            firstpipe_start_pnt = firstpipe_curve_reality.GetEndPoint(0);
-                            firstpipe_end_pnt = firstpipe_curve_reality.GetEndPoint(1);
-                            firstpipe_start_pnt_2d = Common.ToPoint2D(firstpipe_curve_reality.GetEndPoint(0));
-                            firstpipe_end_pnt_2d = Common.ToPoint2D(firstpipe_curve_reality.GetEndPoint(1));
-
-                            if (isLeft_1 == IsLeftMath(mainPipe_start_pnt_2d, mainPipe_end_pnt_2d, firstpipe_start_pnt_2d + (firstpipe_start_pnt_2d - firstpipe_end_pnt_2d).Normalize() * 10))
-                            {
-                                if (SecondPipe != null)
-                                {
-                                    List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
-                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1);
-                                    Global.UIDoc.Document.Regenerate();
-                                }
-                            }
-                            else
-                            {
-                                ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectFirstPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), -Math.PI);
-                                Global.UIDoc.Document.Regenerate();
-                                if (SecondPipe != null)
-                                {
-                                    List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
-                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_1 - Math.PI);
-                                    Global.UIDoc.Document.Regenerate();
-                                }
-                            }
-
-                            reSubTrans.Commit();
-                        }
-                        else
-                        {
-                            flag = true;
-                            reSubTrans.RollBack();
-                        }
-                    }
-
-                    if (flag == true)
-                    {
-                        using (SubTransaction reSubTrans = new SubTransaction(Global.UIDoc.Document))
-                        {
-                            reSubTrans.Start();
-                            ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectFirstPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_2);
-                            var curve_sub_Temp = FirstPipe.GetCurve();
-                            var curve_sub_2d_Temp = Line.CreateUnbound(Common.ToPoint2D(curve_sub_Temp.GetEndPoint(0)), Common.ToPoint2D(curve_sub_Temp.GetEndPoint(1)) - Common.ToPoint2D(curve_sub_Temp.GetEndPoint(0)));
-                            double angle = (curve_sub_2d_Temp as Line).Direction.AngleTo(mainPipe_dir_2d);
-                            firstpipe_curve_reality = FirstPipe.GetCurve();
-
-                            firstpipe_start_pnt = firstpipe_curve_reality.GetEndPoint(0);
-                            firstpipe_end_pnt = firstpipe_curve_reality.GetEndPoint(1);
-                            firstpipe_start_pnt_2d = Common.ToPoint2D(firstpipe_curve_reality.GetEndPoint(0));
-                            firstpipe_end_pnt_2d = Common.ToPoint2D(firstpipe_curve_reality.GetEndPoint(1));
-
-                            if (isLeft_1 == IsLeftMath(mainPipe_start_pnt_2d, mainPipe_end_pnt_2d, firstpipe_start_pnt_2d + (firstpipe_start_pnt_2d - firstpipe_end_pnt_2d).Normalize() * 10))
-                            {
-                                if (SecondPipe != null)
-                                {
-                                    List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
-                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_2);
-                                }
-                            }
-                            else
-                            {
-                                ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectFirstPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), -Math.PI);
-                                if (SecondPipe != null)
-                                {
-                                    List<Element> allComponentConnectSecondPipe = AllComponentsOnPipeTruss(Global.UIDoc.Document, SecondPipe.Id, true);
-                                    ElementTransformUtils.RotateElements(Global.UIDoc.Document, allComponentConnectSecondPipe.Select(item => item.Id).ToList(), Line.CreateUnbound(ints_pnt_firstPipe_mainPipe_2d, XYZ.BasisZ), rotate_angle_firstPipe_2 - Math.PI);
-                                }
-                            }
-
-                            reSubTrans.Commit();
-                        }
-                    }
-                }
-                catch (Exception)
-                { }
-
-                return true;
-            }
-            catch (Exception)
-            { }
-            return false;
-        }
-
-        public int IsLeftMath(XYZ Startpoint, XYZ Endpoint, XYZ P)
-        {
-            double Ans = ((Endpoint.X - Startpoint.X) * (P.Y - Startpoint.Y) -
-              (P.X - Startpoint.X) * (Endpoint.Y - Startpoint.Y));
-            if (Math.Abs(Ans) < 1.0e-8)
-            { return 0; } //P is on the line
-            else
-            {
-                if (Ans > 0)
-                { return 1; } //P is left of the line (CW)
-                else
-                { return -1; } //P is right of the line (CCW)
-            }
         }
 
         private bool HandlerBottomTee(bool flag = true)
@@ -730,174 +536,155 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 double diameter_10 = 10 * Common.mmToFT;
 
-                if (m_flagTopElbowConnect == true)
+                // If Diameter vertical pipe = Diameter main pipe
+                if (g(Diameter, FirstPipe.Diameter) && g(Diameter, SecondPipe.Diameter))
                 {
+                    //Connect to sub
                     (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
+                    (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
+
                     //Connect
                     Connector c3 = GetConnectorClosestTo(FirstPipe, m_sub1Ints_pnt);
-                    m_topElbow = CreateElbow(c3, cntBottom_topTee);
-                    if (m_topElbow == null)
+                    Connector c4 = GetConnectorClosestTo(SecondPipe, m_sub2Ints_pnt);
+                    m_topTee = CreatTee(c3, c4, cntBottom_topTee);
+                    if (m_topTee == null)
                     {
                         return false;
                     }
+
                     return true;
                 }
+                // If Diameter vertical pipe < Diameter main pipe
                 else
                 {
-                    // If Diameter vertical pipe = Diameter main pipe
-                    if (g(Diameter, FirstPipe.Diameter) && g(Diameter, SecondPipe.Diameter))
-                    {
-                        //Connect to sub
-                        (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
-                        (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
+                    Connector c3 = null;
+                    // Create primer pipe 1
+                    m_primerPipe_1 = null;
 
-                        //Connect
-                        Connector c3 = GetConnectorClosestTo(FirstPipe, m_sub1Ints_pnt);
-                        Connector c4 = GetConnectorClosestTo(SecondPipe, m_sub2Ints_pnt);
-                        m_topTee = CreatTee(c3, c4, cntBottom_topTee);
-                        if (m_topTee == null)
+                    XYZ tempVector = null;
+
+                    if (g(Diameter, FirstPipe.Diameter) == false)
+                    {
+                        // Create primer pipe 1
+                        m_primerPipe_1 = Common.Clone(VerticalPipe) as Pipe;
+                        Line newLocationCurve = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
+
+                        XYZ p1 = m_sub1_pnt0;
+
+                        if (m_sub1_pnt0.DistanceTo(m_sub1Ints_pnt) < 0.01)
                         {
-                            return false;
+                            p1 = m_sub1_pnt1;
                         }
 
-                        return true;
+                        (m_primerPipe_1.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, p1);
+
+                        c3 = Common.GetConnectorClosestTo(m_primerPipe_1, m_sub1Ints_pnt);
+
+                        tempVector = newLocationCurve.Direction;
                     }
-                    // If Diameter vertical pipe < Diameter main pipe
                     else
                     {
-                        Connector c3 = null;
-                        // Create primer pipe 1
-                        m_primerPipe_1 = null;
+                        // Connect to sub pipe
+                        var line = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
+                        (FirstPipe.Location as LocationCurve).Curve = line;
+                        c3 = Common.GetConnectorClosestTo(FirstPipe, m_sub1Ints_pnt);
 
-                        XYZ tempVector = null;
-
-                        if (g(Diameter, FirstPipe.Diameter) == false)
-                        {
-                            // Create primer pipe 1
-                            m_primerPipe_1 = Common.Clone(VerticalPipe) as Pipe;
-                            Line newLocationCurve = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
-
-                            XYZ p1 = m_sub1_pnt0;
-
-                            if (m_sub1_pnt0.DistanceTo(m_sub1Ints_pnt) < 0.01)
-                            {
-                                p1 = m_sub1_pnt1;
-                            }
-
-                            (m_primerPipe_1.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, p1);
-
-                            c3 = Common.GetConnectorClosestTo(m_primerPipe_1, m_sub1Ints_pnt);
-
-                            tempVector = newLocationCurve.Direction;
-                        }
-                        else
-                        {
-                            // Connect to sub pipe
-                            var line = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
-                            (FirstPipe.Location as LocationCurve).Curve = line;
-                            c3 = Common.GetConnectorClosestTo(FirstPipe, m_sub1Ints_pnt);
-
-                            tempVector = line.Direction;
-                        }
-
-                        if (m_flagTopElbowConnect == true)
-                        {
-                        }
-
-                        Connector c4 = null;
-                        // Create primer pipe 2
-                        m_primerPipe_2 = null;
-
-                        if (g(Diameter, SecondPipe.Diameter) == false)
-                        {
-                            // Create primer pipe 1
-                            m_primerPipe_2 = Common.Clone(VerticalPipe) as Pipe;
-                            Line newLocationCurve = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
-
-                            XYZ p1 = m_sub2_pnt0;
-
-                            if (m_sub2_pnt0.DistanceTo(m_sub2Ints_pnt) < 0.01)
-                            {
-                                p1 = m_sub2_pnt1;
-                            }
-
-                            (m_primerPipe_2.Location as LocationCurve).Curve = Line.CreateBound(m_sub2Ints_pnt, p1);
-
-                            c4 = Common.GetConnectorClosestTo(m_primerPipe_2, m_sub2Ints_pnt);
-                        }
-                        else
-                        {
-                            // Connect to sub pipe
-                            var line = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
-                            (SecondPipe.Location as LocationCurve).Curve = line;
-                            c4 = Common.GetConnectorClosestTo(FirstPipe, m_sub1Ints_pnt);
-
-                            tempVector = line.Direction;
-                        }
-
-                        // Create top tee
-                        m_topTee = CreatTee(c3, c4, cntBottom_topTee);
-
-                        if (m_topTee == null)
-                        {
-                            return false;
-                        }
-
-                        Connector cntTopTee_main1 = null;
-                        Connector cntTopTee_main2 = null;
-                        Connector cntTopTee_bottom = null;
-                        Common.GetInfo(m_topTee, tempVector, out cntTopTee_main1, out cntTopTee_main2, out cntTopTee_bottom);
-
-                        Pipe checkPrimerTemp1 = GetPipeConnect(cntTopTee_main1.AllRefs);
-                        Pipe checkPrimerTemp2 = GetPipeConnect(cntTopTee_main2.AllRefs);
-
-                        XYZ main1_p = cntTopTee_main1.Origin;
-                        XYZ v_m_1 = cntTopTee_main1.CoordinateSystem.BasisZ;
-
-                        var main2_p = cntTopTee_main2.Origin;
-                        var v_m_2 = cntTopTee_main2.CoordinateSystem.BasisZ;
-
-                        // Pipe 1
-                        HandlerConnectTopReducer(FirstPipe,
-                                                 m_primerPipe_1,
-                                                 checkPrimerTemp1,
-                                                 checkPrimerTemp2,
-                                                 main1_p,
-                                                 v_m_1,
-                                                 main2_p,
-                                                 v_m_2,
-                                                 diameter_10,
-                                                 m_sub1Ints_pnt,
-                                                 m_sub1_pnt0,
-                                                 m_sub1_pnt1,
-                                                 m_topTee,
-                                                 out m_topReducer1);
-
-                        // Pipe 2
-                        HandlerConnectTopReducer(SecondPipe,
-                                                 m_primerPipe_2,
-                                                 checkPrimerTemp1,
-                                                 checkPrimerTemp2,
-                                                 main1_p,
-                                                 v_m_1,
-                                                 main2_p,
-                                                 v_m_2,
-                                                 diameter_10,
-                                                 m_sub2Ints_pnt,
-                                                 m_sub2_pnt0,
-                                                 m_sub2_pnt1,
-                                                 m_topTee,
-                                                 out m_topReducer2);
-
-                        if (FlagAddNipple == true && NippleFamily != null)
-                        {
-                            // Nipple Family
-                            HandlerConnectAccessoryNipple(FlagAddNipple, m_primerPipe_1, m_topReducer1, m_topTee);
-                            HandlerConnectAccessoryNipple(FlagAddNipple, m_primerPipe_2, m_topReducer2, m_topTee);
-                        }
-
-                        return true;
+                        tempVector = line.Direction;
                     }
+
+                    Connector c4 = null;
+                    // Create primer pipe 2
+                    m_primerPipe_2 = null;
+
+                    if (g(Diameter, SecondPipe.Diameter) == false)
+                    {
+                        // Create primer pipe 1
+                        m_primerPipe_2 = Common.Clone(VerticalPipe) as Pipe;
+                        Line newLocationCurve = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
+
+                        XYZ p1 = m_sub2_pnt0;
+
+                        if (m_sub2_pnt0.DistanceTo(m_sub2Ints_pnt) < 0.01)
+                        {
+                            p1 = m_sub2_pnt1;
+                        }
+
+                        (m_primerPipe_2.Location as LocationCurve).Curve = Line.CreateBound(m_sub2Ints_pnt, p1);
+
+                        c4 = Common.GetConnectorClosestTo(m_primerPipe_2, m_sub2Ints_pnt);
+                    }
+                    else
+                    {
+                        // Connect to sub pipe
+                        var line = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
+                        (SecondPipe.Location as LocationCurve).Curve = line;
+                        c4 = Common.GetConnectorClosestTo(FirstPipe, m_sub1Ints_pnt);
+
+                        tempVector = line.Direction;
+                    }
+
+                    // Create top tee
+                    m_topTee = CreatTee(c3, c4, cntBottom_topTee);
+
+                    if (m_topTee == null)
+                    {
+                        return false;
+                    }
+
+                    Connector cntTopTee_main1 = null;
+                    Connector cntTopTee_main2 = null;
+                    Connector cntTopTee_bottom = null;
+                    Common.GetInfo(m_topTee, tempVector, out cntTopTee_main1, out cntTopTee_main2, out cntTopTee_bottom);
+
+                    Pipe checkPrimerTemp1 = GetPipeConnect(cntTopTee_main1.AllRefs);
+                    Pipe checkPrimerTemp2 = GetPipeConnect(cntTopTee_main2.AllRefs);
+
+                    XYZ main1_p = cntTopTee_main1.Origin;
+                    XYZ v_m_1 = cntTopTee_main1.CoordinateSystem.BasisZ;
+
+                    var main2_p = cntTopTee_main2.Origin;
+                    var v_m_2 = cntTopTee_main2.CoordinateSystem.BasisZ;
+
+                    // Pipe 1
+                    HandlerConnectTopReducer(FirstPipe,
+                                             m_primerPipe_1,
+                                             checkPrimerTemp1,
+                                             checkPrimerTemp2,
+                                             main1_p,
+                                             v_m_1,
+                                             main2_p,
+                                             v_m_2,
+                                             diameter_10,
+                                             m_sub1Ints_pnt,
+                                             m_sub1_pnt0,
+                                             m_sub1_pnt1,
+                                             m_topTee,
+                                             out m_topReducer1);
+
+                    // Pipe 2
+                    HandlerConnectTopReducer(SecondPipe,
+                                             m_primerPipe_2,
+                                             checkPrimerTemp1,
+                                             checkPrimerTemp2,
+                                             main1_p,
+                                             v_m_1,
+                                             main2_p,
+                                             v_m_2,
+                                             diameter_10,
+                                             m_sub2Ints_pnt,
+                                             m_sub2_pnt0,
+                                             m_sub2_pnt1,
+                                             m_topTee,
+                                             out m_topReducer2);
+
+                    if (FlagAddNipple == true && NippleFamily != null)
+                    {
+                        // Nipple Family
+                        HandlerConnectAccessoryNipple(FlagAddNipple, m_primerPipe_1, m_topReducer1, m_topTee);
+                        HandlerConnectAccessoryNipple(FlagAddNipple, m_primerPipe_2, m_topReducer2, m_topTee);
+                    }
+
+                    return true;
                 }
             }
             catch (Exception)
@@ -1000,71 +787,6 @@ namespace TotalMEPProject.Commands.FireFighting
                 sub_pnt0 = curve_sub.GetEndPoint(0);
                 sub_pnt1 = curve_sub.GetEndPoint(1);
             }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Handler Divide
-        /// </summary>
-        /// <param name="mainPipe"></param>
-        /// <param name="subPipe"></param>
-        /// <param name="flagTwoPipe"></param>
-        /// <param name="intsMain_pnt"></param>
-        /// <param name="sub_pnt0"></param>
-        /// <param name="sub_pnt1"></param>
-        /// <param name="subInts_pnt"></param>
-        /// <returns></returns>
-        private bool HandlerDivideOnlyPipe(Pipe mainPipe, Pipe subPipe, out XYZ intsMain_pnt, out XYZ sub_pnt0, out XYZ sub_pnt1, out XYZ subInts_pnt)
-        {
-            Global.UIDoc.Document.Regenerate();
-            intsMain_pnt = null;
-            sub_pnt0 = null;
-            sub_pnt1 = null;
-            subInts_pnt = null;
-
-            var curve_main = mainPipe.GetCurve();
-            var curve_main_2d = Line.CreateBound(Common.ToPoint2D(curve_main.GetEndPoint(0)), Common.ToPoint2D(curve_main.GetEndPoint(1)));
-
-            var curve_sub = subPipe.GetCurve();
-
-            Curve curve2d = null;
-            Curve curve3d = null;
-
-            curve2d = Line.CreateBound(Common.ToPoint2D(curve_sub.GetEndPoint(0)), Common.ToPoint2D(curve_sub.GetEndPoint(1)));
-            curve3d = curve_sub;
-
-            //Check intersection
-            IntersectionResultArray arr = new IntersectionResultArray();
-            var result = curve_main_2d.Intersect(curve2d, out arr);
-
-            if (result != SetComparisonResult.Overlap)
-                return false;
-
-            var pInter_2d = arr.get_Item(0).XYZPoint;
-
-            //Find 3d
-            double temp = 200;
-
-            var lineZ = Line.CreateBound(new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z - temp), new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z + temp));
-
-            arr = new IntersectionResultArray();
-            result = lineZ.Intersect(curve_main, out arr);
-            if (result != SetComparisonResult.Overlap)
-                return false;
-
-            intsMain_pnt = arr.get_Item(0).XYZPoint;
-
-            //Find 3d on two sub pipe
-            arr = new IntersectionResultArray();
-            result = lineZ.Intersect(curve3d, out arr);
-            if (result != SetComparisonResult.Overlap)
-                return false;
-
-            subInts_pnt = arr.get_Item(0).XYZPoint;
-
-            sub_pnt0 = curve_sub.GetEndPoint(0);
-            sub_pnt1 = curve_sub.GetEndPoint(1);
 
             return true;
         }
@@ -2461,6 +2183,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 if (MainPipes == null || MainPipes.Count == 0)
                     return false;
 
+                bool flag = false;
                 foreach (ElementId eId in m_mainPipes)
                 {
                     Pipe pipeLoop = Global.UIDoc.Document.GetElement(eId) as Pipe;
@@ -2478,6 +2201,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         {
                             (FirstPipe.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveFirstPipe;
                             m_flagTopElbowConnect = true;
+                            flag = true;
                             MainPipe = pipeLoop;
                             break;
                         }
@@ -2495,54 +2219,45 @@ namespace TotalMEPProject.Commands.FireFighting
                 // Rotate sub pipe by main pipe
                 //HandleBranchPipePerpendiculerMainPipe();
 
-                if (m_flagTopElbowConnect == false)
+                if (HandlerDivide(MainPipe, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
                 {
-                    if (HandlerDivide(MainPipe, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
+                    if (flag == false)
                     {
-                        // If only 1 pipe
-                        if (m_twoPipes == false)
-                            (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
-                        else
+                        if (SecondPipe == null)
                         {
-                            if (SecondPipe == null)
-                            {
-                                (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
-                                SecondPipe = Common.Clone(FirstPipe) as Pipe;
-                                (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
+                            (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
+                            SecondPipe = Common.Clone(FirstPipe) as Pipe;
+                            (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
 
-                                // Set point value again
-                                m_sub1_pnt1 = m_sub1Ints_pnt;
+                            // Set point value again
+                            m_sub1_pnt1 = m_sub1Ints_pnt;
+                        }
+
+                        if (SecondPipe != null)
+                        {
+                            if (HandlerDivide(MainPipe, SecondPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
+                            {
+                                return false;
                             }
 
-                            if (SecondPipe != null)
+                            if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
                             {
-                                if (HandlerDivide(MainPipe, SecondPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
-                                {
-                                    return false;
-                                }
+                                return false;
+                            }
 
-                                if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
-                                {
-                                    return false;
-                                }
-
-                                if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
-                                {
-                                    return false;
-                                }
+                            if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
+                            {
+                                return false;
                             }
                         }
                     }
-                }
-                else
-                {
-                    return HandlerDivideOnlyPipe(MainPipe, FirstPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt);
                 }
 
                 return true;
             }
             catch (Exception)
             { }
+
             return false;
         }
 
@@ -2923,17 +2638,27 @@ namespace TotalMEPProject.Commands.FireFighting
             var c3 = GetConnectorClosestTo(pipeTempMain1, splitPoint);
             var c4 = GetConnectorClosestTo(main2, splitPoint);
             var c5 = GetConnectorClosestTo(pipeCurrent, splitPoint);
+            FamilyInstance retVal = null;
 
-            try
+            using (SubTransaction reSubTrans = new SubTransaction(Global.UIDoc.Document))
             {
-                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+                try
+                {
+                    reSubTrans.Start();
 
-                return fitting;
+                    var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+                    retVal = fitting;
+
+                    reSubTrans.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    reSubTrans.RollBack();
+                }
             }
-            catch (System.Exception ex)
-            {
-                return null;
-            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -3407,6 +3132,707 @@ namespace TotalMEPProject.Commands.FireFighting
             }
 
             return components;
+        }
+
+        #endregion Method
+    }
+
+    public class SourcePipesDataElevationDifferenceElbowConnect
+    {
+        #region Variable
+
+        private Pipe m_firstPipe = null;
+        private Pipe m_secondPipe = null;
+        private Pipe m_mainPipe = null;
+        private PipeType m_pipeTypeProcess = null;
+        private double m_diameter = double.MinValue;
+        private bool m_addNipple = false;
+        private FamilySymbol m_nippleFamily = null;
+        private bool m_addElbowConnection = false;
+        private List<ElementId> m_mainPipes = new List<ElementId>();
+        private Pipe m_verticalPipe = null;
+
+        private XYZ m_intsMain1_pnt = null;
+        private XYZ m_sub1_pnt0 = null;
+        private XYZ m_sub1_pnt1 = null;
+        private XYZ m_sub1Ints_pnt = null;
+
+        private XYZ m_intsMain2_pnt = null;
+        private XYZ m_sub2_pnt0 = null;
+        private XYZ m_sub2_pnt1 = null;
+        private XYZ m_sub2Ints_pnt = null;
+
+        private FamilyInstance m_bottomTee = null;
+        private FamilyInstance m_bottomElbow = null;
+
+        private FamilyInstance m_topTee = null;
+
+        private FamilyInstance m_topReducer1 = null;
+        private FamilyInstance m_topReducer2 = null;
+
+        private FamilyInstance m_topElbow = null;
+
+        private bool m_twoPipes = false;
+
+        #endregion Variable
+
+        #region Properties
+
+        public Pipe FirstPipe { get => m_firstPipe; set => m_firstPipe = value; }
+        public Pipe SecondPipe { get => m_secondPipe; set => m_secondPipe = value; }
+        public Pipe MainPipe { get => m_mainPipe; set => m_mainPipe = value; }
+        public PipeType PipeTypeProcess { get => m_pipeTypeProcess; set => m_pipeTypeProcess = value; }
+        public List<ElementId> MainPipes { get => m_mainPipes; set => m_mainPipes = value; }
+        public double Diameter { get => m_diameter; set => m_diameter = value; }
+
+        public Pipe VerticalPipe { get => m_verticalPipe; set => m_verticalPipe = value; }
+
+        #endregion Properties
+
+        #region Constructor
+
+        public SourcePipesDataElevationDifferenceElbowConnect(List<ElementId> mainPipes, Pipe firstPipe, Pipe secondPipe, PipeType pipeType)
+        {
+            if (mainPipes != null)
+                MainPipes = mainPipes;
+
+            FirstPipe = firstPipe;
+            SecondPipe = secondPipe;
+            PipeTypeProcess = pipeType;
+            Diameter = 0;
+            if (SecondPipe != null)
+                m_twoPipes = true;
+
+            Initialize();
+        }
+
+        #endregion Constructor
+
+        #region Method
+
+        private void Initialize()
+        {
+            using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "STEP"))
+            {
+                try
+                {
+                    reTrans.Start();
+
+                    if (BeforeProcess() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandleVerticalPipe() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandlerBottom() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    if (HandlerTop() == false)
+                    {
+                        reTrans.RollBack();
+                        return;
+                    }
+
+                    reTrans.Commit();
+                }
+                catch (Exception)
+                {
+                    reTrans.RollBack();
+                }
+            }
+        }
+
+        private bool BeforeProcess()
+        {
+            try
+            {
+                // Check has two pipe valid
+                bool flagTwoPipe = SecondPipe != null ? true : false;
+
+                // Get main pipe
+                MainPipe = null;
+                if (MainPipes == null || MainPipes.Count == 0)
+                    return false;
+
+                bool flag = false;
+                foreach (ElementId eId in m_mainPipes)
+                {
+                    Pipe pipeLoop = Global.UIDoc.Document.GetElement(eId) as Pipe;
+                    if (pipeLoop == null)
+                        continue;
+
+                    SourceRotatePipe sourceRotatePipe = new SourceRotatePipe(pipeLoop, FirstPipe, SecondPipe);
+                    if (sourceRotatePipe.IsValid)
+                    {
+                        if (sourceRotatePipe.FlagExtendPipe)
+                        {
+                            (pipeLoop.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveMainPipe;
+                        }
+                        if (sourceRotatePipe.FlagCreateElbow)
+                        {
+                            (FirstPipe.Location as LocationCurve).Curve = sourceRotatePipe.NewCurveFirstPipe;
+                            flag = true;
+                            MainPipe = pipeLoop;
+                            break;
+                        }
+                        else
+                        {
+                            if (HandlerDivide(pipeLoop, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
+                            {
+                                MainPipe = pipeLoop;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (HandlerDivide(MainPipe, FirstPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
+                {
+                    if (flag == false)
+                    {
+                        if (SecondPipe == null)
+                        {
+                            (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
+                            SecondPipe = Common.Clone(FirstPipe) as Pipe;
+                            (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
+
+                            // Set point value again
+                            m_sub1_pnt1 = m_sub1Ints_pnt;
+                        }
+
+                        if (SecondPipe != null)
+                        {
+                            if (HandlerDivide(MainPipe, SecondPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
+                            {
+                                return false;
+                            }
+
+                            if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
+                            {
+                                return false;
+                            }
+
+                            if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool HandleVerticalPipe()
+        {
+            try
+            {
+                Diameter = (double)GetParameterValueByName(FirstPipe, "Diameter");
+                VerticalPipe = Common.Clone(FirstPipe) as Pipe;
+                VerticalPipe.PipeType = PipeTypeProcess;
+                VerticalPipe.LookupParameter("Diameter").Set(Diameter);
+                (VerticalPipe.Location as LocationCurve).Curve = Line.CreateBound(m_intsMain1_pnt, m_sub1Ints_pnt);
+
+                return true;
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool HandlerBottom()
+        {
+            try
+            {
+                if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tee)
+                {
+                    if (MainPipe as Pipe != null && VerticalPipe as Pipe != null && m_intsMain1_pnt != null)
+                    {
+                        Pipe main2 = null;
+
+                        m_bottomTee = CreateTeeFitting(MainPipe as Pipe, VerticalPipe as Pipe, m_intsMain1_pnt, out main2);
+                        if (main2 != null && m_bottomTee != null)
+                        {
+                            MainPipes.Add(main2.Id);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+                else
+                {
+                    return se(MainPipe, VerticalPipe);
+                }
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool HandlerTop()
+        {
+            try
+            {
+                // Process with sub pipes
+
+                Connector cntBottom_topTee = GetConnectorClosestTo(VerticalPipe, m_sub1Ints_pnt);
+                double diameter_10 = 10 * Common.mmToFT;
+
+                // If Diameter vertical pipe = Diameter main pipe
+                if (g(Diameter, FirstPipe.Diameter))
+                {
+                }
+                // If Diameter vertical pipe < Diameter main pipe
+                else
+                {
+                    if (FirstPipe != null)
+                    {
+                        var firstLine = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
+                        (FirstPipe.Location as LocationCurve).Curve = firstLine;
+                    }
+                }
+                Pipe processPipe1 = null;
+                Pipe processPipe2 = null;
+
+                if (FirstPipe != null && SecondPipe != null)
+                {
+                    bool flag = CheckFirstPipeValid(FirstPipe, SecondPipe);
+                    if (flag == false)
+                    {
+                        processPipe1 = SecondPipe;
+                        processPipe2 = FirstPipe;
+                    }
+                    else
+                    {
+                        processPipe1 = FirstPipe;
+                        processPipe2 = SecondPipe;
+                    }
+                }
+                else
+                    processPipe1 = FirstPipe;
+
+                Connector c3 = GetConnectorClosestTo(processPipe1, m_sub1Ints_pnt);
+                m_topElbow = CreateElbow(c3, cntBottom_topTee);
+                if (m_topElbow == null)
+                {
+                    return false;
+                }
+
+                if (processPipe2 != null && m_twoPipes == false)
+                {
+                    Global.UIDoc.Document.Delete(processPipe2.Id);
+                }
+                return true;
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool CheckFirstPipeValid(Pipe pipe1, Pipe pipe2)
+        {
+            try
+            {
+                var cntOfPipe1s = GetConnectorsConnected(pipe1.ConnectorManager.Connectors);
+                var cntOfPipe2s = GetConnectorsConnected(pipe2.ConnectorManager.Connectors);
+
+                if (cntOfPipe1s.Count > 0 && cntOfPipe2s.Count <= 0)
+                    return true;
+
+                if (cntOfPipe1s.Count <= 0 && cntOfPipe2s.Count > 0)
+                    return false;
+
+                if ((cntOfPipe1s.Count <= 0 && cntOfPipe2s.Count <= 0) || (cntOfPipe1s.Count > 0 && cntOfPipe2s.Count > 0))
+                {
+                    Line firstLine = pipe1.GetCurve() as Line;
+                    Line secondLine = pipe2.GetCurve() as Line;
+
+                    if (firstLine.Length >= secondLine.Length)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            catch (Exception)
+            { }
+            return true;
+        }
+
+        private List<Connector> GetConnectorsConnected(ConnectorSet connectorSet)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End)
+                        continue;
+                    if (connector.IsConnected == true)
+                        retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        /// <summary>
+        /// Handler Divide
+        /// </summary>
+        /// <param name="mainPipe"></param>
+        /// <param name="subPipe"></param>
+        /// <param name="flagTwoPipe"></param>
+        /// <param name="intsMain_pnt"></param>
+        /// <param name="sub_pnt0"></param>
+        /// <param name="sub_pnt1"></param>
+        /// <param name="subInts_pnt"></param>
+        /// <returns></returns>
+        private bool HandlerDivide(Pipe mainPipe, Pipe subPipe, bool flagTwoPipe, out XYZ intsMain_pnt, out XYZ sub_pnt0, out XYZ sub_pnt1, out XYZ subInts_pnt)
+        {
+            Global.UIDoc.Document.Regenerate();
+            intsMain_pnt = null;
+            sub_pnt0 = null;
+            sub_pnt1 = null;
+            subInts_pnt = null;
+
+            var curve_main = mainPipe.GetCurve();
+            var curve_main_2d = Line.CreateBound(Common.ToPoint2D(curve_main.GetEndPoint(0)), Common.ToPoint2D(curve_main.GetEndPoint(1)));
+
+            var curve_sub = subPipe.GetCurve();
+
+            Curve curve2d = null;
+            Curve curve3d = null;
+
+            if (flagTwoPipe)
+            {
+                //Expand
+                double t = 10;
+                var p0_ex1 = curve_sub.Evaluate(curve_sub.GetEndParameter(0) - t, false);
+                var p1_ex2 = curve_sub.Evaluate(curve_sub.GetEndParameter(1) + t, false);
+                curve3d = Line.CreateBound(p0_ex1, p1_ex2);
+
+                var expand_2d = Line.CreateBound(Common.ToPoint2D(p0_ex1), Common.ToPoint2D(p1_ex2));
+
+                curve2d = expand_2d;
+            }
+            else
+            {
+                curve2d = Line.CreateBound(Common.ToPoint2D(curve_sub.GetEndPoint(0)), Common.ToPoint2D(curve_sub.GetEndPoint(1)));
+                curve3d = curve_sub;
+            }
+
+            //Check intersection
+            IntersectionResultArray arr = new IntersectionResultArray();
+            var result = curve_main_2d.Intersect(curve2d, out arr);
+
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            var pInter_2d = arr.get_Item(0).XYZPoint;
+
+            //Find 3d
+            double temp = 200;
+
+            var lineZ = Line.CreateBound(new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z - temp), new XYZ(pInter_2d.X, pInter_2d.Y, pInter_2d.Z + temp));
+
+            arr = new IntersectionResultArray();
+            result = lineZ.Intersect(curve_main, out arr);
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            intsMain_pnt = arr.get_Item(0).XYZPoint;
+
+            //Find 3d on two sub pipe
+            arr = new IntersectionResultArray();
+            result = lineZ.Intersect(curve3d, out arr);
+            if (result != SetComparisonResult.Overlap)
+                return false;
+
+            subInts_pnt = arr.get_Item(0).XYZPoint;
+
+            if (flagTwoPipe)
+            {
+                //Get father point
+                int index = subInts_pnt.DistanceTo(curve_sub.GetEndPoint(0)) > subInts_pnt.DistanceTo(curve_sub.GetEndPoint(1)) ? 0 : 1;
+
+                if (index == 0)
+                {
+                    sub_pnt0 = curve_sub.GetEndPoint(index);
+                    sub_pnt1 = subInts_pnt;
+                }
+                else
+                {
+                    sub_pnt0 = subInts_pnt;
+                    sub_pnt1 = curve_sub.GetEndPoint(index);
+                }
+            }
+            else
+            {
+                sub_pnt0 = curve_sub.GetEndPoint(0);
+                sub_pnt1 = curve_sub.GetEndPoint(1);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Get Preferred Junction Type
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <returns></returns>
+        private PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
+        {
+            var pipeType = pipe.PipeType as PipeType;
+
+            return pipeType.RoutingPreferenceManager.PreferredJunctionType;
+        }
+
+        /// <summary>
+        /// Create Tee Fitting
+        /// </summary>
+        /// <param name="pipeMain"></param>
+        /// <param name="pipeCurrent"></param>
+        /// <param name="splitPoint"></param>
+        /// <param name="main2"></param>
+        /// <returns></returns>
+        private FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)
+        {
+            var curve = (pipeMain.Location as LocationCurve).Curve;
+
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            var pipeTempMain1 = pipeMain;
+
+            var line1 = Line.CreateBound(p0, splitPoint);
+            (pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+            var newPlace = new XYZ(0, 0, 0);
+            var elemIds = ElementTransformUtils.CopyElement(
+               Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+            main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+            var line2 = Line.CreateBound(splitPoint, p1);
+            (main2.Location as LocationCurve).Curve = line2;
+
+            //Connect
+            var c3 = GetConnectorClosestTo(pipeTempMain1, splitPoint);
+            var c4 = GetConnectorClosestTo(main2, splitPoint);
+            var c5 = GetConnectorClosestTo(pipeCurrent, splitPoint);
+
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private Connector GetConnectorClosestTo(Element e,
+                                                      XYZ p)
+        {
+            ConnectorManager cm = GetConnectorManager(e);
+
+            return null == cm
+              ? null
+              : GetConnectorClosestTo(cm.Connectors, p);
+        }
+
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="connectors"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private Connector GetConnectorClosestTo(ConnectorSet connectors,
+                                                       XYZ p)
+        {
+            Connector targetConnector = null;
+            double minDist = double.MaxValue;
+
+            foreach (Connector c in connectors)
+            {
+                double d = c.Origin.DistanceTo(p);
+
+                if (d < minDist)
+                {
+                    targetConnector = c;
+                    minDist = d;
+                }
+            }
+            return targetConnector;
+        }
+
+        /// <summary>
+        /// GetConnectorManager
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private ConnectorManager GetConnectorManager(Element e)
+        {
+            MEPCurve mc = e as MEPCurve;
+            FamilyInstance fi = e as FamilyInstance;
+
+            if (null == mc && null == fi)
+            {
+                throw new ArgumentException(
+                  "Element is neither an MEP curve nor a fitting.");
+            }
+
+            return null == mc
+              ? fi.MEPModel.ConnectorManager
+              : mc.ConnectorManager;
+        }
+
+        /// <summary>
+        /// s e
+        /// </summary>
+        /// <param name="mepCurveSplit1"></param>
+        /// <param name="mepCurveSplit2"></param>
+        /// <returns></returns>
+        public bool se(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
+        {
+            try
+            {
+                var locationCurve1 = mepCurveSplit1.GetCurve();
+                var line1 = locationCurve1 as Line;
+
+                var locationCurve2 = mepCurveSplit2.GetCurve();
+                var line2 = locationCurve2 as Line;
+
+                var p10 = line2.GetEndPoint(0);
+                var p11 = line2.GetEndPoint(1);
+
+                var inter1 = locationCurve1.Project(p10);
+                var inter2 = locationCurve1.Project(p11);
+
+                if (inter1 == null || inter2 == null)
+                    return false;
+
+                var d1 = inter1.XYZPoint.DistanceTo(p10);
+                var d2 = inter2.XYZPoint.DistanceTo(p11);
+
+                if (d1 < d2)
+                {
+                    var con = GetConnectorClosestTo(mepCurveSplit2, p10);
+                    var elbow = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+                else
+                {
+                    var con = GetConnectorClosestTo(mepCurveSplit2, p11);
+                    var elbow = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Create Tee
+        /// </summary>
+        /// <param name="c3"></param>
+        /// <param name="c4"></param>
+        /// <param name="c5"></param>
+        /// <returns></returns>
+        public FamilyInstance CreateElbow(Connector c3, Connector c4)
+        {
+            if (c3 == null || c4 == null)
+                return null;
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewElbowFitting(c3, c4);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// g
+        /// </summary>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <returns></returns>
+        private bool g(double d1, double d2)
+        {
+            if (Math.Abs(d1 - d2) < 0.001)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// get parameter value based on its storage type
+        /// </summary>
+        private dynamic GetParameterValue(Parameter parameter)
+        {
+            if (parameter != null && parameter.HasValue)
+            {
+                switch (parameter.StorageType)
+                {
+                    case StorageType.Double:
+                        return parameter.AsDouble();
+
+                    case StorageType.ElementId:
+                        return parameter.AsElementId();
+
+                    case StorageType.Integer:
+                        return parameter.AsInteger();
+
+                    case StorageType.String:
+                        return parameter.AsString();
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get parameter value by name
+        /// </summary>
+        private dynamic GetParameterValueByName(Element elem, string paramName)
+        {
+            if (elem != null)
+            {
+                Parameter parameter = elem.LookupParameter(paramName);
+                return GetParameterValue(parameter);
+            }
+            return null;
         }
 
         #endregion Method
