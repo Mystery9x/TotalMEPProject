@@ -32,6 +32,9 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.label7 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.rBC1ElbowConnect = new System.Windows.Forms.RadioButton();
+            this.rBC1TeeOrTap = new System.Windows.Forms.RadioButton();
             this.ckbNippleCreating = new System.Windows.Forms.CheckBox();
             this.cboC1PipeSize = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -44,22 +47,19 @@
             this.ckbC1ElbowConnection = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.label6 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rBC1ElevationDifference = new System.Windows.Forms.RadioButton();
+            this.rBC1SameElevation = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -75,7 +75,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(427, 309);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(450, 309);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -106,23 +106,24 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(421, 263);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(444, 263);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // tableLayoutPanel5
             // 
             this.tableLayoutPanel5.ColumnCount = 2;
             this.tableLayoutPanel2.SetColumnSpan(this.tableLayoutPanel5, 2);
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 163F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 185F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.Controls.Add(this.label7, 0, 0);
             this.tableLayoutPanel5.Controls.Add(this.panel2, 1, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 40);
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 40);
+            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(415, 31);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(441, 31);
             this.tableLayoutPanel5.TabIndex = 11;
             // 
             // label7
@@ -134,6 +135,39 @@
             this.label7.Size = new System.Drawing.Size(151, 13);
             this.label7.TabIndex = 1;
             this.label7.Text = "Main & Branch Pipe Connection";
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.rBC1ElbowConnect);
+            this.panel2.Controls.Add(this.rBC1TeeOrTap);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(185, 0);
+            this.panel2.Margin = new System.Windows.Forms.Padding(0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(256, 31);
+            this.panel2.TabIndex = 2;
+            // 
+            // rBC1ElbowConnect
+            // 
+            this.rBC1ElbowConnect.AutoSize = true;
+            this.rBC1ElbowConnect.Location = new System.Drawing.Point(128, 3);
+            this.rBC1ElbowConnect.Name = "rBC1ElbowConnect";
+            this.rBC1ElbowConnect.Size = new System.Drawing.Size(54, 17);
+            this.rBC1ElbowConnect.TabIndex = 1;
+            this.rBC1ElbowConnect.TabStop = true;
+            this.rBC1ElbowConnect.Text = "Elbow";
+            this.rBC1ElbowConnect.UseVisualStyleBackColor = true;
+            // 
+            // rBC1TeeOrTap
+            // 
+            this.rBC1TeeOrTap.AutoSize = true;
+            this.rBC1TeeOrTap.Location = new System.Drawing.Point(3, 5);
+            this.rBC1TeeOrTap.Name = "rBC1TeeOrTap";
+            this.rBC1TeeOrTap.Size = new System.Drawing.Size(68, 17);
+            this.rBC1TeeOrTap.TabIndex = 0;
+            this.rBC1TeeOrTap.TabStop = true;
+            this.rBC1TeeOrTap.Text = "Tee/Tap";
+            this.rBC1TeeOrTap.UseVisualStyleBackColor = true;
             // 
             // ckbNippleCreating
             // 
@@ -154,7 +188,7 @@
             this.cboC1PipeSize.Location = new System.Drawing.Point(125, 116);
             this.cboC1PipeSize.Margin = new System.Windows.Forms.Padding(5);
             this.cboC1PipeSize.Name = "cboC1PipeSize";
-            this.cboC1PipeSize.Size = new System.Drawing.Size(291, 21);
+            this.cboC1PipeSize.Size = new System.Drawing.Size(314, 21);
             this.cboC1PipeSize.TabIndex = 6;
             // 
             // label1
@@ -176,7 +210,6 @@
             this.label5.Size = new System.Drawing.Size(69, 13);
             this.label5.TabIndex = 4;
             this.label5.Text = "Nipple Family";
-
             // 
             // label4
             // 
@@ -187,7 +220,6 @@
             this.label4.Size = new System.Drawing.Size(79, 13);
             this.label4.TabIndex = 3;
             this.label4.Text = "Nipple Creating";
-
             // 
             // label3
             // 
@@ -198,7 +230,6 @@
             this.label3.Size = new System.Drawing.Size(93, 13);
             this.label3.TabIndex = 2;
             this.label3.Text = "Elbow Connection";
-
             // 
             // label2
             // 
@@ -209,7 +240,6 @@
             this.label2.Size = new System.Drawing.Size(89, 13);
             this.label2.TabIndex = 1;
             this.label2.Text = "Vertical Pipe Size";
-
             // 
             // cboC1FamilyType
             // 
@@ -219,7 +249,7 @@
             this.cboC1FamilyType.Location = new System.Drawing.Point(125, 79);
             this.cboC1FamilyType.Margin = new System.Windows.Forms.Padding(5);
             this.cboC1FamilyType.Name = "cboC1FamilyType";
-            this.cboC1FamilyType.Size = new System.Drawing.Size(291, 21);
+            this.cboC1FamilyType.Size = new System.Drawing.Size(314, 21);
             this.cboC1FamilyType.TabIndex = 5;
             this.cboC1FamilyType.SelectedIndexChanged += new System.EventHandler(this.cboC1FamilyType_SelectedIndexChanged);
             // 
@@ -231,9 +261,8 @@
             this.cboC1NippleFamily.Location = new System.Drawing.Point(125, 227);
             this.cboC1NippleFamily.Margin = new System.Windows.Forms.Padding(5);
             this.cboC1NippleFamily.Name = "cboC1NippleFamily";
-            this.cboC1NippleFamily.Size = new System.Drawing.Size(291, 21);
+            this.cboC1NippleFamily.Size = new System.Drawing.Size(314, 21);
             this.cboC1NippleFamily.TabIndex = 7;
-
             // 
             // ckbC1ElbowConnection
             // 
@@ -250,18 +279,18 @@
             // 
             this.tableLayoutPanel4.ColumnCount = 2;
             this.tableLayoutPanel2.SetColumnSpan(this.tableLayoutPanel4, 2);
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 163F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 185F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel4.Controls.Add(this.label6, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.panel1, 1, 0);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(0, 3);
+            this.tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(415, 31);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(441, 31);
             this.tableLayoutPanel4.TabIndex = 10;
-
             // 
             // label6
             // 
@@ -272,6 +301,39 @@
             this.label6.Size = new System.Drawing.Size(141, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "Main & Branch Pipe Elevation";
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.rBC1ElevationDifference);
+            this.panel1.Controls.Add(this.rBC1SameElevation);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(185, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(256, 31);
+            this.panel1.TabIndex = 1;
+            // 
+            // rBC1ElevationDifference
+            // 
+            this.rBC1ElevationDifference.AutoSize = true;
+            this.rBC1ElevationDifference.Location = new System.Drawing.Point(128, 5);
+            this.rBC1ElevationDifference.Name = "rBC1ElevationDifference";
+            this.rBC1ElevationDifference.Size = new System.Drawing.Size(121, 17);
+            this.rBC1ElevationDifference.TabIndex = 1;
+            this.rBC1ElevationDifference.TabStop = true;
+            this.rBC1ElevationDifference.Text = "Elevation Difference";
+            this.rBC1ElevationDifference.UseVisualStyleBackColor = true;
+            // 
+            // rBC1SameElevation
+            // 
+            this.rBC1SameElevation.AutoSize = true;
+            this.rBC1SameElevation.Location = new System.Drawing.Point(3, 5);
+            this.rBC1SameElevation.Name = "rBC1SameElevation";
+            this.rBC1SameElevation.Size = new System.Drawing.Size(99, 17);
+            this.rBC1SameElevation.TabIndex = 0;
+            this.rBC1SameElevation.TabStop = true;
+            this.rBC1SameElevation.Text = "Same Elevation";
+            this.rBC1SameElevation.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel3
             // 
@@ -287,14 +349,13 @@
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(421, 34);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(444, 34);
             this.tableLayoutPanel3.TabIndex = 1;
-
             // 
             // btnCancel
             // 
             this.btnCancel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnCancel.Location = new System.Drawing.Point(334, 3);
+            this.btnCancel.Location = new System.Drawing.Point(357, 3);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(84, 28);
             this.btnCancel.TabIndex = 1;
@@ -305,7 +366,7 @@
             // btnOK
             // 
             this.btnOK.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnOK.Location = new System.Drawing.Point(244, 3);
+            this.btnOK.Location = new System.Drawing.Point(267, 3);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(84, 28);
             this.btnOK.TabIndex = 0;
@@ -313,77 +374,11 @@
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.radioButton2);
-            this.panel1.Controls.Add(this.radioButton1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(163, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(252, 31);
-            this.panel1.TabIndex = 1;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.radioButton4);
-            this.panel2.Controls.Add(this.radioButton3);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(163, 0);
-            this.panel2.Margin = new System.Windows.Forms.Padding(0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(252, 31);
-            this.panel2.TabIndex = 2;
-            // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(3, 5);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(99, 17);
-            this.radioButton1.TabIndex = 0;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Same Elevation";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(128, 5);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(121, 17);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "Elevation Difference";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(3, 5);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(68, 17);
-            this.radioButton3.TabIndex = 0;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Tee/Tap";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            // 
-            // radioButton4
-            // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(128, 3);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(54, 17);
-            this.radioButton4.TabIndex = 1;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Elbow";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            // 
             // _2LevelSmartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(427, 309);
+            this.ClientSize = new System.Drawing.Size(450, 309);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -395,13 +390,13 @@
             this.tableLayoutPanel2.PerformLayout();
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
-            this.tableLayoutPanel4.ResumeLayout(false);
-            this.tableLayoutPanel4.PerformLayout();
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -429,9 +424,9 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton rBC1ElbowConnect;
+        private System.Windows.Forms.RadioButton rBC1TeeOrTap;
+        private System.Windows.Forms.RadioButton rBC1ElevationDifference;
+        private System.Windows.Forms.RadioButton rBC1SameElevation;
     }
 }

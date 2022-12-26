@@ -261,6 +261,8 @@ namespace TotalMEPProject.Commands.FireFighting
         }
     }
 
+    #region Add Tee Connection
+
     public class SourcePipesData
     {
         #region Variable
@@ -2315,6 +2317,10 @@ namespace TotalMEPProject.Commands.FireFighting
         }
     }
 
+    #endregion Add Tee Connection
+
+    #region Add Elbow Connection
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public class PlaceBottomElbowData
@@ -3419,4 +3425,6 @@ namespace TotalMEPProject.Commands.FireFighting
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    #endregion Add Elbow Connection
 }
