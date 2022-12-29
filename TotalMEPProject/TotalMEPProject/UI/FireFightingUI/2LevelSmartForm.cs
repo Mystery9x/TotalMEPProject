@@ -112,7 +112,7 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             m_handler = handler;
             m_exEvent = exEvent;
-            rBC1SameElevation.Checked = true;
+            rBC1ElevationDifference.Checked = true;
             rBC1TeeOrTap.Checked = true;
             ckbC1ElbowConnection.Checked = false;
             ckbNippleCreating.Checked = false;
@@ -123,8 +123,8 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             AddFamilyType();
             AddNipple();
-            AppUtils.ff(rBC1SameElevation);
             AppUtils.ff(rBC1ElevationDifference);
+            AppUtils.ff(rBC1SameElevation);
             AppUtils.ff(rBC1TeeOrTap);
             AppUtils.ff(rBC1ElbowConnect);
         }
@@ -242,8 +242,8 @@ namespace TotalMEPProject.UI.FireFightingUI
             AppUtils.sa(cboC1FamilyType);
             AppUtils.sa(cboC1PipeSize);
             AppUtils.sa(cboC1NippleFamily);
-            AppUtils.sa(rBC1SameElevation);
             AppUtils.sa(rBC1ElevationDifference);
+            AppUtils.sa(rBC1SameElevation);
             AppUtils.sa(rBC1TeeOrTap);
             AppUtils.sa(rBC1ElbowConnect);
             this.Close();
@@ -257,8 +257,8 @@ namespace TotalMEPProject.UI.FireFightingUI
             AppUtils.sa(cboC1FamilyType);
             AppUtils.sa(cboC1PipeSize);
             AppUtils.sa(cboC1NippleFamily);
-            AppUtils.sa(rBC1SameElevation);
             AppUtils.sa(rBC1ElevationDifference);
+            AppUtils.sa(rBC1SameElevation);
             AppUtils.sa(rBC1TeeOrTap);
             AppUtils.sa(rBC1ElbowConnect);
             SetFocus();
@@ -297,12 +297,12 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private void rBC1ElevationDifference_CheckedChanged(object sender, EventArgs e)
         {
-            rBC1TeeOrTap.Enabled = !rBC1ElevationDifference.Checked;
-            rBC1ElbowConnect.Enabled = !rBC1ElevationDifference.Checked;
-            cboC1PipeSize.Enabled = !rBC1ElevationDifference.Checked;
-            ckbC1ElbowConnection.Enabled = !rBC1ElevationDifference.Checked;
-            ckbNippleCreating.Enabled = !rBC1ElevationDifference.Checked;
-            cboC1NippleFamily.Enabled = !rBC1ElevationDifference.Checked;
+            rBC1TeeOrTap.Enabled = !rBC1SameElevation.Checked;
+            rBC1ElbowConnect.Enabled = !rBC1SameElevation.Checked;
+            cboC1PipeSize.Enabled = !rBC1SameElevation.Checked;
+            ckbC1ElbowConnection.Enabled = !rBC1SameElevation.Checked;
+            ckbNippleCreating.Enabled = !rBC1SameElevation.Checked;
+            cboC1NippleFamily.Enabled = !rBC1SameElevation.Checked;
         }
 
         #endregion Event

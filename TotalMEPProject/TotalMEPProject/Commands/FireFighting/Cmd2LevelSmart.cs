@@ -90,6 +90,21 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         var pipe1 = pair._Pipe1;
                         var pipe2 = pair._Pipe2;
+                        SourcePipesDataSameElevation sourcePipesData = new SourcePipesDataSameElevation(m_mainPipes,
+                                                                              pipe1,
+                                                                              pipe2,
+                                                                              pipeType,
+                                                                              diameter,
+                                                                              App._2LevelSmartForm.OptionAddNipple,
+                                                                              App._2LevelSmartForm.SelectedNippleFamily);
+                    }
+                }
+                else if (App._2LevelSmartForm.OptionMainBranchElevation_ElevationDifference)
+                {
+                    foreach (PairPipes pair in pairs)
+                    {
+                        var pipe1 = pair._Pipe1;
+                        var pipe2 = pair._Pipe2;
 
                         if (App._2LevelSmartForm.OptionMainBranchConnection_Elbow)
                         {
@@ -108,21 +123,6 @@ namespace TotalMEPProject.Commands.FireFighting
                                                                              App._2LevelSmartForm.OptionAddNipple,
                                                                              App._2LevelSmartForm.SelectedNippleFamily);
                         }
-                    }
-                }
-                else if (App._2LevelSmartForm.OptionMainBranchElevation_ElevationDifference)
-                {
-                    foreach (PairPipes pair in pairs)
-                    {
-                        var pipe1 = pair._Pipe1;
-                        var pipe2 = pair._Pipe2;
-                        SourcePipesDataSameElevation sourcePipesData = new SourcePipesDataSameElevation(m_mainPipes,
-                                                                              pipe1,
-                                                                              pipe2,
-                                                                              pipeType,
-                                                                              diameter,
-                                                                              App._2LevelSmartForm.OptionAddNipple,
-                                                                              App._2LevelSmartForm.SelectedNippleFamily);
                     }
                 }
 

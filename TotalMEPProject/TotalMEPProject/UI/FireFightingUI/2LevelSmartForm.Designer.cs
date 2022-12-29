@@ -48,8 +48,8 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.label6 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.rBC1ElevationDifference = new System.Windows.Forms.RadioButton();
             this.rBC1SameElevation = new System.Windows.Forms.RadioButton();
+            this.rBC1ElevationDifference = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
@@ -304,8 +304,8 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.rBC1ElevationDifference);
             this.panel1.Controls.Add(this.rBC1SameElevation);
+            this.panel1.Controls.Add(this.rBC1ElevationDifference);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(185, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
@@ -313,28 +313,28 @@
             this.panel1.Size = new System.Drawing.Size(256, 31);
             this.panel1.TabIndex = 1;
             // 
-            // rBC1ElevationDifference
-            // 
-            this.rBC1ElevationDifference.AutoSize = true;
-            this.rBC1ElevationDifference.Location = new System.Drawing.Point(128, 5);
-            this.rBC1ElevationDifference.Name = "rBC1ElevationDifference";
-            this.rBC1ElevationDifference.Size = new System.Drawing.Size(121, 17);
-            this.rBC1ElevationDifference.TabIndex = 1;
-            this.rBC1ElevationDifference.TabStop = true;
-            this.rBC1ElevationDifference.Text = "Elevation Difference";
-            this.rBC1ElevationDifference.UseVisualStyleBackColor = true;
-            this.rBC1ElevationDifference.CheckedChanged += new System.EventHandler(this.rBC1ElevationDifference_CheckedChanged);
-            // 
             // rBC1SameElevation
             // 
             this.rBC1SameElevation.AutoSize = true;
-            this.rBC1SameElevation.Location = new System.Drawing.Point(3, 5);
+            this.rBC1SameElevation.Location = new System.Drawing.Point(128, 5);
             this.rBC1SameElevation.Name = "rBC1SameElevation";
             this.rBC1SameElevation.Size = new System.Drawing.Size(99, 17);
-            this.rBC1SameElevation.TabIndex = 0;
+            this.rBC1SameElevation.TabIndex = 1;
             this.rBC1SameElevation.TabStop = true;
             this.rBC1SameElevation.Text = "Same Elevation";
             this.rBC1SameElevation.UseVisualStyleBackColor = true;
+            this.rBC1SameElevation.CheckedChanged += new System.EventHandler(this.rBC1ElevationDifference_CheckedChanged);
+            // 
+            // rBC1ElevationDifference
+            // 
+            this.rBC1ElevationDifference.AutoSize = true;
+            this.rBC1ElevationDifference.Location = new System.Drawing.Point(3, 5);
+            this.rBC1ElevationDifference.Name = "rBC1ElevationDifference";
+            this.rBC1ElevationDifference.Size = new System.Drawing.Size(118, 17);
+            this.rBC1ElevationDifference.TabIndex = 0;
+            this.rBC1ElevationDifference.TabStop = true;
+            this.rBC1ElevationDifference.Text = "ElevationDifference";
+            this.rBC1ElevationDifference.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel3
             // 
@@ -427,7 +427,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.RadioButton rBC1ElbowConnect;
         private System.Windows.Forms.RadioButton rBC1TeeOrTap;
-        private System.Windows.Forms.RadioButton rBC1ElevationDifference;
         private System.Windows.Forms.RadioButton rBC1SameElevation;
+        private System.Windows.Forms.RadioButton rBC1ElevationDifference;
     }
 }
