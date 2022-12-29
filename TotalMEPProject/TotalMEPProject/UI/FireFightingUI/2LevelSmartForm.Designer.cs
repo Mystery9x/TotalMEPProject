@@ -323,7 +323,7 @@
             this.rBC1SameElevation.TabStop = true;
             this.rBC1SameElevation.Text = "Same Elevation";
             this.rBC1SameElevation.UseVisualStyleBackColor = true;
-            this.rBC1SameElevation.CheckedChanged += new System.EventHandler(this.rBC1ElevationDifference_CheckedChanged);
+            this.rBC1SameElevation.CheckedChanged += new System.EventHandler(this.rBC1SameElevation_CheckedChanged);
             // 
             // rBC1ElevationDifference
             // 

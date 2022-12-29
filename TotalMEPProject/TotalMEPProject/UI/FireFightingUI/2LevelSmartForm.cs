@@ -295,16 +295,17 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
-        private void rBC1ElevationDifference_CheckedChanged(object sender, EventArgs e)
+        #endregion Event
+
+        private void rBC1SameElevation_CheckedChanged(object sender, EventArgs e)
         {
             rBC1TeeOrTap.Enabled = !rBC1SameElevation.Checked;
             rBC1ElbowConnect.Enabled = !rBC1SameElevation.Checked;
+            cboC1FamilyType.Enabled = !rBC1SameElevation.Checked;
             cboC1PipeSize.Enabled = !rBC1SameElevation.Checked;
             ckbC1ElbowConnection.Enabled = !rBC1SameElevation.Checked;
             ckbNippleCreating.Enabled = !rBC1SameElevation.Checked;
             cboC1NippleFamily.Enabled = !rBC1SameElevation.Checked;
         }
-
-        #endregion Event
     }
 }
