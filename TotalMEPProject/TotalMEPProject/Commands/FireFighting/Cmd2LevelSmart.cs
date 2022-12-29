@@ -1787,7 +1787,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         XYZ expanDirectionn = (ToPoint2D(CurveFirstPipe_2d.GetEndPoint(1)) - ToPoint2D(CurveFirstPipe_2d.GetEndPoint(0))).Normalize();
 
-                        var expandFirstPipe = Line.CreateBound(ToPoint2D(CurveFirstPipe_2d.GetEndPoint(0)) - expanDirectionn * 400 * mmToFT, ToPoint2D(CurveFirstPipe_2d.GetEndPoint(1) + expanDirectionn * 400 * mmToFT));
+                        var expandFirstPipe = Line.CreateBound(ToPoint2D(CurveFirstPipe_2d.GetEndPoint(0)) - expanDirectionn * 550 * mmToFT, ToPoint2D(CurveFirstPipe_2d.GetEndPoint(1) + expanDirectionn * 550 * mmToFT));
                         if (RealityIntersect(expandFirstPipe, CurveMainPipe_2d))
                             return true;
 
@@ -1901,11 +1901,11 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 if (IsEqual(CurveFirstPipe.GetEndPoint(0), validContOrg))
                 {
-                    NewCurveFirstPipe_2d = Line.CreateBound(ToPoint2D(CurveFirstPipe.GetEndPoint(0)) - directionExpand * 400 * mmToFT, ToPoint2D(CurveFirstPipe.GetEndPoint(1)));
+                    NewCurveFirstPipe_2d = Line.CreateBound(ToPoint2D(CurveFirstPipe.GetEndPoint(0)) - directionExpand * 550 * mmToFT, ToPoint2D(CurveFirstPipe.GetEndPoint(1)));
                 }
                 else
                 {
-                    NewCurveFirstPipe_2d = Line.CreateBound(ToPoint2D(CurveFirstPipe.GetEndPoint(0)), ToPoint2D(CurveFirstPipe.GetEndPoint(1)) + directionExpand * 400 * mmToFT);
+                    NewCurveFirstPipe_2d = Line.CreateBound(ToPoint2D(CurveFirstPipe.GetEndPoint(0)), ToPoint2D(CurveFirstPipe.GetEndPoint(1)) + directionExpand * 550 * mmToFT);
 
                     flag = true;
                 }
@@ -2402,27 +2402,19 @@ namespace TotalMEPProject.Commands.FireFighting
                 double diameter_10 = 10 * Common.mmToFT;
 
                 // If Diameter vertical pipe = Diameter main pipe
-                if (g(Diameter, FirstPipe.Diameter))
+                if (FirstPipe != null)
                 {
-                    return true;
+                    var firstLine = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
+                    (FirstPipe.Location as LocationCurve).Curve = firstLine;
                 }
-                // If Diameter vertical pipe < Diameter main pipe
-                else
+
+                if (SecondPipe != null)
                 {
-                    if (FirstPipe != null)
-                    {
-                        var firstLine = Line.CreateBound(m_sub1_pnt0, m_sub1_pnt1);
-                        (FirstPipe.Location as LocationCurve).Curve = firstLine;
-                    }
-
-                    if (SecondPipe != null)
-                    {
-                        var secondLine = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
-                        (SecondPipe.Location as LocationCurve).Curve = secondLine;
-                    }
-
-                    return true;
+                    var secondLine = Line.CreateBound(m_sub2_pnt0, m_sub2_pnt1);
+                    (SecondPipe.Location as LocationCurve).Curve = secondLine;
                 }
+
+                return true;
             }
             catch (Exception)
             { }
