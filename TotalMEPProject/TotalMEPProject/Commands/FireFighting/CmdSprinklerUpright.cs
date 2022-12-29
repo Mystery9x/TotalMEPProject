@@ -310,9 +310,16 @@ namespace TotalMEPProject.Commands.FireFighting
                 collector.OfClass(typeof(Pipe));
                 collector.WherePasses(new ElementIntersectsSolidFilter(solid)); // Apply intersection filter to find matches
 
+                bool isPipe = false;
+
+                List<Element> pipeList = new List<Element>();
                 if (collector.GetElementCount() == 0)
-                    return result;
-                var pipeList = collector.ToElements();
+                {
+                    isPipe = true;
+                    pipeList = GetPipes(selectedIds, sprinkle_point);
+                }
+                else
+                    pipeList = collector.ToElements().ToList();
 
                 //Global.m_uiDoc.Selection.SetElementIds(collector.ToElementIds());
 
@@ -328,28 +335,64 @@ namespace TotalMEPProject.Commands.FireFighting
                     var p02d = Common.ToPoint2D(p0);
                     var p12d = Common.ToPoint2D(p1);
 
-                    var resultPipe = curve.Project(sprinkle_point);
-
-                    XYZ pointProject = resultPipe.XYZPoint;
-                    XYZ pointProject2d = Common.ToPoint2D(pointProject);
-
-                    var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
-                    if (!Common.IsEqual(distancePoint2d, 0))
+                    if (isPipe)
                     {
-                        if (d < distancePoint2d)
+                        var lineUn = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction);
+                        var resultPipe = lineUn.Project(sprinkle_point);
+
+                        XYZ pointProject = resultPipe.XYZPoint;
+                        XYZ pointProject2d = Common.ToPoint2D(pointProject);
+                        var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
+                        if (!Common.IsEqual(distancePoint2d, 0))
                         {
-                            System.Windows.Forms.MessageBox.Show(distancePoint2d.ToString());
-                            return result;
+                            if (d < distancePoint2d)
+                                return result;
+                            else
+                            {
+                                var vector = pointProject2d - sprinker2d;
+
+                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
+
+                                Global.UIDoc.Document.Regenerate();
+
+                                sprinkle_point = (instance.Location as LocationPoint).Point;
+                            }
                         }
                         else
                         {
-                            var vector = pointProject2d - sprinker2d;
+                            Line line = Line.CreateBound(p0, pointProject);
+                            (pipe.Location as LocationCurve).Curve = line;
 
-                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
+                            p0 = line.GetEndPoint(0);
+                            p1 = line.GetEndPoint(1);
+                        }
+                    }
+                    else
+                    {
+                        var resultPipe = curve.Project(sprinkle_point);
 
-                            Global.UIDoc.Document.Regenerate();
+                        XYZ pointProject = resultPipe.XYZPoint;
+                        XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                            sprinkle_point = (instance.Location as LocationPoint).Point;
+                        var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
+                        if (!Common.IsEqual(distancePoint2d, 0))
+                        {
+                            if (d < distancePoint2d)
+                            {
+                                var con = Common.GetConnectorClosestTo(pipe, sprinkle_point);
+                                if (con.IsConnected)
+                                    return result;
+                            }
+                            else
+                            {
+                                var vector = pointProject2d - sprinker2d;
+
+                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
+
+                                Global.UIDoc.Document.Regenerate();
+
+                                sprinkle_point = (instance.Location as LocationPoint).Point;
+                            }
                         }
                     }
 
@@ -631,6 +674,47 @@ namespace TotalMEPProject.Commands.FireFighting
             }
 
             return result;
+        }
+
+        public static List<Element> GetPipes(List<ElementId> selectedIds, XYZ sprinklerPoint)
+        {
+            Dictionary<Pipe, double> keyValuePairs = new Dictionary<Pipe, double>();
+            List<Element> pipes = new List<Element>();
+            foreach (ElementId elementId in selectedIds)
+            {
+                var pipePick = Global.UIDoc.Document.GetElement(elementId) as Pipe;
+                if (pipePick == null)
+                    continue;
+
+                var con = Common.GetConnectorClosestTo(pipePick, sprinklerPoint);
+                if (con == null)
+                    continue;
+
+                var conOrigin2D = Common.ToPoint2D(con.Origin);
+                var sprinklerPoint2D = Common.ToPoint2D(sprinklerPoint);
+
+                var distance = conOrigin2D.DistanceTo(sprinklerPoint2D);
+
+                if (con.IsConnected)
+                {
+                    double d = UnitUtils.ConvertToInternalUnits(30, DisplayUnitType.DUT_MILLIMETERS);
+                    if (distance > d)
+                        continue;
+                }
+                keyValuePairs.Add(pipePick, distance);
+            }
+
+            if (keyValuePairs.Count > 0)
+            {
+                var min = keyValuePairs.Min(x => x.Value);
+
+                var pipeCloset = keyValuePairs.FirstOrDefault(x => x.Value == min);
+
+                if (pipeCloset.Key != null)
+                    pipes.Add(pipeCloset.Key);
+            }
+
+            return pipes;
         }
 
         public static bool CheckPipeIsEnd(Pipe pipe, XYZ point)
