@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Windows;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -13,6 +14,7 @@ using TotalMEPProject.UI;
 using TotalMEPProject.UI.FireFightingUI;
 using TotalMEPProject.Ultis;
 using TotalMEPProject.Ultis.HolyUltis;
+using RibbonPanel = Autodesk.Revit.UI.RibbonPanel;
 
 namespace TotalMEPProject
 {
@@ -84,6 +86,14 @@ namespace TotalMEPProject
             CreateModifyTab(app, tabName, assemblyPath, iconFolder);
 
             CreateLoginTab(app, tabName, assemblyPath, iconFolder);
+
+            SetTextRibbonSplitButton(tabName, Define.PlumpingRibbonTabName, "Vetical WYED", "Vertical\nConnection");
+            SetTextRibbonSplitButton(tabName, Define.FireFightingRibbonTabName, "Sprinkler\nUpright", "Sprinkler\nConnection");
+            SetTextRibbonSplitButton(tabName, Define.DuctRibbonTabName, "Setting", "Split\nDuct");
+            SetTextRibbonSplitButton(tabName, Define.OpeningRibbonTabName, "Create\nOpening", "Opening");
+            SetTextRibbonSplitButton(tabName, Define.OpeningRibbonTabName, "Create\nSleeve", "Sleeve");
+            SetTextRibbonSplitButton(tabName, Define.OpeningRibbonTabName, "Change Opening", "Change\nObject");
+            SetTextRibbonSplitButton(tabName, Define.ModifyRibbonTabName, "Tap To Tee", "Tee Tap\nTransfer");
 
             bool isHasInternet = LicenseUtils.CheckForInternetConnection();
             string errMess = string.Empty;
@@ -185,8 +195,8 @@ namespace TotalMEPProject
             RibbonPanel plumbingPanel = app.CreateRibbonPanel(tabName, Define.PlumpingRibbonTabName);
 
             ////Create button
-            PulldownButtonData groupVerticalData = new PulldownButtonData("PulldownGroup1", "Vertical\nConnection");
-            PulldownButton groupVertical = plumbingPanel.AddItem(groupVerticalData) as PulldownButton;
+            SplitButtonData groupVerticalData = new SplitButtonData("PulldownGroup1", "Vertical\nConnection");
+            SplitButton groupVertical = plumbingPanel.AddItem(groupVerticalData) as SplitButton;
             AddImagesPullDown(groupVertical, iconFolder, "Vertical Connection-02-01.png", "Vertical Connection-02-01.png");
 
             //Create button
@@ -246,8 +256,8 @@ namespace TotalMEPProject
             fireFightingPanel.AddItem(levelSmartData);
 
             ////Create button
-            PulldownButtonData groupSprinklerData = new PulldownButtonData("Sprinkler", "Sprinkler\nConnection");
-            PulldownButton groupSprinkler = fireFightingPanel.AddItem(groupSprinklerData) as PulldownButton;
+            SplitButtonData groupSprinklerData = new SplitButtonData("Sprinkler", "Sprinkler\nConnection");
+            SplitButton groupSprinkler = fireFightingPanel.AddItem(groupSprinklerData) as SplitButton;
             AddImagesPullDown(groupSprinkler, iconFolder, "Sprinkler Connection-01.png", "Sprinkler Connection-01.png");
 
             //Create button
@@ -282,8 +292,8 @@ namespace TotalMEPProject
             RibbonPanel ductPanel = app.CreateRibbonPanel(tabName, Define.DuctRibbonTabName);
 
             ////Create button
-            PulldownButtonData groupSplitData = new PulldownButtonData("SplitDuct", "Split\nDuct");
-            PulldownButton groupSplit = ductPanel.AddItem(groupSplitData) as PulldownButton;
+            SplitButtonData groupSplitData = new SplitButtonData("SplitDuct", "Split\nDuct");
+            SplitButton groupSplit = ductPanel.AddItem(groupSplitData) as SplitButton;
             AddImagesPullDown(groupSplit, iconFolder, "Split Duct-01.png", "Split Duct-01.png");
 
             //Create button
@@ -328,8 +338,8 @@ namespace TotalMEPProject
             RibbonPanel openingPanel = app.CreateRibbonPanel(tabName, Define.OpeningRibbonTabName);
 
             ////Create button
-            PulldownButtonData groupOpeningData = new PulldownButtonData("PulldownGroup1", "Opening");
-            PulldownButton groupOpening = openingPanel.AddItem(groupOpeningData) as PulldownButton;
+            SplitButtonData groupOpeningData = new SplitButtonData("PulldownGroup1", "Opening");
+            SplitButton groupOpening = openingPanel.AddItem(groupOpeningData) as SplitButton;
             AddImagesPullDown(groupOpening, iconFolder, "Opening-01.png", "Opening-01.png");
 
             //Create button
@@ -346,8 +356,8 @@ namespace TotalMEPProject
             //groupOpening.AddPushButton(deleteBySelectionOpeningData);
 
             ////Create button
-            PulldownButtonData groupSleeveData = new PulldownButtonData("PulldownGroup2", "Sleeve");
-            PulldownButton groupSleeve = openingPanel.AddItem(groupSleeveData) as PulldownButton;
+            SplitButtonData groupSleeveData = new SplitButtonData("PulldownGroup2", "Sleeve");
+            SplitButton groupSleeve = openingPanel.AddItem(groupSleeveData) as SplitButton;
             AddImagesPullDown(groupSleeve, iconFolder, "Sleeve-01.png", "Sleeve-01.png");
 
             //Create button
@@ -364,8 +374,8 @@ namespace TotalMEPProject
             //groupSleeve.AddPushButton(deleteBySelectionData);
 
             ////Create button
-            PulldownButtonData groupChangeData = new PulldownButtonData("PulldownGroupChange", "Change \nObject");
-            PulldownButton groupChange = openingPanel.AddItem(groupChangeData) as PulldownButton;
+            SplitButtonData groupChangeData = new SplitButtonData("PulldownGroupChange", "Change \nObject");
+            SplitButton groupChange = openingPanel.AddItem(groupChangeData) as SplitButton;
             AddImagesPullDown(groupChange, iconFolder, "Change Object.png", "Change Object.png");
             //Create button
             PushButtonData changeOpeningData = new PushButtonData("btnChangeOpening", "Change Opening", assemblyPath, Define.CmdChangeOpeningClassName);
@@ -404,8 +414,8 @@ namespace TotalMEPProject
             modifyPanel.AddItem(fittingRotationData);
 
             ////Create button
-            PulldownButtonData groupData = new PulldownButtonData("PulldownGroup2", "Tee Tap\nTransfer");
-            PulldownButton group = modifyPanel.AddItem(groupData) as PulldownButton;
+            SplitButtonData groupData = new SplitButtonData("PulldownGroup2", "Tee Tap\nTransfer");
+            SplitButton group = modifyPanel.AddItem(groupData) as SplitButton;
             AddImagesPullDown(group, iconFolder, "Tee Tap Transfer-01.png", "Tee Tap Transfer-01.png");
 
             //Create button
@@ -471,7 +481,7 @@ namespace TotalMEPProject
         /// <param name="iconFolder"></param>
         /// <param name="largeImage"></param>
         /// <param name="smallImage"></param>
-        private void AddImagesPullDown(PulldownButton buttonData,
+        private void AddImagesPullDown(SplitButton buttonData,
                                string iconFolder,
                                string largeImage,
                                string smallImage)
@@ -525,6 +535,36 @@ namespace TotalMEPProject
                 Directory.CreateDirectory(configDir);
 
             return configDir;
+        }
+
+        private void SetTextRibbonSplitButton(string tabName, string panelName, string splitButtonText, string newSplitButtonText)
+        {
+            RibbonControl ribbon = ComponentManager.Ribbon;
+            foreach (RibbonTab tab in ribbon.Tabs)
+            {
+                if (tab.Name == tabName)
+                {
+                    foreach (Autodesk.Windows.RibbonPanel panel in tab.Panels)
+                    {
+                        if (panel.Source.AutomationName == panelName)
+                        {
+                            foreach (Autodesk.Windows.RibbonItem item in panel.Source.Items)
+                            {
+                                if (splitButtonText == item.AutomationName)
+                                {
+                                    Autodesk.Windows.RibbonItem ribbonButton = item as Autodesk.Windows.RibbonButton;
+                                    if (ribbonButton is RibbonSplitButton splitButton)
+                                    {
+                                        splitButton.Text = newSplitButtonText;
+                                        splitButton.SynchronizeOption = RibbonListButton.RibbonListButtonSynchronizeOption.Image;
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #endregion Create ribbon
