@@ -281,31 +281,69 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private void ckbC1ElbowConnection_CheckedChanged(object sender, EventArgs e)
         {
-            if (ckbC1ElbowConnection.Checked)
-            {
-                ckbNippleCreating.Enabled = false;
-                cboC1PipeSize.Enabled = false;
-                cboC1NippleFamily.Enabled = false;
-            }
-            else
-            {
-                ckbNippleCreating.Enabled = true;
-                cboC1PipeSize.Enabled = true;
-                cboC1NippleFamily.Enabled = true;
-            }
+            ReDisplay();
         }
 
         #endregion Event
 
         private void rBC1SameElevation_CheckedChanged(object sender, EventArgs e)
         {
-            rBC1TeeOrTap.Enabled = !rBC1SameElevation.Checked;
-            rBC1ElbowConnect.Enabled = !rBC1SameElevation.Checked;
-            cboC1FamilyType.Enabled = !rBC1SameElevation.Checked;
-            cboC1PipeSize.Enabled = !rBC1SameElevation.Checked;
-            ckbC1ElbowConnection.Enabled = !rBC1SameElevation.Checked;
-            ckbNippleCreating.Enabled = !rBC1SameElevation.Checked;
-            cboC1NippleFamily.Enabled = !rBC1SameElevation.Checked;
+            ReDisplay();
+        }
+
+        private void rBC1ElbowConnect_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void rBC1ElevationDifference_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void rBC1TeeOrTap_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void ReDisplay()
+        {
+            rBC1ElevationDifference.Enabled = true;
+            rBC1SameElevation.Enabled = true;
+            rBC1TeeOrTap.Enabled = true;
+            rBC1ElbowConnect.Enabled = true;
+            cboC1FamilyType.Enabled = true;
+            cboC1PipeSize.Enabled = true;
+            ckbC1ElbowConnection.Enabled = true;
+            ckbNippleCreating.Enabled = true;
+            cboC1NippleFamily.Enabled = true;
+
+            if (rBC1SameElevation.Checked == true)
+            {
+                rBC1TeeOrTap.Enabled = false;
+                rBC1ElbowConnect.Enabled = false;
+                cboC1FamilyType.Enabled = false;
+                cboC1PipeSize.Enabled = false;
+                ckbC1ElbowConnection.Enabled = false;
+                ckbNippleCreating.Enabled = false;
+                cboC1NippleFamily.Enabled = false;
+            }
+
+            if (rBC1ElbowConnect.Checked == true)
+            {
+                cboC1PipeSize.Enabled = false;
+                cboC1FamilyType.Enabled = false;
+                ckbNippleCreating.Enabled = false;
+                cboC1NippleFamily.Enabled = false;
+            }
+
+            if (ckbC1ElbowConnection.Checked == true)
+            {
+                cboC1PipeSize.Enabled = false;
+                cboC1FamilyType.Enabled = false;
+                ckbNippleCreating.Enabled = false;
+                cboC1NippleFamily.Enabled = false;
+            }
         }
     }
 }

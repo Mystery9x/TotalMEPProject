@@ -157,6 +157,7 @@
             this.rBC1ElbowConnect.TabStop = true;
             this.rBC1ElbowConnect.Text = "Elbow";
             this.rBC1ElbowConnect.UseVisualStyleBackColor = true;
+            this.rBC1ElbowConnect.CheckedChanged += new System.EventHandler(this.rBC1ElbowConnect_CheckedChanged);
             // 
             // rBC1TeeOrTap
             // 
@@ -168,6 +169,7 @@
             this.rBC1TeeOrTap.TabStop = true;
             this.rBC1TeeOrTap.Text = "Tee/Tap";
             this.rBC1TeeOrTap.UseVisualStyleBackColor = true;
+            this.rBC1TeeOrTap.CheckedChanged += new System.EventHandler(this.rBC1TeeOrTap_CheckedChanged);
             // 
             // ckbNippleCreating
             // 
@@ -335,6 +337,7 @@
             this.rBC1ElevationDifference.TabStop = true;
             this.rBC1ElevationDifference.Text = "ElevationDifference";
             this.rBC1ElevationDifference.UseVisualStyleBackColor = true;
+            this.rBC1ElevationDifference.CheckedChanged += new System.EventHandler(this.rBC1ElevationDifference_CheckedChanged);
             // 
             // tableLayoutPanel3
             // 

@@ -81,7 +81,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     List<Pipe> mainPipes = m_mainPipes.Select(item => Global.UIDoc.Document.GetElement(item) as Pipe).ToList();
                     foreach (Pipe pipe in mainPipes)
                     {
-                        PlaceBottomElbowData placeBottomElbowData = new PlaceBottomElbowData(pipe, pairs, pipeType);
+                        PlaceBottomElbowData placeBottomElbowData = new PlaceBottomElbowData(pipe, pairs, pipeType, App._2LevelSmartForm.OptionMainBranchConnection_TeeOrTap);
                     }
                 }
                 else if (App._2LevelSmartForm.OptionMainBranchElevation_SameElevation)
@@ -3870,10 +3870,13 @@ namespace TotalMEPProject.Commands.FireFighting
 
         private FamilyInstance m_topElbow = null;
 
-        public PlaceBottomElbowData(Pipe mainPipe, List<PairPipes> pairPipes, PipeType pipeTypeProcess)
+        private bool m_mainBrain_teeTap = true;
+
+        public PlaceBottomElbowData(Pipe mainPipe, List<PairPipes> pairPipes, PipeType pipeTypeProcess, bool mainBranchConnectTeeTap)
         {
             ServicePlaceBottomElbows = new List<ServicePlaceBottomElbow>();
             PipeTypeProcess = pipeTypeProcess;
+            m_mainBrain_teeTap = mainBranchConnectTeeTap;
             if (mainPipe != null && pairPipes != null && pairPipes.Count > 0)
             {
                 MainPipe = new SourcePipeData(mainPipe);
@@ -3925,12 +3928,19 @@ namespace TotalMEPProject.Commands.FireFighting
                             reTrans.RollBack();
                             return;
                         }
-
-                        if (HandlerTopTee() == false)
+                        if (m_mainBrain_teeTap == true)
                         {
-                            reTrans.RollBack();
-                            return;
+                            if (HandlerTopTee() == false)
+                            {
+                                reTrans.RollBack();
+                                return;
+                            }
                         }
+                        else
+                        {
+                            HandlerTopElbow();
+                        }
+
                         reTrans.Commit();
                     }
                     catch (Exception)
@@ -3938,6 +3948,124 @@ namespace TotalMEPProject.Commands.FireFighting
                         reTrans.RollBack();
                     }
                 }
+            }
+        }
+
+        private bool HandlerTopElbow()
+        {
+            try
+            {
+                // Process with sub pipes
+
+                Connector cntBottom_topTee = GetConnectorClosestTo(VerticalPipe.ProcessPipe, m_sub1Ints_pnt);
+                double diameter_10 = 10 * Common.mmToFT;
+
+                Pipe processPipe1 = null;
+                Pipe processPipe2 = null;
+
+                if (Pipe1_Final.ProcessPipe != null && Pipe2_Final.ProcessPipe != null)
+                {
+                    bool flag = CheckFirstPipeValid(Pipe1_Final.ProcessPipe, Pipe2_Final.ProcessPipe);
+                    if (flag == false)
+                    {
+                        processPipe1 = Pipe2_Final.ProcessPipe;
+                        processPipe2 = Pipe1_Final.ProcessPipe;
+                    }
+                    else
+                    {
+                        processPipe1 = Pipe1_Final.ProcessPipe;
+                        processPipe2 = Pipe2_Final.ProcessPipe;
+                    }
+                }
+                else
+                    processPipe1 = Pipe1_Final.ProcessPipe;
+
+                Connector c3 = GetConnectorClosestTo(processPipe1, m_sub1Ints_pnt);
+                m_topElbow = CreateElbow(c3, cntBottom_topTee);
+                if (m_topElbow == null)
+                {
+                    return false;
+                }
+
+                if (processPipe2 != null)
+                {
+                    Global.UIDoc.Document.Delete(processPipe2.Id);
+                }
+                return true;
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
+        private bool CheckFirstPipeValid(Pipe pipe1, Pipe pipe2)
+        {
+            try
+            {
+                var cntOfPipe1s = GetConnectorsConnected(pipe1.ConnectorManager.Connectors);
+                var cntOfPipe2s = GetConnectorsConnected(pipe2.ConnectorManager.Connectors);
+
+                if (cntOfPipe1s.Count > 0 && cntOfPipe2s.Count <= 0)
+                    return true;
+
+                if (cntOfPipe1s.Count <= 0 && cntOfPipe2s.Count > 0)
+                    return false;
+
+                if ((cntOfPipe1s.Count <= 0 && cntOfPipe2s.Count <= 0) || (cntOfPipe1s.Count > 0 && cntOfPipe2s.Count > 0))
+                {
+                    Line firstLine = pipe1.GetCurve() as Line;
+                    Line secondLine = pipe2.GetCurve() as Line;
+
+                    if (firstLine.Length >= secondLine.Length)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            catch (Exception)
+            { }
+            return true;
+        }
+
+        private List<Connector> GetConnectorsConnected(ConnectorSet connectorSet)
+        {
+            try
+            {
+                List<Connector> retVal = new List<Connector>();
+                foreach (Connector connector in connectorSet)
+                {
+                    if (connector.ConnectorType != ConnectorType.End)
+                        continue;
+                    if (connector.IsConnected == true)
+                        retVal.Add(connector);
+                }
+                return retVal;
+            }
+            catch (Exception)
+            { }
+            return new List<Connector>();
+        }
+
+        /// <summary>
+        /// Create Tee
+        /// </summary>
+        /// <param name="c3"></param>
+        /// <param name="c4"></param>
+        /// <param name="c5"></param>
+        /// <returns></returns>
+        public FamilyInstance CreateElbow(Connector c3, Connector c4)
+        {
+            if (c3 == null || c4 == null)
+                return null;
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewElbowFitting(c3, c4);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
             }
         }
 
@@ -3951,6 +4079,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 if (ServicePlaceBottomElbowFinal.IntesectCase == IntesectCase.None)
                     return false;
 
+                bool flagSpecial = false;
                 if (ServicePlaceBottomElbowFinal.IntesectCase == IntesectCase.VirtualMain_VirtualBranch || ServicePlaceBottomElbowFinal.IntesectCase == IntesectCase.VirtualMain_RealBranch)
                 {
                     if (MainPipe.DirectionPipe == ProcessDirectionPipe.FirstToSecond)
@@ -3961,37 +4090,53 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         (MainPipe.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(ServicePlaceBottomElbowFinal.IntsectPoint, MainPipe.SecondConnector.Origin);
                     }
+
+                    if (flagTwoPipe == false && ServicePlaceBottomElbowFinal.IntesectCase == IntesectCase.VirtualMain_VirtualBranch && m_mainBrain_teeTap == false)
+                    {
+                        flagSpecial = true;
+                        if (Pipe1_Final.DirectionPipe == ProcessDirectionPipe.FirstToSecond)
+                        {
+                            (Pipe1_Final.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(ServicePlaceBottomElbowFinal.IntsectPointPipe1, Pipe1_Final.FirstConnector.Origin);
+                        }
+                        else if (Pipe1_Final.DirectionPipe == ProcessDirectionPipe.SecondToFirst)
+                        {
+                            (Pipe1_Final.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(ServicePlaceBottomElbowFinal.IntsectPointPipe1, Pipe1_Final.SecondConnector.Origin);
+                        }
+                    }
                 }
 
                 if (HandlerDivide(MainPipe.ProcessPipe, Pipe1_Final.ProcessPipe, flagTwoPipe, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt) == true)
                 {
+                    if (flagSpecial == false)
                     // If only 1 pipe
-                    if (Pipe2_Final.ProcessPipe == null)
                     {
-                        (Pipe1_Final.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
-
-                        Pipe2_Final.ProcessPipe = Common.Clone(Pipe1_Final.ProcessPipe) as Pipe;
-                        (Pipe2_Final.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
-
-                        // Set point value again
-                        m_sub1_pnt1 = m_sub1Ints_pnt;
-                    }
-
-                    if (Pipe2_Final.ProcessPipe != null)
-                    {
-                        if (HandlerDivide(MainPipe.ProcessPipe, Pipe2_Final.ProcessPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
+                        if (Pipe2_Final.ProcessPipe == null)
                         {
-                            return false;
+                            (Pipe1_Final.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
+
+                            Pipe2_Final.ProcessPipe = Common.Clone(Pipe1_Final.ProcessPipe) as Pipe;
+                            (Pipe2_Final.ProcessPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
+
+                            // Set point value again
+                            m_sub1_pnt1 = m_sub1Ints_pnt;
                         }
 
-                        if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
+                        if (Pipe2_Final.ProcessPipe != null)
                         {
-                            return false;
-                        }
+                            if (HandlerDivide(MainPipe.ProcessPipe, Pipe2_Final.ProcessPipe, true, out m_intsMain2_pnt, out m_sub2_pnt0, out m_sub2_pnt1, out m_sub2Ints_pnt) == false)
+                            {
+                                return false;
+                            }
 
-                        if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
-                        {
-                            return false;
+                            if (m_intsMain1_pnt.DistanceTo(m_intsMain2_pnt) > 0.001)
+                            {
+                                return false;
+                            }
+
+                            if (m_sub1Ints_pnt.DistanceTo(m_sub2Ints_pnt) > 0.001)
+                            {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -4723,6 +4868,8 @@ namespace TotalMEPProject.Commands.FireFighting
         public bool IsValidPlaceBottomElbow { get; set; }
         public IntesectCase IntesectCase { get; set; }
         public XYZ IntsectPoint { get; set; }
+
+        public XYZ IntsectPointPipe1 { get; set; }
         public XYZ IntsectPoint_2d { get; set; }
         public double DistanceValid { get; set; }
 
@@ -4774,6 +4921,11 @@ namespace TotalMEPProject.Commands.FireFighting
                         if (RealityIntersect(MainPipe.CurvePipe_Unbound, lineZ, out intersectPnt))
                         {
                             IntsectPoint = intersectPnt;
+                        }
+
+                        if (RealityIntersect(Pipe1.CurvePipe_Unbound, lineZ, out intersectPnt))
+                        {
+                            IntsectPointPipe1 = intersectPnt;
                         }
 
                         if (MainPipe.DirectionPipe == ProcessDirectionPipe.FirstToSecond)
