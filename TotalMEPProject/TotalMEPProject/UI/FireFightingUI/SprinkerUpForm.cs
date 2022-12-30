@@ -108,7 +108,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             cboC2Nipple.Items.Clear();
             var lstFmlNipple = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
-                .Where(x => x.FamilyName.Contains("Nipple"))
+                .Where(x => x.Category.Id.IntegerValue == (int)BuiltInCategory.OST_PipeFitting)
                 .ToList();
 
             foreach (FamilySymbol fmlNipple in lstFmlNipple)

@@ -257,8 +257,9 @@
             // 
             // cboC1NippleFamily
             // 
+            this.cboC1NippleFamily.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboC1NippleFamily.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboC1NippleFamily.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cboC1NippleFamily.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboC1NippleFamily.FormattingEnabled = true;
             this.cboC1NippleFamily.Location = new System.Drawing.Point(125, 227);
             this.cboC1NippleFamily.Margin = new System.Windows.Forms.Padding(5);

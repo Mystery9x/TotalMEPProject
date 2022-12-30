@@ -209,8 +209,9 @@
             // 
             // cboC2Nipple
             // 
+            this.cboC2Nipple.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboC2Nipple.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboC2Nipple.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cboC2Nipple.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboC2Nipple.FormattingEnabled = true;
             this.cboC2Nipple.Location = new System.Drawing.Point(405, 105);
             this.cboC2Nipple.Name = "cboC2Nipple";
