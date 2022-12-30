@@ -2323,10 +2323,22 @@ namespace TotalMEPProject.Commands.FireFighting
                     }
                     else if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tap)
                     {
+                        bool flag = true;
                         if (FirstPipe != null)
-                            se(MainPipe, FirstPipe);
+                        {
+                            flag = se(MainPipe, FirstPipe);
+                        }
+
+                        if (flag == false)
+                            return false;
+
                         if (SecondPipe != null)
-                            se(MainPipe, SecondPipe);
+                        {
+                            flag = se(MainPipe, SecondPipe);
+                        }
+
+                        if (flag == false)
+                            return false;
                     }
 
                     if (VerticalPipe != null)
