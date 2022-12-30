@@ -382,6 +382,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var con = Common.GetConnectorClosestTo(pipe, sprinkle_point);
                                 if (con.IsConnected)
                                     return result;
+                                else if (!con.IsConnected && !App.m_SprinkerUpForm.isElbow)
+                                    return result;
                             }
                             else
                             {
