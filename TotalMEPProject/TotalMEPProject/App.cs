@@ -32,6 +32,7 @@ namespace TotalMEPProject
         public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
         public static SprinkerUpForm m_SprinkerUpForm = null;
+        public static SprinklerDownForm m_SprinklerDownForm = null;
 
         public static HolySplitUpdown _HolyUpdown = null;
         public static bool isApply = true;
@@ -750,6 +751,45 @@ namespace TotalMEPProject
                     m_SprinkerUpForm = new SprinkerUpForm(exEvent, handler);
 
                     m_SprinkerUpForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App.m_SprinkerUpForm.Handle));
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static bool ShowSprinklerDownForm()
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (m_SprinklerDownForm == null || m_SprinklerDownForm.IsDisposed)
+                {
+                    RequestHandler handler = new RequestHandler();
+
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    m_SprinklerDownForm = new SprinklerDownForm(exEvent, handler);
+
+                    m_SprinklerDownForm.Show(hWndRevit);
                 }
                 else
                 {

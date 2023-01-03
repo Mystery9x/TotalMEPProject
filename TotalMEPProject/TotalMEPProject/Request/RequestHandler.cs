@@ -82,6 +82,24 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.SprinklerDownType1_RUN:
+                    {
+                        CmdSprinklerDownright.ProcessType1();
+                    }
+                    break;
+
+                case RequestId.SprinklerDownType2_RUN:
+                    {
+                        //CmdSprinklerUpright.Process();
+                    }
+                    break;
+
+                case RequestId.SprinklerDownType3_RUN:
+                    {
+                        CmdSprinklerDownright.ProcessType3();
+                    }
+                    break;
+
                 default:
                     {
                         break;

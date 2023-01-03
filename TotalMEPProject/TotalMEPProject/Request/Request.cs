@@ -20,6 +20,9 @@ namespace TotalMEPProject.Request
         TwoLevelSmart_OK,
         TwoLevelSmart_Cancel,
         SprinklerUp_Aplly,
+        SprinklerDownType1_RUN,
+        SprinklerDownType2_RUN,
+        SprinklerDownType3_RUN,
     }
 
     public class Request

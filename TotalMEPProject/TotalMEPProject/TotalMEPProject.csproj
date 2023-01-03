@@ -195,6 +195,12 @@
     <Compile Include="UI\FireFightingUI\SprinkerUpForm.Designer.cs">
       <DependentUpon>SprinkerUpForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\FireFightingUI\SprinklerDownForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FireFightingUI\SprinklerDownForm.Designer.cs">
+      <DependentUpon>SprinklerDownForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\FrmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -246,6 +252,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FireFightingUI\SprinkerUpForm.resx">
       <DependentUpon>SprinkerUpForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FireFightingUI\SprinklerDownForm.resx">
+      <DependentUpon>SprinklerDownForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FrmLogin.resx">
       <DependentUpon>FrmLogin.cs</DependentUpon>
