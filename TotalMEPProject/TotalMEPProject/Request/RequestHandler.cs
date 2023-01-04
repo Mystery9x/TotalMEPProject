@@ -90,13 +90,12 @@ namespace TotalMEPProject.Request
 
                 case RequestId.SprinklerDownType2_RUN:
                     {
-                        //CmdSprinklerUpright.Process();
+                        CmdSprinklerDownright.ProcessType2();
                     }
                     break;
 
                 case RequestId.SprinklerDownType3_RUN:
                     {
-                        CmdSprinklerDownright.ProcessType3();
                     }
                     break;
 

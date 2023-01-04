@@ -193,8 +193,8 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 //Set d = 25
-                double d25 = 25;
-                var dFt = Common.mmToFT * d25;
+                //double d25 = 25;
+                var dFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
 
                 var ft_h = Common.mmToFT * height;
 
@@ -369,9 +369,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
         #endregion Type1
 
-        #region Type3
+        #region Type2
 
-        public static Result ProcessType3()
+        public static Result ProcessType2()
         {
             List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_SprinklerDownForm.isD15);
             if (sprinklers == null || sprinklers.Count == 0)
@@ -391,7 +391,7 @@ namespace TotalMEPProject.Commands.FireFighting
             //Find pipe
             foreach (FamilyInstance instance in sprinklers)
             {
-                cc(instance, pipeIds, false);
+                cc(instance, pipeIds, App.m_SprinklerDownForm.FamilyType, App.m_SprinklerDownForm.PipeSize, false);
             }
 
             tran.Commit();
@@ -399,15 +399,15 @@ namespace TotalMEPProject.Commands.FireFighting
             return Result.Succeeded;
         }
 
-        public static bool cc(FamilyInstance instance, List<ElementId> selectedIds, bool isUp)
+        public static bool cc(FamilyInstance instance, List<ElementId> selectedIds, ElementId pipeTypeId, double pipeSize, bool isUp)
         {
             bool result = false;
 
             XYZ direction = isUp ? -XYZ.BasisZ : XYZ.BasisZ;
 
-            //Set d = 25
-            double d25 = 25;
-            var dFt = Common.mmToFT * d25;
+            ////Set d = 25
+            //double d25 = 25;
+            var dFt = Common.mmToFT * pipeSize;
 
             var sprinkle_point = (instance.Location as LocationPoint).Point;
 
@@ -467,6 +467,23 @@ namespace TotalMEPProject.Commands.FireFighting
                     var sprinker2d = Common.ToPoint2D(sprinkle_point);
                     var p02d = Common.ToPoint2D(p0);
                     var p12d = Common.ToPoint2D(p1);
+
+                    var resultPipe = curve.Project(sprinkle_point);
+
+                    XYZ pointProject = resultPipe.XYZPoint;
+                    XYZ pointProject2d = Common.ToPoint2D(pointProject);
+
+                    var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
+                    if (!Common.IsEqual(distancePoint2d, 0))
+                    {
+                        var vector = pointProject2d - sprinker2d;
+
+                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
+
+                        Global.UIDoc.Document.Regenerate();
+
+                        sprinkle_point = (instance.Location as LocationPoint).Point;
+                    }
 
                     //                     if (p02d.DistanceTo(sprinker2d) < p12d.DistanceTo(sprinker2d))
                     //                     {
@@ -530,9 +547,17 @@ namespace TotalMEPProject.Commands.FireFighting
                     lineTemp = Line.CreateBound(pOn, sprinkle_point);
                     var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
 
+                    var height = UnitUtils.ConvertToInternalUnits(App.m_SprinklerDownForm.Height_, DisplayUnitType.DUT_MILLIMETERS);
+
+                    pcenter = new XYZ(pcenter.X, pcenter.Y, pOn.Z - height);
+
                     (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
 
                     newPipeZ.LookupParameter("Diameter").Set(dFt);
+
+                    var pipeType = Global.UIDoc.Document.GetElement(pipeTypeId) as PipeType;
+                    if (pipeType != null)
+                        newPipeZ.PipeType = pipeType;
 
                     Global.UIDoc.Document.Regenerate();
 
@@ -541,7 +566,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     try
                     {
-                        Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                        //Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
 
                         result = true;
                     }
@@ -676,6 +701,6 @@ namespace TotalMEPProject.Commands.FireFighting
             return result;
         }
 
-        #endregion Type3
+        #endregion Type2
     }
 }
