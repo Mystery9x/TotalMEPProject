@@ -796,7 +796,7 @@ namespace TotalMEPProject
                     isShow = true;
                 }
 
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinkerUpForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
 
                 return true;
             }
