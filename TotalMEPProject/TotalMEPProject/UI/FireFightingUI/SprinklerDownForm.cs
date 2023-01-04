@@ -26,6 +26,14 @@ namespace TotalMEPProject.UI.FireFightingUI
         private ExternalEvent m_exEvent;
         public bool isD15 = false;
 
+        public ElementId FamilyType
+        {
+            get
+            {
+                return (cboC3PipeType.SelectedItem as ObjectItem).ObjectId;
+            }
+        }
+
         public double PipeSize
         {
             get
