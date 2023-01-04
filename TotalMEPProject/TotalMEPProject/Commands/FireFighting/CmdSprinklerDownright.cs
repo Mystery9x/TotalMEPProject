@@ -193,8 +193,8 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 //Set d = 25
-                double d25 = 25;
-                var dFt = Common.mmToFT * d25;
+                //double d25 = 25;
+                var dFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
 
                 var ft_h = Common.mmToFT * height;
 
@@ -369,9 +369,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
         #endregion Type1
 
-        #region Type3
+        #region Type2
 
-        public static Result ProcessType3()
+        public static Result ProcessType2()
         {
             List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_SprinklerDownForm.isD15);
             if (sprinklers == null || sprinklers.Count == 0)
@@ -391,7 +391,7 @@ namespace TotalMEPProject.Commands.FireFighting
             //Find pipe
             foreach (FamilyInstance instance in sprinklers)
             {
-                cc(instance, pipeIds, false);
+                cc(instance, pipeIds, App.m_SprinklerDownForm.PipeSize, false);
             }
 
             tran.Commit();
@@ -399,15 +399,15 @@ namespace TotalMEPProject.Commands.FireFighting
             return Result.Succeeded;
         }
 
-        public static bool cc(FamilyInstance instance, List<ElementId> selectedIds, bool isUp)
+        public static bool cc(FamilyInstance instance, List<ElementId> selectedIds, double pipeSize, bool isUp)
         {
             bool result = false;
 
             XYZ direction = isUp ? -XYZ.BasisZ : XYZ.BasisZ;
 
-            //Set d = 25
-            double d25 = 25;
-            var dFt = Common.mmToFT * d25;
+            ////Set d = 25
+            //double d25 = 25;
+            var dFt = Common.mmToFT * pipeSize;
 
             var sprinkle_point = (instance.Location as LocationPoint).Point;
 
@@ -676,6 +676,6 @@ namespace TotalMEPProject.Commands.FireFighting
             return result;
         }
 
-        #endregion Type3
+        #endregion Type2
     }
 }
