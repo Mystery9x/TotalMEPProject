@@ -184,7 +184,13 @@ namespace TotalMEPProject.Commands.FireFighting
                     p = arr.get_Item(0).XYZPoint;
 
                     pipe2 = null;
-                    sr.XuLyDauong(pipe, out pipe2, p);
+                    bool flagCreateTee = true;
+                    if (GetPreferredJunctionType(pipe) != PreferredJunctionType.Tee)
+                    {
+                        flagCreateTee = false;
+                    }
+
+                    ProcessStartSidePipe(pipe, out pipe2, p, flagCreateTee);
 
                     if (pipe2 != null)
                     {
@@ -193,8 +199,8 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 //Set d = 25
-                //double d25 = 25;
-                var dFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
+                double d25 = 25;
+                var dFt = Common.mmToFT * d25;
 
                 var ft_h = Common.mmToFT * height;
 
@@ -217,15 +223,23 @@ namespace TotalMEPProject.Commands.FireFighting
                     var c1 = Common.GetConnectorClosestTo(pipe1, p);
                     var c3 = Common.GetConnectorClosestTo(pipe_v1, p);
 
-                    if (pipe2 != null)
+                    if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                     {
-                        var c2 = Common.GetConnectorClosestTo(pipe2, p);
-                        var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                        CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
                     }
                     else
                     {
-                        Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                        if (pipe2 != null)
+                        {
+                            var c2 = Common.GetConnectorClosestTo(pipe2, p);
+                            var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                        }
+                        else
+                        {
+                            Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                        }
                     }
+
                 }
                 catch (System.Exception ex)
                 {
@@ -367,6 +381,261 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipeNear;
         }
 
+
+
+        public static void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true)
+        {
+            var curve = (pipe.Location as LocationCurve).Curve;
+
+            //Create plane
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
+            double kc_mm = 400 /*1000*/;
+            double km_ft = Common.mmToFT * kc_mm;
+
+            var p02d = new XYZ(p0.X, p0.Y, 0);
+            var p12d = new XYZ(p1.X, p1.Y, 0);
+            var pOn2d = new XYZ(pOn.X, pOn.Y, 0);
+
+            var d1 = p02d.DistanceTo(pOn2d);
+            var d2 = p12d.DistanceTo(pOn2d);
+
+            bool isDauOng = false;
+            int far = -1;
+            if (d1 < km_ft)
+            {
+                if (IsIntersect(p0) == false)
+                {
+                    isDauOng = true;
+                    far = 1;
+                }
+            }
+            else if (d2 < km_ft)
+            {
+                if (IsIntersect(p1) == false)
+                {
+                    isDauOng = true;
+                    far = 0;
+                }
+            }
+
+            Pipe pipe1 = pipe;
+            pipe2 = null;
+
+            if (flagSplit == true)
+            {
+                if (isDauOng == false)
+                {
+                    SplitPipe(pipe, pOn, out pipe1, out pipe2);
+                }
+                else if (far != -1)
+                {
+                    if (far == 1)
+                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(pOn, p1);
+                    else
+                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, pOn);
+                }
+            }
+        }
+
+        public static void SplitPipe(Pipe pipeOrigin, XYZ splitPoint, out Pipe pipe1, out Pipe pipe2)
+        {
+            var curve = (pipeOrigin.Location as LocationCurve).Curve;
+
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            pipe1 = pipeOrigin;
+
+            //Split
+            (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, splitPoint);
+
+            var newPlace = new XYZ(0, 0, 0);
+            var elemIds = ElementTransformUtils.CopyElement(
+              Global.UIDoc.Document, pipeOrigin.Id, newPlace);
+
+            pipe2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+            (pipe2.Location as LocationCurve).Curve = Line.CreateBound(splitPoint, p1);
+
+            //Find
+            double ft = 0.001;
+            var solid = Common.CreateCylindricalVolume(p1, ft, ft, false);
+            if (solid != null)
+            {
+                //Find intersection wit fitting
+                var fittingBuilt = new ElementId(BuiltInCategory.OST_PipeFitting);
+                FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document);
+                collector.OfClass(typeof(FamilyInstance));
+                collector.OfCategoryId(fittingBuilt);
+                collector.WherePasses(new ElementIntersectsSolidFilter(solid)); // Apply intersection filter to find matches
+
+                if (collector.GetElementCount() != 0)
+                {
+                    var elements = collector.ToElements();
+
+                    var c1 = Common.GetConnectorClosestTo(pipe2, p1);
+
+                    foreach (FamilyInstance fitting in elements)
+                    {
+                        var c11 = Common.GetConnectorClosestTo(fitting, p1);
+
+                        if (c1 != null && c11 != null)
+                        {
+                            if (c1.Origin.DistanceTo(c11.Origin) < ft)
+                            {
+                                if (c1.IsConnectedTo(c11) == false)
+                                    c1.ConnectTo(c11);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static bool IsIntersect(XYZ point)
+        {
+            double ft = 0.001;
+            var solid = Common.CreateCylindricalVolume(point, ft, ft, false);
+            if (solid != null)
+            {
+                var fittingBuilt = new ElementId(BuiltInCategory.OST_PipeFitting);
+                FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document);
+                collector.OfClass(typeof(FamilyInstance));
+                collector.OfCategoryId(fittingBuilt);
+                collector.WherePasses(new ElementIntersectsSolidFilter(solid));
+
+                if (collector.GetElementCount() != 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get Preferred Junction Type
+        /// </summary>
+        /// <param name="pipe"></param>
+        /// <returns></returns>
+        private static PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
+        {
+            var pipeType = pipe.PipeType as PipeType;
+
+            return pipeType.RoutingPreferenceManager.PreferredJunctionType;
+        }
+
+        /// <summary>
+        /// Create Tap
+        /// </summary>
+        /// <param name="mepCurveSplit1"></param>
+        /// <param name="mepCurveSplit2"></param>
+        /// <returns></returns>
+        public static bool CreateTap(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
+        {
+            try
+            {
+                var locationCurve1 = mepCurveSplit1.GetCurve();
+                var line1 = locationCurve1 as Line;
+
+                var locationCurve2 = mepCurveSplit2.GetCurve();
+                var line2 = locationCurve2 as Line;
+
+                var p10 = line2.GetEndPoint(0);
+                var p11 = line2.GetEndPoint(1);
+
+                var inter1 = locationCurve1.Project(p10);
+                var inter2 = locationCurve1.Project(p11);
+
+                if (inter1 == null || inter2 == null)
+                    return false;
+
+                var d1 = inter1.XYZPoint.DistanceTo(p10);
+                var d2 = inter2.XYZPoint.DistanceTo(p11);
+
+                if (d1 < d2)
+                {
+                    var con = GetConnectorClosestTo(mepCurveSplit2, p10);
+                    var tap = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+                else
+                {
+                    var con = GetConnectorClosestTo(mepCurveSplit2, p11);
+                    var tap = Global.UIDoc.Document.Create.NewTakeoffFitting(con, mepCurveSplit1);
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private static Connector GetConnectorClosestTo(Element e,
+                                                XYZ p)
+        {
+            ConnectorManager cm = GetConnectorManager(e);
+
+            return null == cm
+              ? null
+              : GetConnectorClosestTo(cm.Connectors, p);
+        }
+
+        /// <summary>
+        /// Get Connector Closest To
+        /// </summary>
+        /// <param name="connectors"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private static Connector GetConnectorClosestTo(ConnectorSet connectors,
+                                                XYZ p)
+        {
+            Connector targetConnector = null;
+            double minDist = double.MaxValue;
+
+            foreach (Connector c in connectors)
+            {
+                double d = c.Origin.DistanceTo(p);
+
+                if (d < minDist)
+                {
+                    targetConnector = c;
+                    minDist = d;
+                }
+            }
+            return targetConnector;
+        }
+
+        /// <summary>
+        /// GetConnectorManager
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private static ConnectorManager GetConnectorManager(Element e)
+        {
+            MEPCurve mc = e as MEPCurve;
+            FamilyInstance fi = e as FamilyInstance;
+
+            if (null == mc && null == fi)
+            {
+                throw new ArgumentException(
+                  "Element is neither an MEP curve nor a fitting.");
+            }
+
+            return null == mc
+              ? fi.MEPModel.ConnectorManager
+              : mc.ConnectorManager;
+        }
         #endregion Type1
 
         #region Type2
