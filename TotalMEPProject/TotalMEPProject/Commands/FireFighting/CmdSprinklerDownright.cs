@@ -199,8 +199,8 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 //Set d = 25
-                double d25 = 25;
-                var dFt = Common.mmToFT * d25;
+
+                var dFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
 
                 var ft_h = Common.mmToFT * height;
 
@@ -239,7 +239,6 @@ namespace TotalMEPProject.Commands.FireFighting
                             Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                         }
                     }
-
                 }
                 catch (System.Exception ex)
                 {
@@ -380,8 +379,6 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             return pipeNear;
         }
-
-
 
         public static void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true)
         {
@@ -636,6 +633,7 @@ namespace TotalMEPProject.Commands.FireFighting
               ? fi.MEPModel.ConnectorManager
               : mc.ConnectorManager;
         }
+
         #endregion Type1
 
         #region Type2
