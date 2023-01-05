@@ -6,10 +6,13 @@ using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TotalMEPProject.UI.FireFightingUI;
 using TotalMEPProject.Ultis;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TotalMEPProject.Commands.FireFighting
 {
@@ -969,5 +972,248 @@ namespace TotalMEPProject.Commands.FireFighting
         }
 
         #endregion Type2
+
+        #region Type3
+
+        public static Result ProcessType3()
+        {
+            // Get selected sprinkler
+            List<FamilyInstance> selSprinklers = sr.SelectSprinklers(App.m_SprinklerDownForm.isD15);
+            if (selSprinklers == null || selSprinklers.Count == 0)
+                return Result.Cancelled;
+
+            // Get selected main pipe
+            List<Pipe> selPipes = PickPipes();
+            if (selPipes == null || selPipes.Count == 0)
+                return Result.Cancelled;
+
+            // Get selected main pipe id
+            List<ElementId> selPipeIds = selPipes.Where(item => item.Id != ElementId.InvalidElementId).Select(item => item.Id).ToList();
+
+            // Process
+            Transaction reTrans = new Transaction(Global.UIDoc.Document, "SPRINKLER_DOWN_RIGHT_TYPE_3");
+            reTrans.Start();
+
+            try
+            {
+                double invalidRadius_mm = 500;
+                double invalidRadius_ft = Common.mmToFT * invalidRadius_mm;
+
+                foreach (FamilyInstance sprinkler in selSprinklers)
+                {
+                    // Location sprinkler
+                    XYZ locSprinkler = (sprinkler.Location as LocationPoint).Point;
+
+                    // Check valid connect
+                    ConnectorSet cntSetOfIns = sprinkler.MEPModel.ConnectorManager.Connectors;
+
+                    if (cntSetOfIns.Size == 0)
+                        continue;
+
+                    Connector cntOfIns_1 = sprinkler.MEPModel.ConnectorManager.Lookup(1);
+
+                    if (cntOfIns_1.IsConnected == true)
+                        continue;
+
+                    // Find intersection with sprinkler
+                    var cylindricalFromIns = Common.CreateCylindricalVolume(locSprinkler, invalidRadius_ft * 5, invalidRadius_ft, true);
+                    if (cylindricalFromIns == null)
+                        continue;
+
+                    FilteredElementCollector filterCollector = new FilteredElementCollector(Global.UIDoc.Document, selPipeIds).OfClass(typeof(Pipe)).WherePasses(new ElementIntersectsSolidFilter(cylindricalFromIns));
+                    if (filterCollector == null || filterCollector.GetElementCount() <= 0)
+                        continue;
+
+                    IList<Element> validPipes = filterCollector.ToElements();
+
+                    // Check pipe nesscesary split
+                    bool isSplit = false;
+                    Pipe processPipe = pp(validPipes.ToList(), locSprinkler, out isSplit);
+
+                    // Process main pipe
+                    Curve curveProcessPipe = (processPipe.Location as LocationCurve).Curve;
+
+                    XYZ firstPnt_ProcessPipe = curveProcessPipe.GetEndPoint(0);
+                    XYZ secondPnt_ProcessPipe = curveProcessPipe.GetEndPoint(1);
+
+                    double dTempEvaluate = 1000;
+
+                    var curveProcessPipe_2d = Line.CreateBound(new XYZ(firstPnt_ProcessPipe.X, firstPnt_ProcessPipe.Y, 0), new XYZ(secondPnt_ProcessPipe.X, secondPnt_ProcessPipe.Y, 0));
+                    XYZ dirCrossProduct = curveProcessPipe_2d.Direction.CrossProduct(XYZ.BasisZ).Normalize();
+
+                    var curveProcessPipe_crossProduct_2d = Line.CreateUnbound(new XYZ(locSprinkler.X, locSprinkler.Y, 0), dirCrossProduct * dTempEvaluate);
+
+                    XYZ p11 = curveProcessPipe_crossProduct_2d.Evaluate(dTempEvaluate, false);
+
+                    curveProcessPipe_crossProduct_2d = Line.CreateUnbound(new XYZ(locSprinkler.X, locSprinkler.Y, 0), -dirCrossProduct * dTempEvaluate);
+
+                    XYZ p22 = curveProcessPipe_crossProduct_2d.Evaluate(dTempEvaluate, false);
+
+                    curveProcessPipe_crossProduct_2d = Line.CreateBound(p11, p22);
+
+                    // Find intersection point
+                    XYZ newPlace = new XYZ(0, 0, 0);
+                    ICollection<ElementId> elemIds = null;
+                    var temp_processPipe_1 = processPipe;
+                    Pipe temp_processPipe_2 = null;
+                    XYZ finalIntPnt = null;
+
+                    IntersectionResultArray intRetArr = new IntersectionResultArray();
+
+                    //Truong hop dau ong
+                    if (isSplit == false)
+                    {
+                        //Expand
+                        var index = curveProcessPipe_2d.GetEndPoint(0).DistanceTo(locSprinkler) < curveProcessPipe_2d.GetEndPoint(1).DistanceTo(locSprinkler) ? 0 : 1;
+                        var curveExpand = Line.CreateUnbound(curveProcessPipe_2d.GetEndPoint(index), curveProcessPipe_2d.Direction * 100);
+
+                        var inter = curveExpand.Intersect(curveProcessPipe_crossProduct_2d, out intRetArr);
+                        if (inter != SetComparisonResult.Overlap)
+                            continue;
+
+                        var p2d = intRetArr.get_Item(0).XYZPoint;
+
+                        var p3d = new XYZ(p2d.X, p2d.Y, locSprinkler.Z);
+
+                        var line3d = Line.CreateBound(p3d, new XYZ(p3d.X, p3d.Y, p3d.Z + dTempEvaluate));
+                        var curveExtend3d_temp = Line.CreateUnbound(curveProcessPipe.GetEndPoint(index), (curveProcessPipe as Line).Direction * 100);
+
+                        intRetArr = new IntersectionResultArray();
+                        inter = curveExtend3d_temp.Intersect(line3d, out intRetArr);
+                        if (inter != SetComparisonResult.Overlap)
+                            continue;
+
+                        finalIntPnt = intRetArr.get_Item(0).XYZPoint;
+                    }
+
+                    // Truong hop o giua ong
+                    else
+                    {
+                        var inter = curveProcessPipe_crossProduct_2d.Intersect(curveProcessPipe_2d, out intRetArr);
+                        if (inter != SetComparisonResult.Overlap)
+                            continue;
+
+                        var p2d = intRetArr.get_Item(0).XYZPoint;
+
+                        var p3d = new XYZ(p2d.X, p2d.Y, locSprinkler.Z);
+
+                        var line3d = Line.CreateBound(p3d, new XYZ(p3d.X, p3d.Y, p3d.Z + dTempEvaluate));
+
+                        intRetArr = new IntersectionResultArray();
+                        inter = curveProcessPipe.Intersect(line3d, out intRetArr);
+                        if (inter != SetComparisonResult.Overlap)
+                            continue;
+
+                        finalIntPnt = intRetArr.get_Item(0).XYZPoint;
+
+                        temp_processPipe_2 = null;
+                        bool flagCreateTee = true;
+                        if (GetPreferredJunctionType(processPipe) != PreferredJunctionType.Tee)
+                        {
+                            flagCreateTee = false;
+                        }
+
+                        ProcessStartSidePipe(processPipe, out temp_processPipe_2, finalIntPnt, flagCreateTee);
+
+                        if (temp_processPipe_2 != null)
+                        {
+                            selPipeIds.Add(temp_processPipe_2.Id);
+                        }
+                    }
+
+                    //Set pipe size
+                    var dPipeSizeFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
+
+                    // Generate Pipe Horizontal
+                    var v_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).Normalize();
+                    var ft_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).GetLength();
+                    var line_Extend = Line.CreateUnbound(finalIntPnt, ft_v * v_v * 2);
+
+                    newPlace = new XYZ(0, 0, 0);
+                    elemIds = ElementTransformUtils.CopyElement(
+                     Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
+
+                    var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+                    var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(ft_v, false));
+                    (horizontal_pipe.Location as LocationCurve).Curve = hor_line;
+                    horizontal_pipe.LookupParameter("Diameter").Set(dPipeSizeFt);
+
+                    // Connect horizontal pipe with main pipe
+                    try
+                    {
+                        var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPnt);
+                        var c3 = Common.GetConnectorClosestTo(horizontal_pipe, finalIntPnt);
+
+                        if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee)
+                        {
+                            CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                        }
+                        else
+                        {
+                            if (temp_processPipe_2 != null)
+                            {
+                                var c2 = Common.GetConnectorClosestTo(temp_processPipe_2, finalIntPnt);
+                                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                            }
+                            else
+                            {
+                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                            }
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                    }
+
+                    //  Generate vertical pipe 2
+                    var line_v2 = Line.CreateBound(hor_line.GetEndPoint(1), locSprinkler);
+
+                    newPlace = new XYZ(0, 0, 0);
+                    elemIds = ElementTransformUtils.CopyElement(
+                     Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
+
+                    var pipe_v2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+                    var center = line_v2.Evaluate((line_v2.GetEndParameter(0) + line_v2.GetEndParameter(1)) / 2, false);
+
+                    (pipe_v2.Location as LocationCurve).Curve = Line.CreateBound(line_v2.GetEndPoint(0), center);
+
+                    pipe_v2.LookupParameter("Diameter").Set(dPipeSizeFt);
+
+                    //Connect horizontal pipe with vertical pipe 2
+                    try
+                    {
+                        var c1 = Common.GetConnectorClosestTo(horizontal_pipe, hor_line.GetEndPoint(1));
+                        var c2 = Common.GetConnectorClosestTo(pipe_v2, hor_line.GetEndPoint(1));
+
+                        Global.UIDoc.Document.Create.NewElbowFitting(c1, c2);
+                    }
+                    catch (System.Exception ex)
+                    {
+                    }
+
+                    // Connect vertical pipe 2 with sprinkler
+                    try
+                    {
+                        var c1 = Common.GetConnectorClosestTo(pipe_v2, center);
+                        var c2 = Common.GetConnectorClosestTo(sprinkler, center);
+
+                        Global.UIDoc.Document.Create.NewTransitionFitting(c1, c2);
+                    }
+                    catch (System.Exception ex)
+                    {
+                    }
+                }
+
+                reTrans.Commit();
+            }
+            catch (Exception)
+            {
+                reTrans.RollBack();
+            }
+
+            return Result.Succeeded;
+        }
+
+        #endregion Type3
     }
 }

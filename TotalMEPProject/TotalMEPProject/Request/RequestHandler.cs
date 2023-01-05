@@ -96,6 +96,7 @@ namespace TotalMEPProject.Request
 
                 case RequestId.SprinklerDownType3_RUN:
                     {
+                        CmdSprinklerDownright.ProcessType3();
                     }
                     break;
 
