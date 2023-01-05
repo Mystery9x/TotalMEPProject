@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.Attributes;
-
-//using MEPGenerator.Lisence;
+﻿//using MEPGenerator.Lisence;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
-using System.Windows.Forms;
-using Autodesk.Revit.Creation;
-using Autodesk.Revit.DB.Plumbing;
-using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Events;
-using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI.Events;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.UI;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace TotalMEPProject.Ultis.HolyUltis
 {
