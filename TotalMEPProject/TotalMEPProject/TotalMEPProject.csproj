@@ -9,6 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TotalMEPProject</RootNamespace>
     <AssemblyName>TotalMEP</AssemblyName>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -177,10 +178,13 @@
     <Compile Include="Request\RequestHandler.cs" />
     <Compile Include="SelectionFilters\ElementSelectionFilters.cs" />
     <Compile Include="Services\DisplayService.cs" />
-    <Compile Include="UI\FastVerticalForm.cs">
+    <Compile Include="UI\BeginUI\ViewSingleProgressBar.xaml.cs">
+      <DependentUpon>ViewSingleProgressBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TotalMEPUI\FastVerticalForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\FastVerticalForm.Designer.cs">
+    <Compile Include="UI\TotalMEPUI\FastVerticalForm.Designer.cs">
       <DependentUpon>FastVerticalForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\FireFightingUI\2LevelSmartForm.cs">
@@ -201,25 +205,25 @@
     <Compile Include="UI\FireFightingUI\SprinklerDownForm.Designer.cs">
       <DependentUpon>SprinklerDownForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\FrmLogin.cs">
+    <Compile Include="UI\BeginUI\FrmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\FrmLogin.Designer.cs">
+    <Compile Include="UI\BeginUI\FrmLogin.Designer.cs">
       <DependentUpon>FrmLogin.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\HolyUpDownForm.cs">
+    <Compile Include="UI\TotalMEPUI\HolyUpDownForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\HolyUpDownForm.Designer.cs">
+    <Compile Include="UI\TotalMEPUI\HolyUpDownForm.Designer.cs">
       <DependentUpon>HolyUpDownForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\ProgessBar.xaml.cs">
+    <Compile Include="UI\BeginUI\ProgessBar.xaml.cs">
       <DependentUpon>ProgessBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\VerticalMEPForm.cs">
+    <Compile Include="UI\TotalMEPUI\VerticalMEPForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\VerticalMEPForm.Designer.cs">
+    <Compile Include="UI\TotalMEPUI\VerticalMEPForm.Designer.cs">
       <DependentUpon>VerticalMEPForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Ultis\AppUtils.cs" />
@@ -244,7 +248,7 @@
     <Content Include="Resources\Revit.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\FastVerticalForm.resx">
+    <EmbeddedResource Include="UI\TotalMEPUI\FastVerticalForm.resx">
       <DependentUpon>FastVerticalForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FireFightingUI\2LevelSmartForm.resx">
@@ -256,13 +260,13 @@
     <EmbeddedResource Include="UI\FireFightingUI\SprinklerDownForm.resx">
       <DependentUpon>SprinklerDownForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\FrmLogin.resx">
+    <EmbeddedResource Include="UI\BeginUI\FrmLogin.resx">
       <DependentUpon>FrmLogin.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\HolyUpDownForm.resx">
+    <EmbeddedResource Include="UI\TotalMEPUI\HolyUpDownForm.resx">
       <DependentUpon>HolyUpDownForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\VerticalMEPForm.resx">
+    <EmbeddedResource Include="UI\TotalMEPUI\VerticalMEPForm.resx">
       <DependentUpon>VerticalMEPForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -270,7 +274,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\ProgessBar.xaml">
+    <Page Include="UI\BeginUI\ProgessBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\BeginUI\ViewSingleProgressBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

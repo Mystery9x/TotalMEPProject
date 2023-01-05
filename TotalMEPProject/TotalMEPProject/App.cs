@@ -672,7 +672,7 @@ namespace TotalMEPProject
 
                     m_HolyUpDownForm = new HolyUpDownForm(exEvent, handler);
 
-                    m_HolyUpDownForm.Show(hWndRevit);
+                    m_HolyUpDownForm.Show();
                 }
                 else
                 {
