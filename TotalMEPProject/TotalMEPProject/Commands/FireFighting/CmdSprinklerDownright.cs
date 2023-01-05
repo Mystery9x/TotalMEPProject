@@ -1375,7 +1375,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPnt);
                             var c3 = Common.GetConnectorClosestTo(horizontal_pipe, finalIntPnt);
 
-                            if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee)
+                            if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                             {
                                 CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
                             }
