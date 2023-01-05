@@ -293,6 +293,7 @@
             this.rdnC3Type1.TabStop = true;
             this.rdnC3Type1.Text = "Type1";
             this.rdnC3Type1.UseVisualStyleBackColor = true;
+            this.rdnC3Type1.CheckedChanged += new System.EventHandler(this.rdnC3Type1_CheckedChanged);
             // 
             // label2
             // 

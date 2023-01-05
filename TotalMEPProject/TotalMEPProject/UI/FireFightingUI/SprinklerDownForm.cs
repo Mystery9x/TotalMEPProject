@@ -188,5 +188,13 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             this.Close();
         }
+
+        private void rdnC3Type1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdnC3Type1.Checked)
+                txbC3Length.Enabled = true;
+            else
+                txbC3Length.Enabled = false;
+        }
     }
 }

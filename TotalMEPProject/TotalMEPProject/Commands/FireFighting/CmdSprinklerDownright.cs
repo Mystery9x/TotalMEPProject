@@ -827,7 +827,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
             if (pipes == null || pipes.Count == 0)
             {
-                double radius = 400; //mm
+                double radius = 100; //mm
                 var ft = Common.mmToFT * radius;
 
                 var solid = Common.CreateCylindricalVolume(sprinkle_point, ft * 5, ft, !isUp);
@@ -969,7 +969,10 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     try
                     {
-                        //Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                        if (CheckPipeIsEnd(pipe, sprinkle_point))
+                            ConnectTee(pipe, newPipeZ);
+                        else
+                            Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
 
                         result = true;
                     }
@@ -1102,6 +1105,32 @@ namespace TotalMEPProject.Commands.FireFighting
             }
 
             return result;
+        }
+
+        public static bool CheckPipeIsEnd(Pipe pipe, XYZ point)
+        {
+            var con = Common.GetConnectorClosestTo(pipe, point);
+
+            return con.IsConnected;
+        }
+
+        public static void ConnectTee(Pipe pipe, Pipe newPipeZ)
+        {
+            var curvePipeMain = pipe.GetCurve();
+
+            var curvePipeDung = newPipeZ.GetCurve();
+
+            Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction);
+
+            IntersectionResultArray array;
+
+            line.Intersect(curvePipeMain, out array);
+            var point = array.get_Item(0).XYZPoint;
+
+            if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                sr.CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            else
+                sr.se(pipe as MEPCurve, newPipeZ as MEPCurve);
         }
 
         #endregion Type2
