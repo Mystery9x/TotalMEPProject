@@ -23,6 +23,7 @@ namespace TotalMEPProject.Request
         SprinklerDownType1_RUN,
         SprinklerDownType2_RUN,
         SprinklerDownType3_RUN,
+        FlexSprinker_RUN
     }
 
     public class Request

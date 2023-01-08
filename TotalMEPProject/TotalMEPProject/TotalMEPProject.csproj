@@ -181,6 +181,12 @@
     <Compile Include="UI\BeginUI\ViewSingleProgressBar.xaml.cs">
       <DependentUpon>ViewSingleProgressBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\FireFightingUI\FlexSprinklerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FireFightingUI\FlexSprinklerForm.Designer.cs">
+      <DependentUpon>FlexSprinklerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\TotalMEPUI\FastVerticalForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -248,6 +254,9 @@
     <Content Include="Resources\Revit.ico" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UI\FireFightingUI\FlexSprinklerForm.resx">
+      <DependentUpon>FlexSprinklerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\TotalMEPUI\FastVerticalForm.resx">
       <DependentUpon>FastVerticalForm.cs</DependentUpon>
     </EmbeddedResource>

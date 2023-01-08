@@ -33,6 +33,7 @@ namespace TotalMEPProject
         public static HolyUpDownForm m_HolyUpDownForm = null;
         public static SprinkerUpForm m_SprinkerUpForm = null;
         public static SprinklerDownForm m_SprinklerDownForm = null;
+        public static FlexSprinklerForm m_flexSprinklerForm = null;
 
         public static HolySplitUpdown _HolyUpdown = null;
         public static bool isApply = true;
@@ -797,6 +798,45 @@ namespace TotalMEPProject
                 }
 
                 DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static bool ShowFlexSprinklerForm()
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (m_flexSprinklerForm == null || m_flexSprinklerForm.IsDisposed)
+                {
+                    RequestHandler handler = new RequestHandler();
+
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    m_flexSprinklerForm = new FlexSprinklerForm(exEvent, handler);
+
+                    m_flexSprinklerForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App.m_flexSprinklerForm.Handle));
 
                 return true;
             }

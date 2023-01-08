@@ -100,6 +100,12 @@ namespace TotalMEPProject.Request
                     }
                     break;
 
+                case RequestId.FlexSprinker_RUN:
+                    {
+                        CmdFlexSprinkler.Process();
+                    }
+                    break;
+
                 default:
                     {
                         break;
