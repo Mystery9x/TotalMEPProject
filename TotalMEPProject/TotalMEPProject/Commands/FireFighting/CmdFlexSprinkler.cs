@@ -1008,7 +1008,7 @@ namespace TotalMEPProject.Commands.FireFighting
                          Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
 
                         var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                        var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(ft_v, false));
+                        var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(100 * Common.mmToFT, false));
                         (horizontal_pipe.Location as LocationCurve).Curve = hor_line;
                         horizontal_pipe.LookupParameter("Diameter").Set(dPipeSizeFt);
 
