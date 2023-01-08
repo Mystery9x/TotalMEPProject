@@ -83,7 +83,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                where p.Id != ElementId.InvalidElementId
                                select p.Id).ToList();
 
-                var height = App.m_flexSprinklerForm.VerticalPipeLength;
+                var height = App.m_flexSprinklerForm.VerticalPipeLengthL2;
 
                 Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
                 tran.Start();
@@ -274,7 +274,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     //Set d = 25
 
-                    double dFt = (double)GetParameterValueByName(pipe, "Diameter");
+                    double dFt = App.m_flexSprinklerForm.PipeSize * Common.mmToFT;
 
                     var ft_h = Common.mmToFT * height;
 
@@ -291,6 +291,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     pipe_v1.LookupParameter("Diameter").Set(dFt);
 
+                    var pipeType = Global.UIDoc.Document.GetElement(App.m_flexSprinklerForm.FamilyType) as PipeType;
+                    if (pipeType != null)
+                        pipe_v1.PipeType = pipeType;
                     //Connect
                     try
                     {
@@ -321,7 +324,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     //Hor
                     var v_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).Normalize();
 
-                    var ft_v = 200 * Common.mmToFT;
+                    var ft_v = App.m_flexSprinklerForm.HorizontalPipeLengthL * Common.mmToFT;
 
                     var line_Extend = Line.CreateUnbound(line_v1.GetEndPoint(1), ft_v * v_v * 2);
 
@@ -362,7 +365,12 @@ namespace TotalMEPProject.Commands.FireFighting
                         var c1_flexPipe = GetConnectorClosestTo(flexPipe, c1.Origin);
                         var c2_flexPipe = GetConnectorClosestTo(flexPipe, c2.Origin);
 
-                        c1_flexPipe.ConnectTo(c1);
+                        var union = Global.UIDoc.Document.Create.NewUnionFitting(c1_flexPipe, c1);
+                        var con = Common.ToList(union.MEPModel.ConnectorManager.Connectors);
+
+                        var vectorMove = con[1].Origin - con[0].Origin;
+
+                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.0001);
                         c2_flexPipe.ConnectTo(c2);
 
                         Global.UIDoc.Document.Regenerate();
@@ -413,7 +421,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                where p.Id != ElementId.InvalidElementId
                                select p.Id).ToList();
 
-                var height = App.m_flexSprinklerForm.VerticalPipeLength;
+                var height = App.m_flexSprinklerForm.VerticalPipeLengthL2;
 
                 Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
                 tran.Start();
@@ -620,7 +628,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     //Set d = 25
 
-                    var dFt = (double)GetParameterValueByName(pipe, "Diameter"); ;
+                    var dFt = App.m_flexSprinklerForm.PipeSize * Common.mmToFT;
 
                     var ft_h = Common.mmToFT * height;
 
@@ -636,7 +644,9 @@ namespace TotalMEPProject.Commands.FireFighting
                     (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                     pipe_v1.LookupParameter("Diameter").Set(dFt);
-
+                    var pipeType = Global.UIDoc.Document.GetElement(App.m_flexSprinklerForm.FamilyType) as PipeType;
+                    if (pipeType != null)
+                        pipe_v1.PipeType = pipeType;
                     //Connect
                     try
                     {
@@ -667,7 +677,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     //Hor
                     var v_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).Normalize();
 
-                    var ft_v = 200 * Common.mmToFT;
+                    var ft_v = App.m_flexSprinklerForm.HorizontalPipeLengthL * Common.mmToFT;
 
                     var line_Extend = Line.CreateUnbound(line_v1.GetEndPoint(1), ft_v * v_v * 2);
 
@@ -696,7 +706,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     //Vertical 2
 
                     XYZ directionTemp = (sprinkle_point - line_hor.GetEndPoint(1)).Normalize();
-                    var line_v2 = Line.CreateBound(line_hor.GetEndPoint(1), line_hor.GetEndPoint(1) + XYZ.BasisZ.Negate() * 100 * Common.mmToFT);
+                    var line_v2 = Line.CreateBound(line_hor.GetEndPoint(1), line_hor.GetEndPoint(1) + XYZ.BasisZ.Negate() * App.m_flexSprinklerForm.ExtendPipeLengthL1 * Common.mmToFT);
 
                     newPlace = new XYZ(0, 0, 0);
                     elemIds = ElementTransformUtils.CopyElement(
@@ -743,7 +753,12 @@ namespace TotalMEPProject.Commands.FireFighting
                         var c1_flexPipe = GetConnectorClosestTo(flexPipe, c1.Origin);
                         var c2_flexPipe = GetConnectorClosestTo(flexPipe, c2.Origin);
 
-                        c1_flexPipe.ConnectTo(c1);
+                        var union = Global.UIDoc.Document.Create.NewUnionFitting(c1_flexPipe, c1);
+                        var con = Common.ToList(union.MEPModel.ConnectorManager.Connectors);
+
+                        var vectorMove = con[1].Origin - con[0].Origin;
+
+                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.0001);
                         c2_flexPipe.ConnectTo(c2);
 
                         Global.UIDoc.Document.Regenerate();
@@ -995,8 +1010,8 @@ namespace TotalMEPProject.Commands.FireFighting
                             }
                         }
 
-                        //Set pipe size
-                        var dPipeSizeFt = (double)GetParameterValueByName(processPipe, "Diameter"); ;
+                        ////Set pipe size
+                        //var dPipeSizeFt = (double)GetParameterValueByName(processPipe, "Diameter"); ;
 
                         // Generate Pipe Horizontal
                         var v_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).Normalize();
@@ -1008,9 +1023,9 @@ namespace TotalMEPProject.Commands.FireFighting
                          Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
 
                         var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                        var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(100 * Common.mmToFT, false));
+                        var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(App.m_flexSprinklerForm.HorizontalPipeLengthL * Common.mmToFT, false));
                         (horizontal_pipe.Location as LocationCurve).Curve = hor_line;
-                        horizontal_pipe.LookupParameter("Diameter").Set(dPipeSizeFt);
+                        horizontal_pipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
 
                         // Connect horizontal pipe with main pipe
                         try
@@ -1060,15 +1075,21 @@ namespace TotalMEPProject.Commands.FireFighting
                             var flexPipe = Global.UIDoc.Document.Create.NewFlexPipe(pnts, flexPipeType);
 
                             //Set the diameter of flex.
-                            flexPipe.LookupParameter("Diameter").Set(dPipeSizeFt);
+                            flexPipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
                             flexPipe.StartTangent = c1.CoordinateSystem.BasisZ; //Set Tangent to Conn Direction.
                             flexPipe.EndTangent = c2.CoordinateSystem.BasisZ.Negate();
 
                             var c1_flexPipe = GetConnectorClosestTo(flexPipe, c1.Origin);
-                            var c2_flexPipe = GetConnectorClosestTo(flexPipe, c2.Origin);
+                            var c2_flexPipe = GetConnectorClosestTo(flexPipe, locSprinkler);
+                            var union = Global.UIDoc.Document.Create.NewUnionFitting(c1_flexPipe, c1);
+                            var con = Common.ToList(union.MEPModel.ConnectorManager.Connectors);
 
-                            c1_flexPipe.ConnectTo(c1);
-                            c2_flexPipe.ConnectTo(c2);
+                            var vectorMove = con[1].Origin - con[0].Origin;
+
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.0001);
+
+                            //c1_flexPipe.ConnectTo(c1);
+                            var a = Global.UIDoc.Document.Create.NewUnionFitting(c2_flexPipe, c2);
 
                             Global.UIDoc.Document.Regenerate();
                         }
