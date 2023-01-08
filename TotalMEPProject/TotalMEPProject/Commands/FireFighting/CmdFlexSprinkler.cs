@@ -370,8 +370,17 @@ namespace TotalMEPProject.Commands.FireFighting
 
                         var vectorMove = con[1].Origin - con[0].Origin;
 
-                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.0001);
-                        c2_flexPipe.ConnectTo(c2);
+                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.00001);
+
+                        var paraTransition = flexPipeType.get_Parameter(BuiltInParameter.RBS_CURVETYPE_DEFAULT_TRANSITION_PARAM);
+                        if (paraTransition != null && !paraTransition.IsReadOnly)
+                        {
+                            var fmlReducerSymbol = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(FamilySymbol))
+                                                                                                      .Cast<FamilySymbol>().FirstOrDefault(x => x.FamilyName.Contains("Reducer - Threaded - GSP"));
+                            if (fmlReducerSymbol != null)
+                                paraTransition.Set(fmlReducerSymbol.Id);
+                            Global.UIDoc.Document.Create.NewTransitionFitting(c2_flexPipe, c2);
+                        }
 
                         Global.UIDoc.Document.Regenerate();
                     }
@@ -713,7 +722,7 @@ namespace TotalMEPProject.Commands.FireFighting
                      Global.UIDoc.Document, pipe1.Id, newPlace);
 
                     var pipe_v2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                    var center = line_hor.GetEndPoint(1) + directionTemp * 100 * Common.mmToFT;
+                    var center = line_hor.GetEndPoint(1) + directionTemp * App.m_flexSprinklerForm.ExtendPipeLengthL1 * Common.mmToFT;
 
                     (pipe_v2.Location as LocationCurve).Curve = line_v2;
 
@@ -758,8 +767,17 @@ namespace TotalMEPProject.Commands.FireFighting
 
                         var vectorMove = con[1].Origin - con[0].Origin;
 
-                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.0001);
-                        c2_flexPipe.ConnectTo(c2);
+                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.00001);
+
+                        var paraTransition = flexPipeType.get_Parameter(BuiltInParameter.RBS_CURVETYPE_DEFAULT_TRANSITION_PARAM);
+                        if (paraTransition != null && !paraTransition.IsReadOnly)
+                        {
+                            var fmlReducerSymbol = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(FamilySymbol))
+                                                                                                      .Cast<FamilySymbol>().FirstOrDefault(x => x.FamilyName.Contains("Reducer - Threaded - GSP"));
+                            if (fmlReducerSymbol != null)
+                                paraTransition.Set(fmlReducerSymbol.Id);
+                            Global.UIDoc.Document.Create.NewTransitionFitting(c2_flexPipe, c2);
+                        }
 
                         Global.UIDoc.Document.Regenerate();
                     }
@@ -1066,32 +1084,41 @@ namespace TotalMEPProject.Commands.FireFighting
                             var c2 = Common.GetConnectorClosestTo(sprinkler, center);
 
                             FlexPipeType flexPipeType = new FilteredElementCollector(Global.UIDoc.Document).OfCategory(BuiltInCategory.OST_FlexPipeCurves).OfClass(typeof(FlexPipeType)).WhereElementIsElementType().Cast<FlexPipeType>().FirstOrDefault();
+                            if (flexPipeType != null)
+                            {
+                                List<XYZ> pnts = new List<XYZ>();
 
-                            List<XYZ> pnts = new List<XYZ>();
+                                pnts.Add(c1.Origin);
+                                pnts.Add(c2.Origin);
 
-                            pnts.Add(c1.Origin);
-                            pnts.Add(c2.Origin);
+                                var flexPipe = Global.UIDoc.Document.Create.NewFlexPipe(pnts, flexPipeType);
 
-                            var flexPipe = Global.UIDoc.Document.Create.NewFlexPipe(pnts, flexPipeType);
+                                //Set the diameter of flex.
+                                flexPipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
+                                flexPipe.StartTangent = c1.CoordinateSystem.BasisZ; //Set Tangent to Conn Direction.
+                                flexPipe.EndTangent = c2.CoordinateSystem.BasisZ.Negate();
 
-                            //Set the diameter of flex.
-                            flexPipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
-                            flexPipe.StartTangent = c1.CoordinateSystem.BasisZ; //Set Tangent to Conn Direction.
-                            flexPipe.EndTangent = c2.CoordinateSystem.BasisZ.Negate();
+                                var c1_flexPipe = GetConnectorClosestTo(flexPipe, c1.Origin);
+                                var c2_flexPipe = GetConnectorClosestTo(flexPipe, locSprinkler);
+                                var union = Global.UIDoc.Document.Create.NewUnionFitting(c1_flexPipe, c1);
+                                var con = Common.ToList(union.MEPModel.ConnectorManager.Connectors);
 
-                            var c1_flexPipe = GetConnectorClosestTo(flexPipe, c1.Origin);
-                            var c2_flexPipe = GetConnectorClosestTo(flexPipe, locSprinkler);
-                            var union = Global.UIDoc.Document.Create.NewUnionFitting(c1_flexPipe, c1);
-                            var con = Common.ToList(union.MEPModel.ConnectorManager.Connectors);
+                                var vectorMove = con[1].Origin - con[0].Origin;
 
-                            var vectorMove = con[1].Origin - con[0].Origin;
+                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.00001);
 
-                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, union.Id, vectorMove.Normalize() * 0.0001);
+                                var paraTransition = flexPipeType.get_Parameter(BuiltInParameter.RBS_CURVETYPE_DEFAULT_TRANSITION_PARAM);
+                                if (paraTransition != null && !paraTransition.IsReadOnly)
+                                {
+                                    var fmlReducerSymbol = new FilteredElementCollector(Global.UIDoc.Document).OfClass(typeof(FamilySymbol))
+                                                                                                              .Cast<FamilySymbol>().FirstOrDefault(x => x.FamilyName.Contains("Reducer - Threaded - GSP"));
+                                    if (fmlReducerSymbol != null)
+                                        paraTransition.Set(fmlReducerSymbol.Id);
+                                    Global.UIDoc.Document.Create.NewTransitionFitting(c2_flexPipe, c2);
+                                }
 
-                            //c1_flexPipe.ConnectTo(c1);
-                            var a = Global.UIDoc.Document.Create.NewUnionFitting(c2_flexPipe, c2);
-
-                            Global.UIDoc.Document.Regenerate();
+                                Global.UIDoc.Document.Regenerate();
+                            }
                         }
                         catch (System.Exception ex)
                         {
