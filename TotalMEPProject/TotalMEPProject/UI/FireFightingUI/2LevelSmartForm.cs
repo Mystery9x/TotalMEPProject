@@ -6,6 +6,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using TotalMEPProject.Commands.FireFighting;
 using TotalMEPProject.Request;
 using TotalMEPProject.Services;
 using TotalMEPProject.Ultis;
@@ -16,89 +17,27 @@ namespace TotalMEPProject.UI.FireFightingUI
     {
         #region Variable & Properties
 
-        private Request.Request m_request;
-
         private Request.RequestHandler m_handler;
 
         private ExternalEvent m_exEvent;
 
-        public ElementId FamilyType
+        private TwoLevelSmartDialogData m_dialogResultData = new TwoLevelSmartDialogData();
+
+        public TwoLevelSmartDialogData DialogResultData
         {
             get
             {
-                return (cboC1FamilyType.SelectedItem as ObjectItem).ObjectId;
-            }
-        }
+                if (m_dialogResultData == null)
+                    m_dialogResultData = new TwoLevelSmartDialogData();
 
-        public FamilySymbol SelectedNippleFamily
-        {
-            get
-            {
-                return (cboC1NippleFamily.SelectedItem as FamilySymbol);
-            }
-        }
-
-        public bool OptionMainBranchElevation_SameElevation
-        {
-            get
-            {
-                return rBC1SameElevation.Checked;
-            }
-        }
-
-        public bool OptionMainBranchElevation_ElevationDifference
-        {
-            get
-            {
-                return rBC1ElevationDifference.Checked;
-            }
-        }
-
-        public bool OptionMainBranchConnection_TeeOrTap
-        {
-            get
-            {
-                return rBC1TeeOrTap.Checked;
-            }
-        }
-
-        public bool OptionMainBranchConnection_Elbow
-        {
-            get
-            {
-                return rBC1ElbowConnect.Checked;
-            }
-        }
-
-        public bool OptionAddNipple
-        {
-            get
-            {
-                return ckbNippleCreating.Checked;
-            }
-        }
-
-        public bool OptionAddElbowConnection
-        {
-            get
-            {
-                return ckbC1ElbowConnection.Checked;
-            }
-        }
-
-        public double PipeSize
-        {
-            get
-            {
-                var value = cboC1PipeSize.SelectedItem.ToString();
-
-                value = value.Replace(" mm", "");
-
-                double d = 0;
-                if (double.TryParse(value, out d) == false)
-                    return double.MaxValue;
-
-                return d;
+                m_dialogResultData.IsCheckedEleDiff = rBC1ElevationDifference.Checked;
+                m_dialogResultData.IsCheckedTeeTap = rBC1TeeOrTap.Checked;
+                m_dialogResultData.PipeTypeId = (cboC1FamilyType.SelectedItem as ObjectItem).ObjectId;
+                m_dialogResultData.PipeSize = double.TryParse(cboC1PipeSize.SelectedItem.ToString().Replace(" mm", ""), out double retVal) == false ? double.MaxValue : retVal;
+                m_dialogResultData.FlagAddElbowLastBranch = ckbC1ElbowConnection.Checked;
+                m_dialogResultData.FlagAddNipple = ckbNippleCreating.Checked;
+                m_dialogResultData.NippleFamily = (cboC1NippleFamily.SelectedItem as FamilySymbol);
+                return m_dialogResultData;
             }
         }
 
@@ -208,104 +147,6 @@ namespace TotalMEPProject.UI.FireFightingUI
             m_exEvent.Raise();
         }
 
-        #endregion Method
-
-        #region Event
-
-        private void cboC1FamilyType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var familyTypeId = (cboC1FamilyType.SelectedItem as ObjectItem).ObjectId;
-
-            var familyType = Global.UIDoc.Document.GetElement(familyTypeId) as MEPCurveType;
-
-            if (familyType.RoutingPreferenceManager != null)
-            {
-                PipeSegment CurrentSegment = null;
-                int count = familyType.RoutingPreferenceManager.GetNumberOfRules(RoutingPreferenceRuleGroupType.Segments);
-
-                for (int i = 0; i < count; i++)
-                {
-                    var rule = familyType.RoutingPreferenceManager.GetRule(RoutingPreferenceRuleGroupType.Segments, i);
-
-                    CurrentSegment = Global.UIDoc.Document.GetElement(rule.MEPPartId) as PipeSegment;
-                }
-
-                if (CurrentSegment != null)
-                    AddDiameter(CurrentSegment);
-            }
-        }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            PressCancel();
-            App._2LevelSmartForm = null;
-            AppUtils.sa(cboC1FamilyType);
-            AppUtils.sa(cboC1PipeSize);
-            AppUtils.sa(cboC1NippleFamily);
-            AppUtils.sa(rBC1ElevationDifference);
-            AppUtils.sa(rBC1SameElevation);
-            AppUtils.sa(rBC1TeeOrTap);
-            AppUtils.sa(rBC1ElbowConnect);
-            this.Close();
-        }
-
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            if (PipeSize == double.MaxValue)
-                return;
-
-            AppUtils.sa(cboC1FamilyType);
-            AppUtils.sa(cboC1PipeSize);
-            AppUtils.sa(cboC1NippleFamily);
-            AppUtils.sa(rBC1ElevationDifference);
-            AppUtils.sa(rBC1SameElevation);
-            AppUtils.sa(rBC1TeeOrTap);
-            AppUtils.sa(rBC1ElbowConnect);
-            SetFocus();
-            MakeRequest(RequestId.TwoLevelSmart_OK);
-        }
-
-        private void ckbNippleCreating_CheckedChanged(object sender, EventArgs e)
-        {
-            if (ckbNippleCreating.Checked)
-            {
-                ckbC1ElbowConnection.Enabled = false;
-                cboC1NippleFamily.Enabled = true;
-            }
-            else
-            {
-                ckbC1ElbowConnection.Enabled = true;
-                cboC1NippleFamily.Enabled = false;
-            }
-        }
-
-        private void ckbC1ElbowConnection_CheckedChanged(object sender, EventArgs e)
-        {
-            ReDisplay();
-        }
-
-        #endregion Event
-
-        private void rBC1SameElevation_CheckedChanged(object sender, EventArgs e)
-        {
-            ReDisplay();
-        }
-
-        private void rBC1ElbowConnect_CheckedChanged(object sender, EventArgs e)
-        {
-            ReDisplay();
-        }
-
-        private void rBC1ElevationDifference_CheckedChanged(object sender, EventArgs e)
-        {
-            ReDisplay();
-        }
-
-        private void rBC1TeeOrTap_CheckedChanged(object sender, EventArgs e)
-        {
-            ReDisplay();
-        }
-
         private void ReDisplay()
         {
             rBC1ElevationDifference.Enabled = true;
@@ -339,11 +180,101 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             if (ckbC1ElbowConnection.Checked == true)
             {
-                cboC1PipeSize.Enabled = false;
-                cboC1FamilyType.Enabled = false;
-                ckbNippleCreating.Enabled = false;
-                cboC1NippleFamily.Enabled = false;
+                //cboC1PipeSize.Enabled = false;
+                //cboC1FamilyType.Enabled = false;
+                //ckbNippleCreating.Enabled = false;
+                //cboC1NippleFamily.Enabled = false;
             }
         }
+
+        #endregion Method
+
+        #region Event
+
+        private void cboC1FamilyType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var familyTypeId = (cboC1FamilyType.SelectedItem as ObjectItem).ObjectId;
+
+            var familyType = Global.UIDoc.Document.GetElement(familyTypeId) as MEPCurveType;
+
+            if (familyType.RoutingPreferenceManager != null)
+            {
+                PipeSegment CurrentSegment = null;
+                int count = familyType.RoutingPreferenceManager.GetNumberOfRules(RoutingPreferenceRuleGroupType.Segments);
+
+                for (int i = 0; i < count; i++)
+                {
+                    var rule = familyType.RoutingPreferenceManager.GetRule(RoutingPreferenceRuleGroupType.Segments, i);
+
+                    CurrentSegment = Global.UIDoc.Document.GetElement(rule.MEPPartId) as PipeSegment;
+                }
+
+                if (CurrentSegment != null)
+                    AddDiameter(CurrentSegment);
+            }
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            PressCancel();
+            App.m_2LevelSmartForm = null;
+            AppUtils.sa(cboC1FamilyType);
+            AppUtils.sa(cboC1PipeSize);
+            AppUtils.sa(cboC1NippleFamily);
+            AppUtils.sa(rBC1ElevationDifference);
+            AppUtils.sa(rBC1SameElevation);
+            AppUtils.sa(rBC1TeeOrTap);
+            AppUtils.sa(rBC1ElbowConnect);
+            this.Close();
+        }
+
+        private void btnOK_Click(object sender, EventArgs e)
+        {
+            if (m_dialogResultData.PipeSize == double.MaxValue)
+                return;
+
+            AppUtils.sa(cboC1FamilyType);
+            AppUtils.sa(cboC1PipeSize);
+            AppUtils.sa(cboC1NippleFamily);
+            AppUtils.sa(rBC1ElevationDifference);
+            AppUtils.sa(rBC1SameElevation);
+            AppUtils.sa(rBC1TeeOrTap);
+            AppUtils.sa(rBC1ElbowConnect);
+
+            SetFocus();
+            MakeRequest(RequestId.TwoLevelSmart_OK);
+        }
+
+        private void ckbNippleCreating_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void ckbC1ElbowConnection_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void rBC1SameElevation_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void rBC1ElbowConnect_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void rBC1ElevationDifference_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        private void rBC1TeeOrTap_CheckedChanged(object sender, EventArgs e)
+        {
+            ReDisplay();
+        }
+
+        #endregion Event
     }
 }

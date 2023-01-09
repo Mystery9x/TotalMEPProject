@@ -28,7 +28,7 @@ namespace TotalMEPProject
 
         public static WindowHandle hWndRevit = null;
         public static VerticalMEPForm verticalMEPForm = null;
-        public static _2LevelSmartForm _2LevelSmartForm = null;
+        public static _2LevelSmartForm m_2LevelSmartForm = null;
         public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
         public static SprinkerUpForm m_SprinkerUpForm = null;
@@ -704,22 +704,22 @@ namespace TotalMEPProject
 
                 bool isShow = false;
 
-                if (_2LevelSmartForm == null || _2LevelSmartForm.IsDisposed)
+                if (m_2LevelSmartForm == null || m_2LevelSmartForm.IsDisposed)
                 {
                     RequestHandler handler = new RequestHandler();
 
                     ExternalEvent exEvent = ExternalEvent.Create(handler);
 
-                    _2LevelSmartForm = new _2LevelSmartForm(exEvent, handler);
+                    m_2LevelSmartForm = new _2LevelSmartForm(exEvent, handler);
 
-                    _2LevelSmartForm.Show(hWndRevit);
+                    m_2LevelSmartForm.Show(hWndRevit);
                 }
                 else
                 {
                     isShow = true;
                 }
 
-                DisplayService.SetFocus(new HandleRef(null, App._2LevelSmartForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_2LevelSmartForm.Handle));
 
                 return true;
             }
