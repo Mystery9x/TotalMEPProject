@@ -492,7 +492,7 @@ namespace TotalMEPProject.Commands.FireFighting
             int far = -1;
             if (d1 < km_ft)
             {
-                if (IsIntersect(p0) == false)
+                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn))
                 {
                     isDauOng = true;
                     far = 1;
@@ -500,7 +500,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             else if (d2 < km_ft)
             {
-                if (IsIntersect(p1) == false)
+                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn))
                 {
                     isDauOng = true;
                     far = 0;
