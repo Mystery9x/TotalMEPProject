@@ -39,6 +39,8 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.rdnC3D20 = new System.Windows.Forms.RadioButton();
+            this.rdnC3D15 = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -50,12 +52,10 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.cboC3PipeType = new System.Windows.Forms.ComboBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.rdnC3Elbow = new System.Windows.Forms.RadioButton();
-            this.rdnC3TeeTap = new System.Windows.Forms.RadioButton();
-            this.rdnC3D15 = new System.Windows.Forms.RadioButton();
-            this.rdnC3D20 = new System.Windows.Forms.RadioButton();
             this.cboC3PipeSize = new System.Windows.Forms.ComboBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.rdnC3TeeTap = new System.Windows.Forms.RadioButton();
+            this.rdnC3Elbow = new System.Windows.Forms.RadioButton();
             this.button1 = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
@@ -210,6 +210,28 @@
             this.panel1.Size = new System.Drawing.Size(331, 30);
             this.panel1.TabIndex = 1;
             // 
+            // rdnC3D20
+            // 
+            this.rdnC3D20.AutoSize = true;
+            this.rdnC3D20.Location = new System.Drawing.Point(130, 5);
+            this.rdnC3D20.Name = "rdnC3D20";
+            this.rdnC3D20.Size = new System.Drawing.Size(45, 17);
+            this.rdnC3D20.TabIndex = 3;
+            this.rdnC3D20.TabStop = true;
+            this.rdnC3D20.Text = "D20";
+            this.rdnC3D20.UseVisualStyleBackColor = true;
+            // 
+            // rdnC3D15
+            // 
+            this.rdnC3D15.AutoSize = true;
+            this.rdnC3D15.Location = new System.Drawing.Point(6, 5);
+            this.rdnC3D15.Name = "rdnC3D15";
+            this.rdnC3D15.Size = new System.Drawing.Size(45, 17);
+            this.rdnC3D15.TabIndex = 2;
+            this.rdnC3D15.TabStop = true;
+            this.rdnC3D15.Text = "D15";
+            this.rdnC3D15.UseVisualStyleBackColor = true;
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.tableLayoutPanel3);
@@ -281,6 +303,7 @@
             this.rdnC3Type1.TabStop = true;
             this.rdnC3Type1.Text = "Type1";
             this.rdnC3Type1.UseVisualStyleBackColor = true;
+            this.rdnC3Type1.CheckedChanged += new System.EventHandler(this.rdnC3Type1_CheckedChanged);
             // 
             // groupBox3
             // 
@@ -343,6 +366,16 @@
             this.cboC3PipeType.TabIndex = 5;
             this.cboC3PipeType.SelectedIndexChanged += new System.EventHandler(this.cboC3PipeType_SelectedIndexChanged_1);
             // 
+            // cboC3PipeSize
+            // 
+            this.cboC3PipeSize.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cboC3PipeSize.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboC3PipeSize.FormattingEnabled = true;
+            this.cboC3PipeSize.Location = new System.Drawing.Point(123, 35);
+            this.cboC3PipeSize.Name = "cboC3PipeSize";
+            this.cboC3PipeSize.Size = new System.Drawing.Size(205, 21);
+            this.cboC3PipeSize.TabIndex = 6;
+            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.rdnC3TeeTap);
@@ -355,17 +388,6 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Fitting at the end of route";
             // 
-            // rdnC3Elbow
-            // 
-            this.rdnC3Elbow.AutoSize = true;
-            this.rdnC3Elbow.Location = new System.Drawing.Point(134, 19);
-            this.rdnC3Elbow.Name = "rdnC3Elbow";
-            this.rdnC3Elbow.Size = new System.Drawing.Size(54, 17);
-            this.rdnC3Elbow.TabIndex = 0;
-            this.rdnC3Elbow.TabStop = true;
-            this.rdnC3Elbow.Text = "Elbow";
-            this.rdnC3Elbow.UseVisualStyleBackColor = true;
-            // 
             // rdnC3TeeTap
             // 
             this.rdnC3TeeTap.AutoSize = true;
@@ -377,38 +399,16 @@
             this.rdnC3TeeTap.Text = "Tee/Tap";
             this.rdnC3TeeTap.UseVisualStyleBackColor = true;
             // 
-            // rdnC3D15
+            // rdnC3Elbow
             // 
-            this.rdnC3D15.AutoSize = true;
-            this.rdnC3D15.Location = new System.Drawing.Point(6, 5);
-            this.rdnC3D15.Name = "rdnC3D15";
-            this.rdnC3D15.Size = new System.Drawing.Size(45, 17);
-            this.rdnC3D15.TabIndex = 2;
-            this.rdnC3D15.TabStop = true;
-            this.rdnC3D15.Text = "D15";
-            this.rdnC3D15.UseVisualStyleBackColor = true;
-            this.rdnC3D15.CheckedChanged += new System.EventHandler(this.rdnC3D15_CheckedChanged);
-            // 
-            // rdnC3D20
-            // 
-            this.rdnC3D20.AutoSize = true;
-            this.rdnC3D20.Location = new System.Drawing.Point(130, 5);
-            this.rdnC3D20.Name = "rdnC3D20";
-            this.rdnC3D20.Size = new System.Drawing.Size(45, 17);
-            this.rdnC3D20.TabIndex = 3;
-            this.rdnC3D20.TabStop = true;
-            this.rdnC3D20.Text = "D20";
-            this.rdnC3D20.UseVisualStyleBackColor = true;
-            // 
-            // cboC3PipeSize
-            // 
-            this.cboC3PipeSize.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cboC3PipeSize.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboC3PipeSize.FormattingEnabled = true;
-            this.cboC3PipeSize.Location = new System.Drawing.Point(123, 35);
-            this.cboC3PipeSize.Name = "cboC3PipeSize";
-            this.cboC3PipeSize.Size = new System.Drawing.Size(205, 21);
-            this.cboC3PipeSize.TabIndex = 6;
+            this.rdnC3Elbow.AutoSize = true;
+            this.rdnC3Elbow.Location = new System.Drawing.Point(134, 19);
+            this.rdnC3Elbow.Name = "rdnC3Elbow";
+            this.rdnC3Elbow.Size = new System.Drawing.Size(54, 17);
+            this.rdnC3Elbow.TabIndex = 0;
+            this.rdnC3Elbow.TabStop = true;
+            this.rdnC3Elbow.Text = "Elbow";
+            this.rdnC3Elbow.UseVisualStyleBackColor = true;
             // 
             // button1
             // 

@@ -192,7 +192,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
-        private void rdnC3D15_CheckedChanged(object sender, EventArgs e)
+        private void rdnC3Type1_CheckedChanged(object sender, EventArgs e)
         {
             if (rdnC3Type1.Checked)
                 txbC3Length.Enabled = true;
