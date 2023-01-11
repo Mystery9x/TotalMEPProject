@@ -9,6 +9,7 @@ namespace TotalMEPProject.Ultis
     public class CreateFittingForMEPUtils
     {
         public static double MAX_REDUCER = 1000 * Common.mmToFT;
+        public static double MAX_FSILON = 200 * Common.mmToFT;
 
         public static bool iss(MEPCurve mep1, MEPCurve mep2)
         {
@@ -78,6 +79,63 @@ namespace TotalMEPProject.Ultis
             }
 
             return false;
+        }
+
+        public static FamilyInstance ctt(MEPCurve mep1, MEPCurve mep2, bool checkDistance = false)
+        {
+            if (mep1 == null || mep2 == null)
+                return null;
+
+            var same = iss(mep1, mep2);
+            if (same == true)
+                return null;
+
+            try
+            {
+                List<Connector> connectors = Common.GetConnectionNearest(mep1, mep2);
+                if (connectors != null && connectors.Count == 2)
+                {
+                    var c0 = connectors[0];
+                    var c1 = connectors[1];
+
+                    if (checkDistance == true)
+                    {
+                        if (c0.Origin.DistanceTo(c1.Origin) > CreateFittingForMEPUtils.MAX_REDUCER)
+                            return null;
+                    }
+
+                    //if (mep1 as Duct != null && (DuctConnected(mep1 as Duct, c0.Origin) || DuctConnected(mep2 as Duct, c1.Origin)))
+                    if ((mep1 as Duct != null || mep1 as Pipe != null) && (c0.IsConnected == true || c1.IsConnected == true))
+                    {
+                        return null;
+                    }
+
+                    var transition = Global.UIDoc.Document.Create.NewTransitionFitting(connectors[0], connectors[1]);
+
+                    if (transition != null)
+                        return transition;
+                }
+            }
+            catch (System.Exception ex)
+            {
+            }
+            return null;
+        }
+
+        public static FamilyInstance ct(Connector c3, Connector c4, Connector c5)
+        {
+            if (c3 == null || c4 == null || c5 == null)
+                return null;
+            try
+            {
+                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+                return fitting;
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
         }
 
         public static FamilyInstance CreatTee(Connector c3, Connector c4, Connector c5)
