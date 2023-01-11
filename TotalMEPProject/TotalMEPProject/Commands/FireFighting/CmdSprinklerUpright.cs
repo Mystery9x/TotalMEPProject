@@ -3,8 +3,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using TotalMEPProject.Services;
+using TotalMEPProject.UI.BeginUI;
 using TotalMEPProject.Ultis;
 
 namespace TotalMEPProject.Commands.FireFighting
@@ -31,33 +36,96 @@ namespace TotalMEPProject.Commands.FireFighting
 
         public static Result Process()
         {
-            List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_SprinkerUpForm.isD15);
-            if (sprinklers == null || sprinklers.Count == 0)
-                return Result.Cancelled;
-
-            List<Pipe> pipes = PickPipe();
-            if (pipes == null || pipes.Count == 0)
-                return Result.Cancelled;
-
-            var pipeIds = (from Pipe p in pipes
-                           where p.Id != ElementId.InvalidElementId
-                           select p.Id).ToList();
-
-            TransactionGroup tranGr = new TransactionGroup(Global.UIDoc.Document, "CreateConnector");
-            tranGr.Start();
-
-            //Find pipe
-            foreach (FamilyInstance instance in sprinklers)
+            try
             {
-                Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
-                tran.Start();
-                sr.cc(tran, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
+                if (App.m_SprinkerUpForm != null && App.m_SprinkerUpForm.IsDisposed == false)
+                {
+                    App.m_SprinkerUpForm.Hide();
+                }
 
-                tran.Commit();
+                List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_SprinkerUpForm.isD15);
+                if (sprinklers == null || sprinklers.Count == 0)
+                    return Result.Cancelled;
+
+                List<Pipe> pipes = PickPipe();
+                if (pipes == null || pipes.Count == 0)
+                    return Result.Cancelled;
+
+                var pipeIds = (from Pipe p in pipes
+                               where p.Id != ElementId.InvalidElementId
+                               select p.Id).ToList();
+
+                // Status cancel export : default = false
+                bool isCancelExport = false;
+
+                // Count type imported
+                int nCount = 0;
+
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                IntPtr intPtr = process.MainWindowHandle;
+                ViewSingleProgressBar progressBar = new ViewSingleProgressBar("Sprinkler Up", "Process : ");
+                progressBar.prgSingle.Minimum = 1;
+                progressBar.prgSingle.Maximum = sprinklers.Count;
+                progressBar.prgSingle.Value = 1;
+                WindowInteropHelper helper = new WindowInteropHelper(progressBar);
+                helper.Owner = intPtr;
+                progressBar.Show();
+
+                TransactionGroup tranGr = new TransactionGroup(Global.UIDoc.Document, "CreateConnector");
+                tranGr.Start();
+
+                //Find pipe
+                try
+                {
+                    foreach (FamilyInstance instance in sprinklers)
+                    {
+                        double dPercent = 0.0;
+                        try
+                        {
+                            Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
+                            tran.Start();
+                            sr.cc(tran, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
+
+                            tran.Commit();
+                        }
+                        catch (Exception)
+                        { }
+
+                        // If click cancel button when exporting
+                        if (progressBar.IsCancel)
+                        {
+                            isCancelExport = true;
+                            break;
+                        }
+
+                        nCount++;
+                        dPercent = (nCount / (sprinklers.Count * 1.0)) * 100.0;
+                        progressBar.tbxMessage.Text = "Complete : " + dPercent.ToString("0.00") + "% ";
+                        progressBar.IncrementProgressBar();
+                    }
+                }
+                catch (Exception)
+                { }
+                finally
+                {
+                    progressBar.Dispose();
+                }
+
+                tranGr.Assimilate();
+
+                return Result.Succeeded;
             }
-
-            tranGr.Assimilate();
-            return Result.Succeeded;
+            catch (System.Exception)
+            { }
+            finally
+            {
+                if (App.m_SprinkerUpForm != null && App.m_SprinkerUpForm.IsDisposed == false)
+                {
+                    App.m_SprinkerUpForm.Show(App.hWndRevit);
+                }
+                DisplayService.SetFocus(new HandleRef(null, App.m_2LevelSmartForm.Handle));
+            }
+            return Result.Cancelled;
         }
 
         public static List<Pipe> PickPipe()

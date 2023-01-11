@@ -740,8 +740,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
                                 pipe1 = temp_pipe1;
                                 pipe2 = temp_pipe2;
+                                DivideCase_2(validMainPipe, pipe1, twoPipes, out inter_main1, out p0_sub1, out p1_sub1, out inters_sub1);
                             }
-                            DivideCase_2(validMainPipe, pipe1, twoPipes, out inter_main1, out p0_sub1, out p1_sub1, out inters_sub1);
 
                             XYZ inter_main2 = null;
                             XYZ p0_sub2 = null;
@@ -2355,6 +2355,8 @@ namespace TotalMEPProject.Commands.FireFighting
         private XYZ m_sub2_pnt1 = null;
         private XYZ m_sub2Ints_pnt = null;
 
+        private bool m_flagCutPipe = false;
+
         private FamilyInstance m_bottomTee = null;
         private FamilyInstance m_bottomElbow = null;
 
@@ -2530,6 +2532,8 @@ namespace TotalMEPProject.Commands.FireFighting
                             {
                                 return false;
                             }
+
+                            m_flagCutPipe = true;
                         }
                     }
                 }
@@ -2576,12 +2580,14 @@ namespace TotalMEPProject.Commands.FireFighting
                 {
                     if (FirstPipe != null)
                     {
-                        SetBuiltinParameterValue(FirstPipe, BuiltInParameter.RBS_OFFSET_PARAM, middleElevation);
+                        //SetBuiltinParameterValue(FirstPipe, BuiltInParameter.RBS_OFFSET_PARAM, middleElevation);
+                        MovePipe(FirstPipe, m_intsMain1_pnt, m_sub1Ints_pnt);
                     }
 
                     if (SecondPipe != null)
                     {
-                        SetBuiltinParameterValue(SecondPipe, BuiltInParameter.RBS_OFFSET_PARAM, middleElevation);
+                        //SetBuiltinParameterValue(SecondPipe, BuiltInParameter.RBS_OFFSET_PARAM, middleElevation);
+                        MovePipe(SecondPipe, m_intsMain2_pnt, m_sub2Ints_pnt);
                     }
 
                     if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tee)
@@ -2631,6 +2637,13 @@ namespace TotalMEPProject.Commands.FireFighting
             catch (Exception)
             { }
             return false;
+        }
+
+        private void MovePipe(Pipe processPipe, XYZ finalPoint, XYZ beginPoint)
+        {
+            XYZ tranMove = finalPoint - beginPoint;
+            //Move element
+            ElementTransformUtils.MoveElement(Global.UIDoc.Document, processPipe.Id, tranMove);
         }
 
         public int IsLeftMath(XYZ Startpoint, XYZ Endpoint, XYZ P)
