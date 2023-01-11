@@ -479,7 +479,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             {
                                 flagCreateTee = false;
                             }
-                            ProcessStartSidePipe(validMainPipe, out temp_processPipe_2, finalIntPntMainPipe, flagCreateTee);
+                            ProcessStartSidePipeCaseElbow(validMainPipe, out temp_processPipe_2, finalIntPntMainPipe, flagCreateTee, ResultData.FlagAddElbowLastBranch);
                             if (temp_processPipe_2 != null)
                             {
                                 MainPipeIds.Add(temp_processPipe_2.Id);
@@ -492,6 +492,11 @@ namespace TotalMEPProject.Commands.FireFighting
                             continue;
                         }
 
+                        if (ResultData.FlagAddElbowLastBranch == false && flagSplit == false)
+                        {
+                            reTrans.RollBack();
+                            continue;
+                        }
                         var verticalPipe = Common.Clone(branchPipe) as Pipe;
                         verticalPipe.PipeType = pipeType;
                         (verticalPipe.Location as LocationCurve).Curve = Line.CreateBound(finalIntPntMainPipe, finalIntPntBranchPipe);
@@ -514,7 +519,11 @@ namespace TotalMEPProject.Commands.FireFighting
                                 else
                                 {
                                     if (ResultData.FlagAddElbowLastBranch)
+                                    {
+                                        double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
+                                        verticalPipe.LookupParameter("Diameter").Set(diameter);
                                         Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                    }
                                 }
                             }
                         }
@@ -705,7 +714,11 @@ namespace TotalMEPProject.Commands.FireFighting
                                     else
                                     {
                                         if (ResultData.FlagAddElbowLastBranch)
+                                        {
+                                            double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
+                                            verticalPipe.LookupParameter("Diameter").Set(diameter);
                                             Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                        }
                                     }
                                 }
                             }
@@ -722,14 +735,13 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             if (pipe2 == null)
                             {
-                                (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0_sub1, inters_sub1);
-
-                                pipe2 = Common.Clone(pipe1) as Pipe;
-                                (pipe2.Location as LocationCurve).Curve = Line.CreateBound(inters_sub1, p1_sub1);
-
-                                //Set lai gia tri
-                                p1_sub1 = inters_sub1;
+                                var temp_pipe1 = pipe1;
+                                var temp_pipe2_id = PlumbingUtils.BreakCurve(Global.UIDoc.Document, temp_pipe1.Id, inters_sub1);
+                                var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
+                                pipe1 = temp_pipe1;
+                                pipe2 = temp_pipe2;
                             }
+                            DivideCase_2(validMainPipe, pipe1, twoPipes, out inter_main1, out p0_sub1, out p1_sub1, out inters_sub1);
 
                             XYZ inter_main2 = null;
                             XYZ p0_sub2 = null;
@@ -789,6 +801,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     //Tao mot ong mồi
                                     pipe_moi_1 = Common.Clone(verticalPipe) as Pipe;
+                                    pipe_moi_1.LookupParameter("Diameter").Set(diamterPipe);
 
                                     var line = Line.CreateBound(p0_sub1, p1_sub1);
 
@@ -823,6 +836,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     //Tao mot ong mồi
                                     pipe_moi_2 = Common.Clone(verticalPipe) as Pipe;
+                                    pipe_moi_2.LookupParameter("Diameter").Set(diamterPipe);
 
                                     var line = Line.CreateBound(p0_sub2, p1_sub2);
 
@@ -961,14 +975,14 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             if (pipe2 == null)
                             {
-                                (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0_sub1, inters_sub1);
-
-                                pipe2 = Common.Clone(pipe1) as Pipe;
-                                (pipe2.Location as LocationCurve).Curve = Line.CreateBound(inters_sub1, p1_sub1);
-
-                                //Set lai gia tri
-                                p1_sub1 = inters_sub1;
+                                var temp_pipe1 = pipe1;
+                                var temp_pipe2_id = PlumbingUtils.BreakCurve(Global.UIDoc.Document, temp_pipe1.Id, inters_sub1);
+                                var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
+                                pipe1 = temp_pipe1;
+                                pipe2 = temp_pipe2;
                             }
+
+                            DivideCase_2(main, pipe1, twoPipes, out inter_main1, out p0_sub1, out p1_sub1, out inters_sub1);
 
                             XYZ inter_main2 = null;
                             XYZ p0_sub2 = null;
@@ -2092,6 +2106,67 @@ namespace TotalMEPProject.Commands.FireFighting
             if (flagSplit == true)
             {
                 if (isDauOng == false)
+                {
+                    SplitPipe(pipe, pOn, out pipe1, out pipe2);
+                }
+                else if (far != -1)
+                {
+                    if (far == 1)
+                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(pOn, p1);
+                    else
+                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, pOn);
+                }
+            }
+        }
+
+        public static void ProcessStartSidePipeCaseElbow(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true, bool flagCreateLastElbow = false)
+        {
+            var curve = (pipe.Location as LocationCurve).Curve;
+
+            //Create plane
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
+            double kc_mm = 500 /*1000*/;
+            double km_ft = Common.mmToFT * kc_mm;
+
+            var p02d = new XYZ(p0.X, p0.Y, 0);
+            var p12d = new XYZ(p1.X, p1.Y, 0);
+            var pOn2d = new XYZ(pOn.X, pOn.Y, 0);
+
+            var d1 = p02d.DistanceTo(pOn2d);
+            var d2 = p12d.DistanceTo(pOn2d);
+
+            bool isDauOng = false;
+            int far = -1;
+            if (d1 < km_ft)
+            {
+                if (IsIntersect(p0) == false)
+                {
+                    isDauOng = true;
+                    far = 1;
+                }
+            }
+            else if (d2 < km_ft)
+            {
+                if (IsIntersect(p1) == false)
+                {
+                    isDauOng = true;
+                    far = 0;
+                }
+            }
+
+            Pipe pipe1 = pipe;
+            pipe2 = null;
+
+            if (flagSplit == true)
+            {
+                if (isDauOng == false)
+                {
+                    SplitPipe(pipe, pOn, out pipe1, out pipe2);
+                }
+                else if (flagCreateLastElbow == false)
                 {
                     SplitPipe(pipe, pOn, out pipe1, out pipe2);
                 }

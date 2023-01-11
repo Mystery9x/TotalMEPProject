@@ -158,6 +158,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             ckbC1ElbowConnection.Enabled = true;
             ckbNippleCreating.Enabled = true;
             cboC1NippleFamily.Enabled = true;
+            cboC1NippleFamily.Enabled = ckbNippleCreating.Checked;
 
             if (rBC1SameElevation.Checked == true)
             {
