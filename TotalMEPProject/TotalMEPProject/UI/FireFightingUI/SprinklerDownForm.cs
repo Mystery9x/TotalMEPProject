@@ -18,6 +18,7 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private ExternalEvent m_exEvent;
         public bool isD15 = false;
+        public bool isTeeTap = false;
 
         public ElementId FamilyType
         {
@@ -120,31 +121,10 @@ namespace TotalMEPProject.UI.FireFightingUI
             m_exEvent.Raise();
         }
 
-        private void cboC3PipeType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var familyTypeId = (cboC3PipeType.SelectedItem as ObjectItem).ObjectId;
-
-            var familyType = Global.UIDoc.Document.GetElement(familyTypeId) as MEPCurveType;
-
-            if (familyType.RoutingPreferenceManager != null)
-            {
-                PipeSegment CurrentSegment = null;
-                int count = familyType.RoutingPreferenceManager.GetNumberOfRules(RoutingPreferenceRuleGroupType.Segments);
-
-                for (int i = 0; i < count; i++)
-                {
-                    var rule = familyType.RoutingPreferenceManager.GetRule(RoutingPreferenceRuleGroupType.Segments, i);
-
-                    CurrentSegment = Global.UIDoc.Document.GetElement(rule.MEPPartId) as PipeSegment;
-                }
-
-                if (CurrentSegment != null)
-                    AddDiameter(CurrentSegment);
-            }
-        }
-
         private void SprinklerDownForm_Load(object sender, EventArgs e)
         {
+            rdnC3TeeTap.Checked = true;
+            rdnC3D15.Checked = true;
             rdnC3Type1.Checked = true;
             AppUtils.ff(txbC3Length, "200");
             AddFamilyType();
@@ -155,7 +135,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             if (Height_ == double.MinValue)
                 return;
             isD15 = rdnC3D15.Checked;
-
+            isTeeTap = rdnC3TeeTap.Checked;
             AppUtils.sa(cboC3PipeType);
             AppUtils.sa(cboC3PipeSize);
             AppUtils.sa(txbC3Length, txbC3Length.Text.ToString());
@@ -189,7 +169,30 @@ namespace TotalMEPProject.UI.FireFightingUI
             this.Close();
         }
 
-        private void rdnC3Type1_CheckedChanged(object sender, EventArgs e)
+        private void cboC3PipeType_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            var familyTypeId = (cboC3PipeType.SelectedItem as ObjectItem).ObjectId;
+
+            var familyType = Global.UIDoc.Document.GetElement(familyTypeId) as MEPCurveType;
+
+            if (familyType.RoutingPreferenceManager != null)
+            {
+                PipeSegment CurrentSegment = null;
+                int count = familyType.RoutingPreferenceManager.GetNumberOfRules(RoutingPreferenceRuleGroupType.Segments);
+
+                for (int i = 0; i < count; i++)
+                {
+                    var rule = familyType.RoutingPreferenceManager.GetRule(RoutingPreferenceRuleGroupType.Segments, i);
+
+                    CurrentSegment = Global.UIDoc.Document.GetElement(rule.MEPPartId) as PipeSegment;
+                }
+
+                if (CurrentSegment != null)
+                    AddDiameter(CurrentSegment);
+            }
+        }
+
+        private void rdnC3D15_CheckedChanged(object sender, EventArgs e)
         {
             if (rdnC3Type1.Checked)
                 txbC3Length.Enabled = true;

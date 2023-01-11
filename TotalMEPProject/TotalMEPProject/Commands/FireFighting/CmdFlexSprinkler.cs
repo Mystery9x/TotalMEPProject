@@ -185,6 +185,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     Pipe pipe2 = null;
                     XYZ p = null;
 
+                    bool isDauOng = false;
                     IntersectionResultArray arr = new IntersectionResultArray();
                     if (split == false)
                     {
@@ -263,7 +264,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             flagCreateTee = false;
                         }
 
-                        ProcessStartSidePipe(pipe, out pipe2, p, flagCreateTee);
+                        ProcessStartSidePipe(pipe, out pipe2, p, out isDauOng, flagCreateTee);
 
                         if (pipe2 != null)
                         {
@@ -299,16 +300,42 @@ namespace TotalMEPProject.Commands.FireFighting
                         var c1 = Common.GetConnectorClosestTo(pipe1, p);
                         var c3 = Common.GetConnectorClosestTo(pipe_v1, p);
 
-                        if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                        if (App.m_flexSprinklerForm.IsCheckedTee)
                         {
-                            CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                            if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                            {
+                                CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                            }
+                            else
+                            {
+                                if (pipe2 != null)
+                                {
+                                    var c2 = Common.GetConnectorClosestTo(pipe2, p);
+                                    var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                }
+                                else
+                                {
+                                    tran.RollBack();
+                                    continue;
+                                }
+                            }
                         }
                         else
                         {
-                            if (pipe2 != null)
+                            if (!isDauOng)
                             {
-                                var c2 = Common.GetConnectorClosestTo(pipe2, p);
-                                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                                {
+                                    CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                                }
+                                else
+                                {
+                                    if (pipe2 != null)
+                                    {
+                                        var c2 = Common.GetConnectorClosestTo(pipe2, p);
+                                        var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                    }
+                                }
                             }
                             else
                             {
@@ -548,6 +575,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     Pipe pipe2 = null;
                     XYZ p = null;
 
+                    bool isDauOng = false;
                     IntersectionResultArray arr = new IntersectionResultArray();
                     if (split == false)
                     {
@@ -626,7 +654,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             flagCreateTee = false;
                         }
 
-                        ProcessStartSidePipe(pipe, out pipe2, p, flagCreateTee);
+                        ProcessStartSidePipe(pipe, out pipe2, p, out isDauOng, flagCreateTee);
 
                         if (pipe2 != null)
                         {
@@ -661,16 +689,42 @@ namespace TotalMEPProject.Commands.FireFighting
                         var c1 = Common.GetConnectorClosestTo(pipe1, p);
                         var c3 = Common.GetConnectorClosestTo(pipe_v1, p);
 
-                        if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                        if (App.m_flexSprinklerForm.IsCheckedTee)
                         {
-                            CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                            if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                            {
+                                CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                            }
+                            else
+                            {
+                                if (pipe2 != null)
+                                {
+                                    var c2 = Common.GetConnectorClosestTo(pipe2, p);
+                                    var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                }
+                                else
+                                {
+                                    tran.RollBack();
+                                    continue;
+                                }
+                            }
                         }
                         else
                         {
-                            if (pipe2 != null)
+                            if (!isDauOng)
                             {
-                                var c2 = Common.GetConnectorClosestTo(pipe2, p);
-                                var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                                {
+                                    CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                                }
+                                else
+                                {
+                                    if (pipe2 != null)
+                                    {
+                                        var c2 = Common.GetConnectorClosestTo(pipe2, p);
+                                        var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                    }
+                                }
                             }
                             else
                             {
@@ -942,6 +996,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                         IntersectionResultArray intRetArr = new IntersectionResultArray();
 
+                        bool isDauOng = false;
                         //Truong hop dau ong
                         if (isSplit == false)
                         {
@@ -1019,7 +1074,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 flagCreateTee = false;
                             }
 
-                            ProcessStartSidePipe(processPipe, out temp_processPipe_2, finalIntPnt, flagCreateTee);
+                            ProcessStartSidePipe(processPipe, out temp_processPipe_2, finalIntPnt, out isDauOng, flagCreateTee);
 
                             if (temp_processPipe_2 != null)
                             {
@@ -1049,17 +1104,47 @@ namespace TotalMEPProject.Commands.FireFighting
                         {
                             var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPnt);
                             var c3 = Common.GetConnectorClosestTo(horizontal_pipe, finalIntPnt);
-
-                            if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
+                            if (App.m_flexSprinklerForm.IsCheckedTee)
                             {
-                                CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                                if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
+                                {
+                                    CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                                }
+                                else
+                                {
+                                    if (temp_processPipe_2 != null)
+                                    {
+                                        var c2 = Common.GetConnectorClosestTo(temp_processPipe_2, finalIntPnt);
+                                        var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                    }
+                                    else
+                                    {
+                                        reTrans.RollBack();
+                                        continue;
+                                    }
+                                }
                             }
                             else
                             {
-                                if (temp_processPipe_2 != null)
+                                if (!isDauOng)
                                 {
-                                    var c2 = Common.GetConnectorClosestTo(temp_processPipe_2, finalIntPnt);
-                                    var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                    if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
+                                    {
+                                        CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                                    }
+                                    else
+                                    {
+                                        if (temp_processPipe_2 != null)
+                                        {
+                                            var c2 = Common.GetConnectorClosestTo(temp_processPipe_2, finalIntPnt);
+                                            var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                        }
+                                        else
+                                        {
+                                            reTrans.RollBack();
+                                            continue;
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -1251,6 +1336,9 @@ namespace TotalMEPProject.Commands.FireFighting
                 return null;
 
             Pipe pipeNear = null;
+
+            Dictionary<Pipe, double> keyValuePairs = new Dictionary<Pipe, double>();
+
             foreach (Element pipe in pipes)
             {
                 if (pipe as Pipe == null)
@@ -1271,16 +1359,20 @@ namespace TotalMEPProject.Commands.FireFighting
                     continue;
 
                 var p = project.XYZPoint;
+
                 if (p.DistanceTo(curve.GetEndPoint(0)) != 0 && p.DistanceTo(curve.GetEndPoint(1)) != 0)
-                {
                     bSplit = true;
-                    return pipe as Pipe;
-                }
-                else
-                {
-                    pipeNear = pipe as Pipe;
-                }
+
+                var disFml = Common.ToPoint2D(p).DistanceTo(Common.ToPoint2D(sprinkle_point));
+
+                keyValuePairs.Add(pipe as Pipe, disFml);
             }
+
+            var min = keyValuePairs.Min(x => x.Value);
+
+            var pairs = keyValuePairs.FirstOrDefault(x => x.Value == min);
+            if (pairs.Key != null)
+                pipeNear = pairs.Key;
             return pipeNear;
         }
 
@@ -1291,7 +1383,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <param name="pipe2"></param>
         /// <param name="pOn"></param>
         /// <param name="flagSplit"></param>
-        public static void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true)
+        public static void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, out bool isDauOng, bool flagSplit = true)
         {
             var curve = (pipe.Location as LocationCurve).Curve;
 
@@ -1310,11 +1402,11 @@ namespace TotalMEPProject.Commands.FireFighting
             var d1 = p02d.DistanceTo(pOn2d);
             var d2 = p12d.DistanceTo(pOn2d);
 
-            bool isDauOng = false;
+            isDauOng = false;
             int far = -1;
             if (d1 < km_ft)
             {
-                if (IsIntersect(p0) == false)
+                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_flexSprinklerForm.IsCheckedTee)
                 {
                     isDauOng = true;
                     far = 1;
@@ -1322,7 +1414,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             else if (d2 < km_ft)
             {
-                if (IsIntersect(p1) == false)
+                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_flexSprinklerForm.IsCheckedTee)
                 {
                     isDauOng = true;
                     far = 0;
@@ -1346,6 +1438,13 @@ namespace TotalMEPProject.Commands.FireFighting
                         (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, pOn);
                 }
             }
+        }
+
+        public static bool CheckPipeIsEnd(Pipe pipe, XYZ point)
+        {
+            var con = Common.GetConnectorClosestTo(pipe, point);
+
+            return con.IsConnected;
         }
 
         /// <summary>

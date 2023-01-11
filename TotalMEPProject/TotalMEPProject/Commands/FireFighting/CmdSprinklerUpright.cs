@@ -256,7 +256,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
         public static bool cc(Transaction tran, FamilyInstance instance, List<ElementId> selectedIds, bool isConnectNipple, bool isConnectTee, FamilySymbol fmlNipple, double pipeSize, ElementId pipeTypeId, bool isUp)
         {
-            double d = UnitUtils.ConvertToInternalUnits(30, DisplayUnitType.DUT_MILLIMETERS);
+            double d = UnitUtils.ConvertToInternalUnits(70, DisplayUnitType.DUT_MILLIMETERS);
 
             bool result = false;
 

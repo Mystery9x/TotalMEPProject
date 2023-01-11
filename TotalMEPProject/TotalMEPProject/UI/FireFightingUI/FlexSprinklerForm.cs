@@ -34,6 +34,11 @@ namespace TotalMEPProject.UI.FireFightingUI
             get => rbC4D15.Checked;
         }
 
+        public bool IsCheckedTee
+        {
+            get => rdnC4TeeTap.Checked;
+        }
+
         public bool IsCheckedD20
         {
             get => !rbC4D15.Checked;
@@ -199,6 +204,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             AddFamilyType();
             rbC4D15.Checked = true;
             rbC4Type1.Checked = true;
+            rdnC4TeeTap.Checked = true;
             AppUtils.ff(rbC4D15);
             AppUtils.ff(rbC4D20);
             AppUtils.ff(rbC4Type1);
@@ -250,12 +256,9 @@ namespace TotalMEPProject.UI.FireFightingUI
             this.Close();
         }
 
-        private void tbC4Length_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            Common.NumberCheck(sender, e, false);
-        }
+        #endregion Event
 
-        private void cboC4PipeType_SelectedIndexChanged(object sender, EventArgs e)
+        private void cboC4PipeType_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             var familyTypeId = (cboC4PipeType.SelectedItem as ObjectItem).ObjectId;
 
@@ -278,9 +281,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
-        #endregion Event
-
-        private void rbC4Type1_CheckedChanged(object sender, EventArgs e)
+        private void rbC4Type1_CheckedChanged_1(object sender, EventArgs e)
         {
             if (rbC4Type1.Checked)
             {
@@ -290,7 +291,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
-        private void rbC4Type2_CheckedChanged(object sender, EventArgs e)
+        private void rbC4Type2_CheckedChanged_1(object sender, EventArgs e)
         {
             if (rbC4Type2.Checked)
             {
@@ -300,7 +301,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             }
         }
 
-        private void rbC4Type3_CheckedChanged(object sender, EventArgs e)
+        private void rbC4Type3_CheckedChanged_1(object sender, EventArgs e)
         {
             if (rbC4Type3.Checked)
             {
