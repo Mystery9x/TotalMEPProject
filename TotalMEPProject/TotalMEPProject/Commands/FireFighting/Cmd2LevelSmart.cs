@@ -2009,24 +2009,35 @@ namespace TotalMEPProject.Commands.FireFighting
             processIntPnt = null;
             try
             {
-                Line flattenCurve_processPipe = processPipe.GetExpandFlattenCurve(500 * Common.mmToFT);
+                Line flattenCurve_processPipe = Line.CreateUnbound(processPipe.GetFlattenCurve().GetEndPoint(0), processPipe.GetFlattenCurve().Direction);
+                XYZ originPnt = processPipe.GetFlattenCurve().GetEndPoint(0);
+
                 List<Tuple<Pipe, XYZ>> validMainPipes = new List<Tuple<Pipe, XYZ>>();
+
+                Dictionary<Pipe, double> dictMainPipes = new Dictionary<Pipe, double>();
                 foreach (var mainPipe in mainPipes)
                 {
                     Line flattenCurve_mainPipe = mainPipe.GetExpandFlattenCurve(700 * Common.mmToFT);
                     if (RealityIntersect(flattenCurve_processPipe, flattenCurve_mainPipe, out XYZ intPnt))
                     {
                         validMainPipes.Add(new Tuple<Pipe, XYZ>(mainPipe, intPnt));
+                        dictMainPipes.Add(mainPipe, originPnt.DistanceTo(intPnt));
                     }
                 }
 
                 if (validMainPipes.Count <= 0)
                     return null;
 
+                double minDist = dictMainPipes.Min(item => item.Value);
+                var validDic = dictMainPipes.FirstOrDefault(item => item.Value == minDist);
+
                 Pipe pipeNear = null;
 
                 foreach (var validDataMainPipe in validMainPipes)
                 {
+                    if (validDataMainPipe.Item1.Id != validDic.Key.Id)
+                        continue;
+
                     var curve = (validDataMainPipe.Item1.Location as LocationCurve).Curve;
 
                     if (curve is Line == false)
