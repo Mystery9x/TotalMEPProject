@@ -123,7 +123,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 {
                     App.m_SprinkerUpForm.Show(App.hWndRevit);
                 }
-                DisplayService.SetFocus(new HandleRef(null, App.m_2LevelSmartForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_SprinkerUpForm.Handle));
             }
             return Result.Cancelled;
         }
