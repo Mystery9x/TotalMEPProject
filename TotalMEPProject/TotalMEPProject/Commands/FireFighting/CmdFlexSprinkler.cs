@@ -354,6 +354,10 @@ namespace TotalMEPProject.Commands.FireFighting
                                                 var c2 = Common.GetConnectorClosestTo(pipe2, p);
                                                 var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
                                             }
+                                            else
+                                            {
+                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                            }
                                         }
                                     }
                                     else
@@ -775,6 +779,10 @@ namespace TotalMEPProject.Commands.FireFighting
                                             {
                                                 var c2 = Common.GetConnectorClosestTo(pipe2, p);
                                                 var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
+                                            }
+                                            else
+                                            {
+                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                             }
                                         }
                                     }
@@ -1226,8 +1234,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                                 }
                                                 else
                                                 {
-                                                    reTrans.RollBack();
-                                                    continue;
+                                                    Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                                 }
                                             }
                                         }
