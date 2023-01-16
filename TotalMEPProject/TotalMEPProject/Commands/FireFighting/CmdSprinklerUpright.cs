@@ -543,7 +543,11 @@ namespace TotalMEPProject.Commands.FireFighting
                             if (CheckPipeIsEnd(pipe, sprinkle_point))
                             {
                                 if (isConnectNipple)
-                                    ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                                {
+                                    var pipeCut = ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                                    if (pipeCut != null)
+                                        selectedIds.Add(pipeCut.Id);
+                                }
                                 else
                                 {
                                     if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
@@ -560,6 +564,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                         var point = array.get_Item(0).XYZPoint;
 
                                         CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                                        if (pipe1 != null)
+                                            selectedIds.Add(pipe1.Id);
                                     }
                                     else
                                         se(pipe as MEPCurve, newPipeZ as MEPCurve);
@@ -592,9 +598,17 @@ namespace TotalMEPProject.Commands.FireFighting
                         else
                         {
                             if (isConnectNipple)
-                                ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                            {
+                                var pipeCut = ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                                if (pipeCut != null)
+                                    selectedIds.Add(pipeCut.Id);
+                            }
                             else if (isConnectTee)
-                                ConnectTee(pipe, newPipeZ, instance, pcenter, sprinkle_point);
+                            {
+                                var pipeCut = ConnectTee(pipe, newPipeZ, instance, pcenter, sprinkle_point);
+                                if (pipeCut != null)
+                                    selectedIds.Add(pipeCut.Id);
+                            }
                             else
                             {
                                 if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
@@ -611,6 +625,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                     var point = array.get_Item(0).XYZPoint;
 
                                     CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                                    if (pipe1 != null)
+                                        selectedIds.Add(pipe1.Id);
                                 }
                                 else
                                     se(pipe as MEPCurve, newPipeZ as MEPCurve);
@@ -895,8 +911,9 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipeType.RoutingPreferenceManager.PreferredJunctionType;
         }
 
-        public static void ConnectTeeAndNipple(Pipe pipe, Pipe newPipeZ, FamilyInstance instance, FamilySymbol fmlNipple, XYZ pOn, XYZ pcenter, XYZ sprinkle_point)
+        public static Pipe ConnectTeeAndNipple(Pipe pipe, Pipe newPipeZ, FamilyInstance instance, FamilySymbol fmlNipple, XYZ pOn, XYZ pcenter, XYZ sprinkle_point)
         {
+            Pipe pipe1 = null;
             var curvePipeMain = pipe.GetCurve();
 
             var curvePipeDung = newPipeZ.GetCurve();
@@ -911,7 +928,7 @@ namespace TotalMEPProject.Commands.FireFighting
             FamilyInstance tee = null;
 
             if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
-                tee = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                tee = CreateTeeFitting(pipe, newPipeZ, point, out pipe1);
             else
                 tee = se(pipe as MEPCurve, newPipeZ as MEPCurve);
 
@@ -956,10 +973,13 @@ namespace TotalMEPProject.Commands.FireFighting
 
             if (cConnectReducer != null)
                 cReducer.ConnectTo(cConnectReducer);
+
+            return pipe1;
         }
 
-        public static void ConnectTee(Pipe pipe, Pipe newPipeZ, FamilyInstance instance, XYZ pcenter, XYZ sprinkle_point)
+        public static Pipe ConnectTee(Pipe pipe, Pipe newPipeZ, FamilyInstance instance, XYZ pcenter, XYZ sprinkle_point)
         {
+            Pipe pipe1 = null;
             var curvePipeMain = pipe.GetCurve();
 
             var curvePipeDung = newPipeZ.GetCurve();
@@ -976,7 +996,7 @@ namespace TotalMEPProject.Commands.FireFighting
             FamilyInstance fitting = null;
 
             if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
-                fitting = CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                fitting = CreateTeeFitting(pipe, newPipeZ, point, out pipe1);
             else
                 fitting = se(pipe as MEPCurve, newPipeZ as MEPCurve);
 
@@ -989,6 +1009,8 @@ namespace TotalMEPProject.Commands.FireFighting
             ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector);
 
             cTee.ConnectTo(cSprinkle);
+
+            return pipe1;
         }
 
         public static FamilyInstance CreateTeeFitting(Pipe pipeMain, Pipe pipeCurrent, XYZ splitPoint, out Pipe main2)

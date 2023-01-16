@@ -1528,8 +1528,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                             }
                                             else
                                             {
-                                                reTrans.RollBack();
-                                                continue;
+                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                             }
                                         }
                                     }
