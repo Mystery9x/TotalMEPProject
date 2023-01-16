@@ -2096,9 +2096,6 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     var validDic = dictMainPipes_Expand.FirstOrDefault(item => item.Value == minDist);
 
-                    Line tmp = Line.CreateBound(originPnt, validMainPipes_Expand.Where(item => item.Item1.Id == validDic.Key.Id).FirstOrDefault().Item2);
-                    Global.UIDoc.Document.Create.NewDetailCurve(Global.UIDoc.ActiveView, tmp);
-
                     Pipe pipeNear = null;
 
                     foreach (var validDataMainPipe in validMainPipes_Expand)
