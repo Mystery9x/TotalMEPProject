@@ -2616,12 +2616,15 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         if (SecondPipe == null)
                         {
-                            (FirstPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1_pnt0, m_sub1Ints_pnt);
-                            SecondPipe = Common.Clone(FirstPipe) as Pipe;
-                            (SecondPipe.Location as LocationCurve).Curve = Line.CreateBound(m_sub1Ints_pnt, m_sub1_pnt1);
-
-                            // Set point value again
-                            m_sub1_pnt1 = m_sub1Ints_pnt;
+                            var temp_pipe1 = FirstPipe;
+                            var temp_pipe2_id = PlumbingUtils.BreakCurve(Global.UIDoc.Document, temp_pipe1.Id, m_sub1Ints_pnt);
+                            var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
+                            FirstPipe = temp_pipe1;
+                            SecondPipe = temp_pipe2;
+                            if (SecondPipe != null)
+                            {
+                                HandlerDivide(MainPipe, FirstPipe, true, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt);
+                            }
                         }
 
                         if (SecondPipe != null)
