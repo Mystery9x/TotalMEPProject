@@ -507,7 +507,15 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && flagSplit == true)
                             {
-                                CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
+                                if (!ResultData.FlagAddElbowLastBranch)
+                                    CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
+                                else
+                                {
+                                    if (CheckPipeIsEnd(temp_processPipe_1, verticalPipe.GetCurve().GetEndPoint(0)))
+                                        CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
+                                    else
+                                        Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                }
                             }
                             else
                             {
