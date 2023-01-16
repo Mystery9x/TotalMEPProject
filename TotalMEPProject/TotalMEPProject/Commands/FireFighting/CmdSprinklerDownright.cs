@@ -1063,7 +1063,11 @@ namespace TotalMEPProject.Commands.FireFighting
                                     CreateTap(pipe as MEPCurve, newPipeZ as MEPCurve);
                                 }
                                 else
-                                    ConnectTee(pipe, newPipeZ);
+                                {
+                                    var pipeCut = ConnectTee(pipe, newPipeZ);
+                                    if (pipeCut != null)
+                                        selectedIds.Add(pipeCut.Id);
+                                }
                             }
                             else
                             {
@@ -1072,7 +1076,11 @@ namespace TotalMEPProject.Commands.FireFighting
                                     if (GetPreferredJunctionType(pipe) != PreferredJunctionType.Tee)
                                         CreateTap(pipe as MEPCurve, newPipeZ as MEPCurve);
                                     else
-                                        ConnectTee(pipe, newPipeZ);
+                                    {
+                                        var pipeCut = ConnectTee(pipe, newPipeZ);
+                                        if (pipeCut != null)
+                                            selectedIds.Add(pipeCut.Id);
+                                    }
                                 }
                                 else
                                 {
@@ -1223,8 +1231,9 @@ namespace TotalMEPProject.Commands.FireFighting
             return con.IsConnected;
         }
 
-        public static void ConnectTee(Pipe pipe, Pipe newPipeZ)
+        public static Pipe ConnectTee(Pipe pipe, Pipe newPipeZ)
         {
+            Pipe pipe1 = null;
             var curvePipeMain = pipe.GetCurve();
 
             var curvePipeDung = newPipeZ.GetCurve();
@@ -1236,7 +1245,9 @@ namespace TotalMEPProject.Commands.FireFighting
             line.Intersect(curvePipeMain, out array);
             var point = array.get_Item(0).XYZPoint;
 
-            sr.CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+            sr.CreateTeeFitting(pipe, newPipeZ, point, out pipe1);
+
+            return pipe1;
         }
 
         #endregion Type2
