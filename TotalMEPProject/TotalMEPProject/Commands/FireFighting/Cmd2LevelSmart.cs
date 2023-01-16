@@ -2003,6 +2003,15 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
+        /// <summary>
+        /// Process Main Pipe
+        /// </summary>
+        /// <param name="mainPipes"></param>
+        /// <param name="processPipe"></param>
+        /// <param name="flagSplit"></param>
+        /// <param name="processIntPnt"></param>
+        /// <returns></returns>
+
         private Pipe ProcessMainPipe(List<Pipe> mainPipes, Pipe processPipe, out bool flagSplit, out XYZ processIntPnt)
         {
             flagSplit = false;
@@ -2012,68 +2021,128 @@ namespace TotalMEPProject.Commands.FireFighting
                 Line flattenCurve_processPipe = Line.CreateUnbound(processPipe.GetFlattenCurve().GetEndPoint(0), processPipe.GetFlattenCurve().Direction);
                 XYZ originPnt = processPipe.GetFlattenCurve().GetEndPoint(0);
 
-                List<Tuple<Pipe, XYZ>> validMainPipes = new List<Tuple<Pipe, XYZ>>();
+                List<Tuple<Pipe, XYZ>> validMainPipes_Expand = new List<Tuple<Pipe, XYZ>>();
+                List<Tuple<Pipe, XYZ>> validMainPipes_Real = new List<Tuple<Pipe, XYZ>>();
 
-                Dictionary<Pipe, double> dictMainPipes = new Dictionary<Pipe, double>();
+                Dictionary<Pipe, double> dictMainPipes_Expand = new Dictionary<Pipe, double>();
+                Dictionary<Pipe, double> dictMainPipes_Real = new Dictionary<Pipe, double>();
                 foreach (var mainPipe in mainPipes)
                 {
-                    Line flattenCurve_mainPipe = mainPipe.GetExpandFlattenCurve(700 * Common.mmToFT);
-                    if (RealityIntersect(flattenCurve_processPipe, flattenCurve_mainPipe, out XYZ intPnt))
+                    XYZ intPnt;
+                    Line flattenCurve_mainPipe = mainPipe.GetFlattenCurve();
+                    if (RealityIntersect(flattenCurve_processPipe, flattenCurve_mainPipe, out intPnt))
                     {
-                        validMainPipes.Add(new Tuple<Pipe, XYZ>(mainPipe, intPnt));
-                        dictMainPipes.Add(mainPipe, originPnt.DistanceTo(intPnt));
+                        validMainPipes_Real.Add(new Tuple<Pipe, XYZ>(mainPipe, intPnt));
+                        dictMainPipes_Real.Add(mainPipe, originPnt.DistanceTo(intPnt));
+                    }
+
+                    Line flattenCurve_mainPipe_Expand = mainPipe.GetExpandFlattenCurve(700 * Common.mmToFT);
+                    if (RealityIntersect(flattenCurve_processPipe, flattenCurve_mainPipe_Expand, out intPnt))
+                    {
+                        validMainPipes_Expand.Add(new Tuple<Pipe, XYZ>(mainPipe, intPnt));
+                        dictMainPipes_Expand.Add(mainPipe, originPnt.DistanceTo(intPnt));
                     }
                 }
 
-                if (validMainPipes.Count <= 0)
-                    return null;
-
-                double minDist = dictMainPipes.Min(item => item.Value);
-                var validDic = dictMainPipes.FirstOrDefault(item => item.Value == minDist);
-
-                Pipe pipeNear = null;
-
-                foreach (var validDataMainPipe in validMainPipes)
+                if (validMainPipes_Real.Count > 0)
                 {
-                    if (validDataMainPipe.Item1.Id != validDic.Key.Id)
-                        continue;
+                    double minDist = dictMainPipes_Real.Min(item => item.Value);
 
-                    var curve = (validDataMainPipe.Item1.Location as LocationCurve).Curve;
+                    var validDic = dictMainPipes_Real.FirstOrDefault(item => item.Value == minDist);
 
-                    if (curve is Line == false)
-                        continue;
+                    Pipe pipeNear = null;
 
-                    var d = (curve as Line).Direction;
-
-                    if (Common.IsParallel(d, XYZ.BasisZ, 0))
-                        continue;
-
-                    var project = curve.Project(validDataMainPipe.Item2);
-                    if (project == null)
-                        continue;
-
-                    var p = project.XYZPoint;
-                    processIntPnt = p;
-
-                    if (p.DistanceTo(curve.GetEndPoint(0)) != 0 && p.DistanceTo(curve.GetEndPoint(1)) != 0)
+                    foreach (var validDataMainPipe in validMainPipes_Real)
                     {
-                        flagSplit = true;
+                        if (validDataMainPipe.Item1.Id != validDic.Key.Id)
+                            continue;
 
-                        return validDataMainPipe.Item1;
+                        var curve = (validDataMainPipe.Item1.Location as LocationCurve).Curve;
+
+                        if (curve is Line == false)
+                            continue;
+
+                        var d = (curve as Line).Direction;
+
+                        if (Common.IsParallel(d, XYZ.BasisZ, 0))
+                            continue;
+
+                        var project = curve.Project(validDataMainPipe.Item2);
+                        if (project == null)
+                            continue;
+
+                        var p = project.XYZPoint;
+                        processIntPnt = p;
+
+                        if (p.DistanceTo(curve.GetEndPoint(0)) != 0 && p.DistanceTo(curve.GetEndPoint(1)) != 0)
+                        {
+                            flagSplit = true;
+
+                            return validDataMainPipe.Item1;
+                        }
+                        else
+                        {
+                            pipeNear = validDataMainPipe.Item1;
+                        }
                     }
-                    else
-                    {
-                        pipeNear = validDataMainPipe.Item1;
-                    }
+                    return pipeNear;
                 }
-                return pipeNear;
+                else
+                {
+                    if (validMainPipes_Expand.Count <= 0)
+                        return null;
+
+                    double minDist = dictMainPipes_Expand.Min(item => item.Value);
+
+                    var validDic = dictMainPipes_Expand.FirstOrDefault(item => item.Value == minDist);
+
+                    Line tmp = Line.CreateBound(originPnt, validMainPipes_Expand.Where(item => item.Item1.Id == validDic.Key.Id).FirstOrDefault().Item2);
+                    Global.UIDoc.Document.Create.NewDetailCurve(Global.UIDoc.ActiveView, tmp);
+
+                    Pipe pipeNear = null;
+
+                    foreach (var validDataMainPipe in validMainPipes_Expand)
+                    {
+                        if (validDataMainPipe.Item1.Id != validDic.Key.Id)
+                            continue;
+
+                        var curve = (validDataMainPipe.Item1.Location as LocationCurve).Curve;
+
+                        if (curve is Line == false)
+                            continue;
+
+                        var d = (curve as Line).Direction;
+
+                        if (Common.IsParallel(d, XYZ.BasisZ, 0))
+                            continue;
+
+                        var project = curve.Project(validDataMainPipe.Item2);
+                        if (project == null)
+                            continue;
+
+                        var p = project.XYZPoint;
+                        processIntPnt = p;
+
+                        if (p.DistanceTo(curve.GetEndPoint(0)) != 0 && p.DistanceTo(curve.GetEndPoint(1)) != 0)
+                        {
+                            flagSplit = true;
+
+                            return validDataMainPipe.Item1;
+                        }
+                        else
+                        {
+                            pipeNear = validDataMainPipe.Item1;
+                        }
+                    }
+                    return pipeNear;
+                }
             }
             catch (Exception)
             { }
             return null;
         }
 
-        public static void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true)
+        public void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true)
         {
             var curve = (pipe.Location as LocationCurve).Curve;
 
@@ -2096,7 +2165,7 @@ namespace TotalMEPProject.Commands.FireFighting
             int far = -1;
             if (d1 < km_ft)
             {
-                if (IsIntersect(p0) == false)
+                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn))
                 {
                     isDauOng = true;
                     far = 1;
@@ -2104,7 +2173,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             else if (d2 < km_ft)
             {
-                if (IsIntersect(p1) == false)
+                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn))
                 {
                     isDauOng = true;
                     far = 0;
@@ -2130,7 +2199,14 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        public static void ProcessStartSidePipeCaseElbow(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true, bool flagCreateLastElbow = false)
+        public bool CheckPipeIsEnd(Pipe pipe, XYZ point)
+        {
+            var con = Common.GetConnectorClosestTo(pipe, point);
+
+            return con.IsConnected;
+        }
+
+        public void ProcessStartSidePipeCaseElbow(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true, bool flagCreateLastElbow = false)
         {
             var curve = (pipe.Location as LocationCurve).Curve;
 
@@ -2191,7 +2267,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        public static void SplitPipe(Pipe pipeOrigin, XYZ splitPoint, out Pipe pipe1, out Pipe pipe2)
+        public void SplitPipe(Pipe pipeOrigin, XYZ splitPoint, out Pipe pipe1, out Pipe pipe2)
         {
             var curve = (pipeOrigin.Location as LocationCurve).Curve;
 
@@ -2246,7 +2322,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
         }
 
-        public static bool IsIntersect(XYZ point)
+        public bool IsIntersect(XYZ point)
         {
             double ft = 0.001;
             var solid = Common.CreateCylindricalVolume(point, ft, ft, false);
@@ -2271,7 +2347,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// </summary>
         /// <param name="pipe"></param>
         /// <returns></returns>
-        private static PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
+        private PreferredJunctionType GetPreferredJunctionType(Pipe pipe)
         {
             var pipeType = pipe.PipeType as PipeType;
 
@@ -2302,7 +2378,7 @@ namespace TotalMEPProject.Commands.FireFighting
         /// <param name="mepCurveSplit1"></param>
         /// <param name="mepCurveSplit2"></param>
         /// <returns></returns>
-        public static bool CreateTap(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
+        public bool CreateTap(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)
         {
             try
             {
