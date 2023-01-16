@@ -605,6 +605,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             IntersectionResultArray intRetArr = new IntersectionResultArray();
 
+                            bool flagDauOng_CaseTap = false;
                             //Truong hop dau ong
                             if (flagSplit == false)
                             {
@@ -677,7 +678,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     flagCreateTee = false;
                                 }
-                                ProcessStartSidePipe(validMainPipe, out temp_processPipe_2, finalIntPntMainPipe, flagCreateTee);
+                                ProcessStartSidePipe(validMainPipe, out temp_processPipe_2, finalIntPntMainPipe, flagCreateTee, out flagDauOng_CaseTap);
                                 if (temp_processPipe_2 != null)
                                 {
                                     MainPipeIds.Add(temp_processPipe_2.Id);
@@ -702,7 +703,16 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && flagSplit == true)
                                 {
-                                    CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
+                                    if (flagDauOng_CaseTap == false)
+                                    {
+                                        CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
+                                    }
+                                    else
+                                    {
+                                        double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
+                                        verticalPipe.LookupParameter("Diameter").Set(diameter);
+                                        Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                    }
                                 }
                                 else
                                 {
@@ -2139,8 +2149,9 @@ namespace TotalMEPProject.Commands.FireFighting
             return null;
         }
 
-        public void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit = true)
+        public void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit, out bool isDauOngChinh)
         {
+            isDauOngChinh = false;
             var curve = (pipe.Location as LocationCurve).Curve;
 
             //Create plane
@@ -2188,6 +2199,19 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
                 else if (far != -1)
                 {
+                    if (far == 1)
+                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(pOn, p1);
+                    else
+                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, pOn);
+                }
+            }
+            else
+            {
+                if (isDauOng == false)
+                { }
+                else if (far != -1)
+                {
+                    isDauOngChinh = true;
                     if (far == 1)
                         (pipe1.Location as LocationCurve).Curve = Line.CreateBound(pOn, p1);
                     else
