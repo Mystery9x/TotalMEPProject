@@ -528,8 +528,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     if (ResultData.FlagAddElbowLastBranch)
                                     {
-                                        double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
-                                        verticalPipe.LookupParameter("Diameter").Set(diameter);
+                                        //double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
+                                        //verticalPipe.LookupParameter("Diameter").Set(diameter);
                                         Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                     }
                                 }
@@ -717,8 +717,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                     }
                                     else
                                     {
-                                        double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
-                                        verticalPipe.LookupParameter("Diameter").Set(diameter);
+                                        //double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
+                                        //verticalPipe.LookupParameter("Diameter").Set(diameter);
                                         Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                     }
                                 }
@@ -733,8 +733,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         if (ResultData.FlagAddElbowLastBranch)
                                         {
-                                            double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
-                                            verticalPipe.LookupParameter("Diameter").Set(diameter);
+                                            //double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
+                                            //verticalPipe.LookupParameter("Diameter").Set(diameter);
                                             Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                         }
                                     }
@@ -758,7 +758,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
                                 pipe1 = temp_pipe1;
                                 pipe2 = temp_pipe2;
-                                DivideCase_2(validMainPipe, pipe1, twoPipes, out inter_main1, out p0_sub1, out p1_sub1, out inters_sub1);
+                                DivideCase_2_Special(validMainPipe, pipe1, twoPipes, out inter_main1, out p0_sub1, out p1_sub1, out inters_sub1);
                             }
 
                             XYZ inter_main2 = null;
@@ -2168,6 +2168,10 @@ namespace TotalMEPProject.Commands.FireFighting
 
             //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
             double kc_mm = 400 /*1000*/;
+
+            if ((double)GetParameterValueByName(pipe, "Diameter") / Common.mmToFT >= 90)
+                kc_mm = 1010;
+
             double km_ft = Common.mmToFT * kc_mm;
 
             var p02d = new XYZ(p0.X, p0.Y, 0);
@@ -2245,6 +2249,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
             //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
             double kc_mm = 500 /*1000*/;
+            if ((double)GetParameterValueByName(pipe, "Diameter") / Common.mmToFT >= 90)
+                kc_mm = 1010;
+
             double km_ft = Common.mmToFT * kc_mm;
 
             var p02d = new XYZ(p0.X, p0.Y, 0);
