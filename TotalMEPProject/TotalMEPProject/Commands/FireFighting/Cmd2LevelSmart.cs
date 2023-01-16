@@ -2170,7 +2170,7 @@ namespace TotalMEPProject.Commands.FireFighting
             double kc_mm = 400 /*1000*/;
 
             if ((double)GetParameterValueByName(pipe, "Diameter") / Common.mmToFT >= 90)
-                kc_mm = 1010;
+                kc_mm = 1100;
 
             double km_ft = Common.mmToFT * kc_mm;
 
@@ -2250,7 +2250,7 @@ namespace TotalMEPProject.Commands.FireFighting
             //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
             double kc_mm = 500 /*1000*/;
             if ((double)GetParameterValueByName(pipe, "Diameter") / Common.mmToFT >= 90)
-                kc_mm = 1010;
+                kc_mm = 1100;
 
             double km_ft = Common.mmToFT * kc_mm;
 
