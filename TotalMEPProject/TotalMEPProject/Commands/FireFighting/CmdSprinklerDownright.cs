@@ -1238,12 +1238,16 @@ namespace TotalMEPProject.Commands.FireFighting
 
             var curvePipeDung = newPipeZ.GetCurve();
 
-            Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction);
+            //Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction * 100);
 
-            IntersectionResultArray array;
+            //IntersectionResultArray array;
 
-            line.Intersect(curvePipeMain, out array);
-            var point = array.get_Item(0).XYZPoint;
+            //line.Intersect(curvePipeMain, out array);
+            //var point = array.get_Item(0).XYZPoint;
+
+            var result = curvePipeMain.Project((curvePipeDung as Line).Origin);
+
+            var point = result.XYZPoint;
 
             sr.CreateTeeFitting(pipe, newPipeZ, point, out pipe1);
 
