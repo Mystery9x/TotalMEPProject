@@ -345,7 +345,10 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                                         {
-                                            CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                                            if (CheckPipeIsEnd(pipe1, sprinkle_point))
+                                                CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                                            else
+                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                         }
                                         else
                                         {
@@ -771,7 +774,10 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                                         {
-                                            CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                                            if (CheckPipeIsEnd(pipe1, sprinkle_point))
+                                                CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
+                                            else
+                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                         }
                                         else
                                         {
@@ -1223,7 +1229,12 @@ namespace TotalMEPProject.Commands.FireFighting
                                         {
                                             if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                                             {
-                                                CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                                                if (CheckPipeIsEnd(temp_processPipe_1, locSprinkler))
+                                                    CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                                                else
+                                                {
+                                                    Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                                }
                                             }
                                             else
                                             {
