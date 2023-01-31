@@ -280,6 +280,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         }
 
                         //Set d = 25
+                        Line tempLine = (pipe1.Location as LocationCurve).Curve as Line;
 
                         var dFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
 
@@ -293,12 +294,14 @@ namespace TotalMEPProject.Commands.FireFighting
 
                         var line_v1 = Line.CreateUnbound(p, XYZ.BasisZ * ft_h * 2);
 
-                        line_v1 = Line.CreateBound(p, line_v1.Evaluate(ft_h, false));
+                        XYZ tmpPoint = line_v1.Evaluate(ft_h, false);
+                        p = curve.Project(tmpPoint).XYZPoint;
+                        line_v1 = Line.CreateBound(p, tmpPoint);
                         (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                         pipe_v1.LookupParameter("Diameter").Set(dFt);
 
-                        //Connect
+                        ////Connect
                         try
                         {
                             var c1 = Common.GetConnectorClosestTo(pipe1, p);
@@ -1047,6 +1050,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             // Generate Pipe Horizontal
                             var v_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).Normalize();
                             var ft_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).GetLength();
+                            finalIntPnt = curveProcessPipe.Project(locSprinkler).XYZPoint;
                             var line_Extend = Line.CreateBound(finalIntPnt, locSprinkler);
 
                             newPlace = new XYZ(0, 0, 0);

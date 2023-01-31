@@ -526,6 +526,8 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
 
+                    pOn = curveExtend3d_temp.Project(pcenter).XYZPoint;
+
                     (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
 
                     newPipeZ.LookupParameter("Diameter").Set(dFt);
