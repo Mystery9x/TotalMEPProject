@@ -306,6 +306,11 @@ namespace TotalMEPProject.Commands.FireFighting
                             var line_v1 = Line.CreateUnbound(p, XYZ.BasisZ * ft_h * 2);
 
                             line_v1 = Line.CreateBound(p, line_v1.Evaluate(ft_h, false));
+
+                            XYZ tmpPoint = line_v1.Evaluate(ft_h, false);
+                            p = curve.Project(tmpPoint).XYZPoint;
+                            line_v1 = Line.CreateBound(p, tmpPoint);
+
                             (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                             pipe_v1.LookupParameter("Diameter").Set(dFt);
@@ -736,6 +741,11 @@ namespace TotalMEPProject.Commands.FireFighting
                             var line_v1 = Line.CreateUnbound(p, XYZ.BasisZ * ft_h * 2);
 
                             line_v1 = Line.CreateBound(p, line_v1.Evaluate(ft_h, false));
+
+                            XYZ tmpPoint = line_v1.Evaluate(ft_h, false);
+                            p = curve.Project(tmpPoint).XYZPoint;
+                            line_v1 = Line.CreateBound(p, tmpPoint);
+
                             (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                             pipe_v1.LookupParameter("Diameter").Set(dFt);
