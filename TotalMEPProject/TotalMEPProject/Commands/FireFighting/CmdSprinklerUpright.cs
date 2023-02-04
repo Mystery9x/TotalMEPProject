@@ -335,6 +335,7 @@ namespace TotalMEPProject.Commands.FireFighting
             var dFt = Common.mmToFT * pipeSize;
 
             var sprinkle_point = (instance.Location as LocationPoint).Point;
+            var sprinkle_pointClone = (instance.Location as LocationPoint).Point;
 
             XYZ newPlace = new XYZ(0, 0, 0);
             ICollection<ElementId> elemIds = null;
@@ -347,271 +348,208 @@ namespace TotalMEPProject.Commands.FireFighting
                 pipes = pipes.Where(item => selectedIds.Contains(item.Id)).ToList();
             }
 
-            if (pipes == null || pipes.Count == 0)
+            double radius = 100; //mm
+            var ft = Common.mmToFT * radius;
+
+            var solid = Common.CreateCylindricalVolume(sprinkle_point, ft * 5, ft, !isUp);
+            if (solid == null)
+                return result;
+
+            ////Test////////////////////////////////////////////////////////////////////////
+            //foreach (Edge edge in solid.Edges)
+            //{
+            //    var curve2 = edge.AsCurve();
+
+            //    for (int i = 0; i < curve2.Tessellate().Count; i++)
+            //    {
+            //        XYZ p02 = curve2.Tessellate()[i];
+            //        XYZ p12 = curve2.Tessellate()[(i + 1) % curve2.Tessellate().Count];
+
+            //        Common.CreateModelLine(p02, p12);
+            //    }
+            //}
+
+            //Find intersection
+            FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document, selectedIds);
+            collector.OfClass(typeof(Pipe));
+            collector.WherePasses(new ElementIntersectsSolidFilter(solid)); // Apply intersection filter to find matches
+
+            bool isPipe = false;
+
+            List<Element> pipeList = new List<Element>();
+            if (collector.GetElementCount() == 0)
             {
-                double radius = 100; //mm
-                var ft = Common.mmToFT * radius;
+                isPipe = true;
+                pipeList = GetPipes(selectedIds, sprinkle_point);
+            }
+            else
+                pipeList = collector.ToElements().ToList();
 
-                var solid = Common.CreateCylindricalVolume(sprinkle_point, ft * 5, ft, !isUp);
-                if (solid == null)
-                    return result;
+            //Global.m_uiDoc.Selection.SetElementIds(collector.ToElementIds());
 
-                ////Test////////////////////////////////////////////////////////////////////////
-                //foreach (Edge edge in solid.Edges)
-                //{
-                //    var curve2 = edge.AsCurve();
+            foreach (Pipe pipe in pipeList)
+            {
+                var curve = (pipe.Location as LocationCurve).Curve;
 
-                //    for (int i = 0; i < curve2.Tessellate().Count; i++)
-                //    {
-                //        XYZ p02 = curve2.Tessellate()[i];
-                //        XYZ p12 = curve2.Tessellate()[(i + 1) % curve2.Tessellate().Count];
+                var p0 = curve.GetEndPoint(0);
+                var p1 = curve.GetEndPoint(1);
 
-                //        Common.CreateModelLine(p02, p12);
-                //    }
-                //}
+                //Move sprinker về điểm gần nhất với pipe
+                var sprinker2d = Common.ToPoint2D(sprinkle_point);
+                var p02d = Common.ToPoint2D(p0);
+                var p12d = Common.ToPoint2D(p1);
 
-                //Find intersection
-                FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document, selectedIds);
-                collector.OfClass(typeof(Pipe));
-                collector.WherePasses(new ElementIntersectsSolidFilter(solid)); // Apply intersection filter to find matches
-
-                bool isPipe = false;
-
-                List<Element> pipeList = new List<Element>();
-                if (collector.GetElementCount() == 0)
+                if (isPipe)
                 {
-                    isPipe = true;
-                    pipeList = GetPipes(selectedIds, sprinkle_point);
-                }
-                else
-                    pipeList = collector.ToElements().ToList();
+                    var lineUn = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction);
+                    var resultPipe = lineUn.Project(sprinkle_point);
 
-                //Global.m_uiDoc.Selection.SetElementIds(collector.ToElementIds());
-
-                foreach (Pipe pipe in pipeList)
-                {
-                    var curve = (pipe.Location as LocationCurve).Curve;
-
-                    var p0 = curve.GetEndPoint(0);
-                    var p1 = curve.GetEndPoint(1);
-
-                    //Move sprinker về điểm gần nhất với pipe
-                    var sprinker2d = Common.ToPoint2D(sprinkle_point);
-                    var p02d = Common.ToPoint2D(p0);
-                    var p12d = Common.ToPoint2D(p1);
-
-                    if (isPipe)
+                    XYZ pointProject = resultPipe.XYZPoint;
+                    XYZ pointProject2d = Common.ToPoint2D(pointProject);
+                    var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
+                    if (!Common.IsEqual(distancePoint2d, 0))
                     {
-                        var lineUn = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction);
-                        var resultPipe = lineUn.Project(sprinkle_point);
-
-                        XYZ pointProject = resultPipe.XYZPoint;
-                        XYZ pointProject2d = Common.ToPoint2D(pointProject);
-                        var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
-                        if (!Common.IsEqual(distancePoint2d, 0))
-                        {
-                            if (d < distancePoint2d)
-                                return result;
-                            else
-                            {
-                                var vector = pointProject2d - sprinker2d;
-
-                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
-
-                                Global.UIDoc.Document.Regenerate();
-
-                                sprinkle_point = (instance.Location as LocationPoint).Point;
-                            }
-                        }
+                        if (d < distancePoint2d)
+                            return result;
                         else
                         {
-                            Line line = Line.CreateBound(p0, pointProject);
-                            (pipe.Location as LocationCurve).Curve = line;
+                            var vector = pointProject2d - sprinker2d;
 
-                            p0 = line.GetEndPoint(0);
-                            p1 = line.GetEndPoint(1);
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
+
+                            Global.UIDoc.Document.Regenerate();
+
+                            sprinkle_point = (instance.Location as LocationPoint).Point;
                         }
                     }
                     else
                     {
-                        var resultPipe = curve.Project(sprinkle_point);
+                        Line line = Line.CreateBound(p0, pointProject);
+                        (pipe.Location as LocationCurve).Curve = line;
 
-                        XYZ pointProject = resultPipe.XYZPoint;
-                        XYZ pointProject2d = Common.ToPoint2D(pointProject);
-
-                        var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
-                        if (!Common.IsEqual(distancePoint2d, 0))
-                        {
-                            if (d < distancePoint2d)
-                            {
-                                var con = Common.GetConnectorClosestTo(pipe, sprinkle_point);
-                                if (con.IsConnected)
-                                    return result;
-                                else if (!con.IsConnected && !App.m_SprinkerUpForm.isElbow)
-                                    return result;
-                            }
-                            else
-                            {
-                                var vector = pointProject2d - sprinker2d;
-
-                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
-
-                                Global.UIDoc.Document.Regenerate();
-
-                                sprinkle_point = (instance.Location as LocationPoint).Point;
-                            }
-                        }
+                        p0 = line.GetEndPoint(0);
+                        p1 = line.GetEndPoint(1);
                     }
+                }
+                else
+                {
+                    var resultPipe = curve.Project(sprinkle_point);
 
-                    //                     if (p02d.DistanceTo(sprinker2d) < p12d.DistanceTo(sprinker2d))
-                    //                     {
-                    //                         sprinkle_point = new XYZ(p02d.X, p02d.Y, sprinkle_point.Z);
-                    //                     }
-                    //                     else
-                    //                     {
-                    //                         sprinkle_point = new XYZ(p12d.X, p12d.Y, sprinkle_point.Z);
-                    //                     }
+                    XYZ pointProject = resultPipe.XYZPoint;
+                    XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                    //(instance.Location as LocationPoint).Point = sprinkle_point;
-                    //Global.m_uiDoc.Document.Regenerate();
-                    //////////////////////////////////////////////////////////////////////////
-
-                    var line2d = Line.CreateBound(new XYZ(p0.X, p0.Y, 0), new XYZ(p1.X, p1.Y, 0));
-                    var v = line2d.Direction.CrossProduct(XYZ.BasisZ).Normalize();
-
-                    double dTemp = 1000;
-
-                    var lineTemp = Line.CreateUnbound(new XYZ(sprinkle_point.X, sprinkle_point.Y, 0), v * dTemp);
-
-                    var p11 = lineTemp.Evaluate(dTemp, false);
-
-                    lineTemp = Line.CreateUnbound(new XYZ(sprinkle_point.X, sprinkle_point.Y, 0), -v * dTemp);
-
-                    var p22 = lineTemp.Evaluate(dTemp, false);
-
-                    lineTemp = Line.CreateBound(p11, p22);
-
-                    //expand
-                    var index = line2d.GetEndPoint(0).DistanceTo(sprinkle_point) < line2d.GetEndPoint(1).DistanceTo(sprinkle_point) ? 0 : 1;
-                    var curveExpand = Line.CreateUnbound(line2d.GetEndPoint(index), line2d.Direction * 100);
-
-                    IntersectionResultArray arr = new IntersectionResultArray();
-                    var inter = curveExpand.Intersect(lineTemp, out arr);
-                    if (inter != SetComparisonResult.Overlap)
-                        continue;
-
-                    var p2d = arr.get_Item(0).XYZPoint;
-
-                    var p3d = new XYZ(p2d.X, p2d.Y, sprinkle_point.Z);
-
-                    var line3d = Line.CreateBound(p3d, new XYZ(p3d.X, p3d.Y, p3d.Z + (isUp ? -1 : 1) * dTemp));
-
-                    var curveExtend3d_temp = Line.CreateUnbound(curve.GetEndPoint(index), (curve as Line).Direction * 100);
-
-                    arr = new IntersectionResultArray();
-                    inter = curveExtend3d_temp.Intersect(line3d, out arr);
-                    if (inter != SetComparisonResult.Overlap)
-                        continue;
-
-                    var pOn = arr.get_Item(0).XYZPoint;
-
-                    //Create pipe Z
-                    newPlace = new XYZ(0, 0, 0);
-                    elemIds = ElementTransformUtils.CopyElement(
-                      Global.UIDoc.Document, pipe.Id, newPlace);
-
-                    var newPipeZ = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-
-                    lineTemp = Line.CreateBound(pOn, sprinkle_point);
-
-                    var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
-
-                    pOn = curveExtend3d_temp.Project(pcenter).XYZPoint;
-
-                    Line l = Line.CreateUnbound(pOn, XYZ.BasisZ);
-
-                    pcenter = l.Project(sprinkle_point).XYZPoint;
-
-                    (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
-
-                    newPipeZ.LookupParameter("Diameter").Set(dFt);
-
-                    var pipeType = Global.UIDoc.Document.GetElement(pipeTypeId) as PipeType;
-                    if (pipeType != null)
-                        newPipeZ.PipeType = pipeType;
-
-                    Global.UIDoc.Document.Regenerate();
-
-                    try
+                    var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
+                    if (!Common.IsEqual(distancePoint2d, 0))
                     {
-                        if (App.m_SprinkerUpForm.isElbow)
+                        if (d < distancePoint2d)
                         {
-                            if (CheckPipeIsEnd(pipe, sprinkle_point))
-                            {
-                                if (isConnectNipple)
-                                {
-                                    var pipeCut = ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
-                                    if (pipeCut != null)
-                                        selectedIds.Add(pipeCut.Id);
-                                }
-                                else
-                                {
-                                    if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
-                                    {
-                                        var curvePipeMain = pipe.GetCurve();
-
-                                        var curvePipeDung = newPipeZ.GetCurve();
-
-                                        Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction);
-
-                                        IntersectionResultArray array;
-
-                                        line.Intersect(curvePipeMain, out array);
-                                        var point = array.get_Item(0).XYZPoint;
-
-                                        CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
-                                        if (pipe1 != null)
-                                            selectedIds.Add(pipe1.Id);
-                                    }
-                                    else
-                                        se(pipe as MEPCurve, newPipeZ as MEPCurve);
-
-                                    Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
-                                    Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
-
-                                    var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
-                                }
-                            }
-                            else
-                            {
-                                if (isConnectNipple)
-                                    ConnectNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
-                                else
-                                {
-                                    Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
-                                    Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
-
-                                    var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
-
-                                    Connector c1 = Common.GetConnectorClosestTo(pipe, pOn);
-
-                                    Connector c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
-
-                                    var elbow = Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
-                                }
-                            }
+                            var con = Common.GetConnectorClosestTo(pipe, sprinkle_point);
+                            if (con.IsConnected)
+                                return result;
+                            else if (!con.IsConnected && !App.m_SprinkerUpForm.isElbow)
+                                return result;
                         }
                         else
+                        {
+                            var vector = pointProject2d - sprinker2d;
+
+                            ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d));
+
+                            Global.UIDoc.Document.Regenerate();
+
+                            sprinkle_point = (instance.Location as LocationPoint).Point;
+                        }
+                    }
+                }
+
+                //                     if (p02d.DistanceTo(sprinker2d) < p12d.DistanceTo(sprinker2d))
+                //                     {
+                //                         sprinkle_point = new XYZ(p02d.X, p02d.Y, sprinkle_point.Z);
+                //                     }
+                //                     else
+                //                     {
+                //                         sprinkle_point = new XYZ(p12d.X, p12d.Y, sprinkle_point.Z);
+                //                     }
+
+                //(instance.Location as LocationPoint).Point = sprinkle_point;
+                //Global.m_uiDoc.Document.Regenerate();
+                //////////////////////////////////////////////////////////////////////////
+
+                var line2d = Line.CreateBound(new XYZ(p0.X, p0.Y, 0), new XYZ(p1.X, p1.Y, 0));
+                var v = line2d.Direction.CrossProduct(XYZ.BasisZ).Normalize();
+
+                double dTemp = 1000;
+
+                var lineTemp = Line.CreateUnbound(new XYZ(sprinkle_point.X, sprinkle_point.Y, 0), v * dTemp);
+
+                var p11 = lineTemp.Evaluate(dTemp, false);
+
+                lineTemp = Line.CreateUnbound(new XYZ(sprinkle_point.X, sprinkle_point.Y, 0), -v * dTemp);
+
+                var p22 = lineTemp.Evaluate(dTemp, false);
+
+                lineTemp = Line.CreateBound(p11, p22);
+
+                //expand
+                var index = line2d.GetEndPoint(0).DistanceTo(sprinkle_point) < line2d.GetEndPoint(1).DistanceTo(sprinkle_point) ? 0 : 1;
+                var curveExpand = Line.CreateUnbound(line2d.GetEndPoint(index), line2d.Direction * 100);
+
+                IntersectionResultArray arr = new IntersectionResultArray();
+                var inter = curveExpand.Intersect(lineTemp, out arr);
+                if (inter != SetComparisonResult.Overlap)
+                    continue;
+
+                var p2d = arr.get_Item(0).XYZPoint;
+
+                var p3d = new XYZ(p2d.X, p2d.Y, sprinkle_point.Z);
+
+                var line3d = Line.CreateBound(p3d, new XYZ(p3d.X, p3d.Y, p3d.Z + (isUp ? -1 : 1) * dTemp));
+
+                var curveExtend3d_temp = Line.CreateUnbound(curve.GetEndPoint(index), (curve as Line).Direction * 100);
+
+                arr = new IntersectionResultArray();
+                inter = curveExtend3d_temp.Intersect(line3d, out arr);
+                if (inter != SetComparisonResult.Overlap)
+                    continue;
+
+                var pOn = arr.get_Item(0).XYZPoint;
+
+                //Create pipe Z
+                newPlace = new XYZ(0, 0, 0);
+                elemIds = ElementTransformUtils.CopyElement(
+                  Global.UIDoc.Document, pipe.Id, newPlace);
+
+                var newPipeZ = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+                lineTemp = Line.CreateBound(pOn, sprinkle_point);
+
+                var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
+
+                pOn = curveExtend3d_temp.Project(pcenter).XYZPoint;
+
+                Line l = Line.CreateUnbound(pOn, XYZ.BasisZ);
+
+                pcenter = l.Project(sprinkle_point).XYZPoint;
+
+                (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
+
+                newPipeZ.LookupParameter("Diameter").Set(dFt);
+
+                var pipeType = Global.UIDoc.Document.GetElement(pipeTypeId) as PipeType;
+                if (pipeType != null)
+                    newPipeZ.PipeType = pipeType;
+
+                Global.UIDoc.Document.Regenerate();
+
+                try
+                {
+                    if (App.m_SprinkerUpForm.isElbow)
+                    {
+                        if (CheckPipeIsEnd(pipe, sprinkle_point))
                         {
                             if (isConnectNipple)
                             {
                                 var pipeCut = ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
-                                if (pipeCut != null)
-                                    selectedIds.Add(pipeCut.Id);
-                            }
-                            else if (isConnectTee)
-                            {
-                                var pipeCut = ConnectTee(pipe, newPipeZ, instance, pcenter, sprinkle_point);
                                 if (pipeCut != null)
                                     selectedIds.Add(pipeCut.Id);
                             }
@@ -643,122 +581,83 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
                             }
                         }
+                        else
+                        {
+                            if (isConnectNipple)
+                                ConnectNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                            else
+                            {
+                                Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
+                                Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
 
-                        result = true;
+                                var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+
+                                Connector c1 = Common.GetConnectorClosestTo(pipe, pOn);
+
+                                Connector c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
+
+                                var elbow = Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                            }
+                        }
                     }
-                    catch (System.Exception ex)
+                    else
                     {
-                        tran.RollBack();
+                        if (isConnectNipple)
+                        {
+                            var pipeCut = ConnectTeeAndNipple(pipe, newPipeZ, instance, fmlNipple, pOn, pcenter, sprinkle_point);
+                            if (pipeCut != null)
+                                selectedIds.Add(pipeCut.Id);
+                        }
+                        else if (isConnectTee)
+                        {
+                            var pipeCut = ConnectTee(pipe, newPipeZ, instance, pcenter, sprinkle_point);
+                            if (pipeCut != null)
+                                selectedIds.Add(pipeCut.Id);
+                        }
+                        else
+                        {
+                            if (GetPreferredJunctionType(pipe) == PreferredJunctionType.Tee)
+                            {
+                                var curvePipeMain = pipe.GetCurve();
+
+                                var curvePipeDung = newPipeZ.GetCurve();
+
+                                Line line = Line.CreateUnbound((curvePipeDung as Line).Origin, (curvePipeDung as Line).Direction);
+
+                                IntersectionResultArray array;
+
+                                line.Intersect(curvePipeMain, out array);
+                                var point = array.get_Item(0).XYZPoint;
+
+                                CreateTeeFitting(pipe, newPipeZ, point, out Pipe pipe1);
+                                if (pipe1 != null)
+                                    selectedIds.Add(pipe1.Id);
+                            }
+                            else
+                            {
+                                var result1 = curve.Intersect(newPipeZ.GetCurve(), out IntersectionResultArray resultArray);
+                                if (result1 == SetComparisonResult.Overlap)
+                                {
+                                    var point = resultArray.get_Item(0).XYZPoint;
+                                    if (!curve.GetEndPoint(0).IsAlmostEqualTo(point, 10e-5) && !curve.GetEndPoint(1).IsAlmostEqualTo(point, 10e-5))
+                                        se(pipe as MEPCurve, newPipeZ as MEPCurve);
+                                    else
+                                        tran.RollBack();
+                                }
+                            }
+
+                            Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
+                            Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+
+                            var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                        }
                     }
+
+                    result = true;
                 }
-            }
-            else
-            {
-                foreach (Pipe pipe in pipes)
+                catch (System.Exception ex)
                 {
-                    var curve = (pipe.Location as LocationCurve).Curve;
-
-                    //Create plane
-                    var p0 = curve.GetEndPoint(0);
-                    var p1 = curve.GetEndPoint(1);
-
-                    //var plane = Plane.CreateByThreePoints(p0, p1, new XYZ(p1.X, p1.Y, p1.Z + 1));
-
-                    //var sprinkle_point_1 = plane.ProjectOnto(sprinkle_point);
-                    //if (sprinkle_point_1 == null)
-                    //{
-                    //    sprinkle_point_1 = sprinkle_point;//Chung to sprinkle_point nam giua pipe
-                    //}
-
-                    var proj = curve.Project(sprinkle_point);
-                    var sprinkle_point_1 = proj.XYZPoint;
-
-                    var lineZ = Line.CreateBound(sprinkle_point_1, new XYZ(sprinkle_point_1.X, sprinkle_point_1.Y, sprinkle_point_1.Z + 1000 * (isUp ? -1 : 1)));
-
-                    XYZ pOn = null;
-                    IntersectionResultArray array = new IntersectionResultArray();
-                    var inter = lineZ.Intersect(curve, out array);
-                    if (inter != SetComparisonResult.Overlap)
-                    {
-                        continue;
-                    }
-                    else
-                        pOn = array.get_Item(0).XYZPoint;
-
-                    //Move sprinkler ////////////////////////////////////////////////////////////////////////
-                    sprinkle_point = new XYZ(pOn.X, pOn.Y, sprinkle_point.Z);
-                    (instance.Location as LocationPoint).Point = sprinkle_point;
-                    //////////////////////////////////////////////////////////////////////////
-
-                    //Calculate point on curve
-
-                    Pipe pipe1 = pipe;
-                    Pipe pipe2 = null;
-                    XuLyDauong(pipe, out pipe2, pOn);
-
-                    //Create pipe Z
-                    newPlace = new XYZ(0, 0, 0);
-                    elemIds = ElementTransformUtils.CopyElement(
-                      Global.UIDoc.Document, pipe.Id, newPlace);
-
-                    var newPipeZ = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-
-                    var lineTemp = Line.CreateBound(pOn, sprinkle_point);
-                    var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
-
-                    (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
-
-                    newPipeZ.LookupParameter("Diameter").Set(dFt);
-
-                    Global.UIDoc.Document.Regenerate();
-
-                    Connector c1 = Common.GetConnectorClosestTo(pipe1, pOn);
-                    Connector c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
-
-                    if (pipe2 != null)
-                    {
-                        Connector c2 = Common.GetConnectorClosestTo(pipe2, pOn);
-
-                        try
-                        {
-                            Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
-
-                            result = true;
-                        }
-                        catch (System.Exception ex)
-                        {
-                        }
-
-                        //Add them Pipe sau khi cat
-                        selectedIds.Add(pipe2.Id);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
-
-                            result = true;
-                        }
-                        catch (System.Exception ex)
-                        {
-                        }
-                    }
-
-                    try
-                    {
-                        Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
-                        Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
-
-                        Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
-
-                        result = true;
-                    }
-                    catch (System.Exception ex)
-                    {
-                    }
-
-                    break;
+                    tran.RollBack();
                 }
             }
 
