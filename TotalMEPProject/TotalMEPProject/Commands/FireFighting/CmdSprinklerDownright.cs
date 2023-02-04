@@ -838,6 +838,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     using (TransactionGroup trGr = new TransactionGroup(Global.UIDoc.Document, "SprinklerDown"))
                     {
+                        trGr.Start();
                         foreach (FamilyInstance sprinkler in selSprinklers)
                         {
                             Transaction reTrans = new Transaction(Global.UIDoc.Document, "SPRINKLER_DOWN_RIGHT_TYPE_3");
@@ -1180,6 +1181,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             reTrans.Commit();
                         }
+                        trGr.Assimilate();
                     }
 
                     if (isCancelExport == false)
