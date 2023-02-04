@@ -404,7 +404,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         Pipe temp_processPipe_2 = null;
                         XYZ finalIntPntMainPipe = null;
                         XYZ finalIntPntBranchPipe = null;
-
+                        Curve curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(0), (curveMainPipe as Line).Direction * 100); ;
                         IntersectionResultArray intRetArr = new IntersectionResultArray();
 
                         //Truong hop dau ong
@@ -422,7 +422,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             var p2d = intRetArr.get_Item(0).XYZPoint;
                             var p3d = new XYZ(p2d.X, p2d.Y, intPnt.Z);
                             var lineZ = Line.CreateBound(p3d, new XYZ(p2d.X, p2d.Y, p2d.Z + dTempEvaluate));
-                            var curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
+                            curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
 
                             intRetArr = new IntersectionResultArray();
                             inter = curveMainPipeExtend3d_temp.Intersect(lineZ, out intRetArr);
@@ -492,11 +492,13 @@ namespace TotalMEPProject.Commands.FireFighting
                             continue;
                         }
 
-                        if (ResultData.FlagAddElbowLastBranch == false && flagSplit == false)
-                        {
-                            reTrans.RollBack();
-                            continue;
-                        }
+                        finalIntPntMainPipe = curveMainPipeExtend3d_temp.Project(finalIntPntBranchPipe).XYZPoint;
+
+                        //if (ResultData.FlagAddElbowLastBranch == false && flagSplit == false)
+                        //{
+                        //    reTrans.RollBack();
+                        //    continue;
+                        //}
                         var verticalPipe = Common.Clone(branchPipe) as Pipe;
                         verticalPipe.PipeType = pipeType;
                         (verticalPipe.Location as LocationCurve).Curve = Line.CreateBound(finalIntPntMainPipe, finalIntPntBranchPipe);
@@ -516,6 +518,10 @@ namespace TotalMEPProject.Commands.FireFighting
                                     else
                                         Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                 }
+                            }
+                            else if (GetPreferredJunctionType(temp_processPipe_1) == PreferredJunctionType.Tap)
+                            {
+                                CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
                             }
                             else
                             {
@@ -604,6 +610,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             var curveProcessFlatten = Line.CreateUnbound(firstPnt_ProcessPipe.FlattenPoint(), (pipe1.GetFlattenCurve()).Direction * 100);
 
+                            var curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(0), (curveMainPipe as Line).Direction * 100);
                             // Find intersection point
                             XYZ newPlace = new XYZ(0, 0, 0);
                             Pipe temp_processPipe_1 = validMainPipe;
@@ -629,7 +636,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var p2d = intRetArr.get_Item(0).XYZPoint;
                                 var p3d = new XYZ(p2d.X, p2d.Y, intPnt.Z);
                                 var lineZ = Line.CreateBound(p3d, new XYZ(p2d.X, p2d.Y, p2d.Z + dTempEvaluate));
-                                var curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
+                                curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
 
                                 intRetArr = new IntersectionResultArray();
                                 inter = curveMainPipeExtend3d_temp.Intersect(lineZ, out intRetArr);
@@ -699,6 +706,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
+                            finalIntPntMainPipe = curveMainPipeExtend3d_temp.Project(finalIntPntBranchPipe).XYZPoint;
                             var verticalPipe = Common.Clone(pipe1) as Pipe;
                             verticalPipe.PipeType = pipeType;
                             verticalPipe.LookupParameter("Diameter").Set(diamterPipe);
@@ -1339,7 +1347,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
             var curve_main = main.GetCurve();
             var curve_main_2d = Line.CreateBound(Common.ToPoint2D(curve_main.GetEndPoint(0)), Common.ToPoint2D(curve_main.GetEndPoint(1)));
-            var curve_main_expand = Line.CreateUnbound(curve_main.GetEndPoint(0), Common.ToPoint2D(curve_main.GetEndPoint(1)));
+            var curve_main_expand = Line.CreateUnbound(curve_main.GetEndPoint(0), (curve_main as Line).Direction * 100);
 
             var curve_sub = pipeSub.GetCurve();
 
@@ -1391,7 +1399,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 return false;
 
             inters_sub = arr.get_Item(0).XYZPoint;
-
+            inters_main = curve_main_expand.Project(inters_sub).XYZPoint;
             if (twoPipes)
             {
                 //Get father point
@@ -1479,6 +1487,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 return false;
 
             inters_sub = arr.get_Item(0).XYZPoint;
+            inters_main = curve_main_expand.Project(inters_sub).XYZPoint;
 
             if (twoPipes)
             {
