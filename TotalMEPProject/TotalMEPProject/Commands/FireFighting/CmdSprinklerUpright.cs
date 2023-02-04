@@ -639,7 +639,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 if (result1 == SetComparisonResult.Overlap)
                                 {
                                     var point = resultArray.get_Item(0).XYZPoint;
-                                    if (!curve.GetEndPoint(0).IsAlmostEqualTo(point, 10e-5) && !curve.GetEndPoint(1).IsAlmostEqualTo(point, 10e-5))
+                                    if (!Common.Equals(curve.GetEndPoint(0), point) && !Common.Equals(curve.GetEndPoint(1), point))
                                         se(pipe as MEPCurve, newPipeZ as MEPCurve);
                                     else
                                         tran.RollBack();
