@@ -36,11 +36,6 @@
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.label4 = new System.Windows.Forms.Label();
             this.txbC3Length = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.rdnC3D20 = new System.Windows.Forms.RadioButton();
-            this.rdnC3D15 = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -60,9 +55,6 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -76,24 +68,23 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 170F));
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel6, 0, 5);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel5, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox2, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox4, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.button1, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel6, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel5, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox2, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox4, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 6;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 90F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(513, 328);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(513, 279);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel6
@@ -106,7 +97,7 @@
             this.tableLayoutPanel6.Controls.Add(this.btnC3OK, 2, 0);
             this.tableLayoutPanel6.Controls.Add(this.btnC3Run, 1, 0);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(0, 292);
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(0, 243);
             this.tableLayoutPanel6.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 1;
@@ -145,7 +136,7 @@
             this.tableLayoutPanel5.Controls.Add(this.label4, 0, 0);
             this.tableLayoutPanel5.Controls.Add(this.txbC3Length, 1, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 257);
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 208);
             this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
@@ -173,72 +164,13 @@
             this.txbC3Length.TabIndex = 4;
             this.txbC3Length.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txbC3Length_KeyPress);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.tableLayoutPanel2);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(3, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(337, 49);
-            this.groupBox1.TabIndex = 5;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Sprinkler Head Size";
-            // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Controls.Add(this.panel1, 0, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(331, 30);
-            this.tableLayoutPanel2.TabIndex = 1;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.rdnC3D20);
-            this.panel1.Controls.Add(this.rdnC3D15);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(331, 30);
-            this.panel1.TabIndex = 1;
-            // 
-            // rdnC3D20
-            // 
-            this.rdnC3D20.AutoSize = true;
-            this.rdnC3D20.Location = new System.Drawing.Point(130, 5);
-            this.rdnC3D20.Name = "rdnC3D20";
-            this.rdnC3D20.Size = new System.Drawing.Size(45, 17);
-            this.rdnC3D20.TabIndex = 3;
-            this.rdnC3D20.TabStop = true;
-            this.rdnC3D20.Text = "D20";
-            this.rdnC3D20.UseVisualStyleBackColor = true;
-            // 
-            // rdnC3D15
-            // 
-            this.rdnC3D15.AutoSize = true;
-            this.rdnC3D15.Location = new System.Drawing.Point(6, 5);
-            this.rdnC3D15.Name = "rdnC3D15";
-            this.rdnC3D15.Size = new System.Drawing.Size(45, 17);
-            this.rdnC3D15.TabIndex = 2;
-            this.rdnC3D15.TabStop = true;
-            this.rdnC3D15.Text = "D15";
-            this.rdnC3D15.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.tableLayoutPanel3);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(3, 58);
+            this.groupBox2.Location = new System.Drawing.Point(3, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(337, 50);
+            this.groupBox2.Size = new System.Drawing.Size(337, 53);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sprinkler Connection Type";
@@ -255,7 +187,7 @@
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(331, 31);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(331, 34);
             this.tableLayoutPanel3.TabIndex = 2;
             // 
             // panel2
@@ -267,7 +199,7 @@
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Margin = new System.Windows.Forms.Padding(0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(331, 31);
+            this.panel2.Size = new System.Drawing.Size(331, 34);
             this.panel2.TabIndex = 2;
             // 
             // rdnC3Type3
@@ -309,7 +241,7 @@
             // 
             this.groupBox3.Controls.Add(this.tableLayoutPanel4);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox3.Location = new System.Drawing.Point(3, 170);
+            this.groupBox3.Location = new System.Drawing.Point(3, 121);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(337, 84);
             this.groupBox3.TabIndex = 7;
@@ -381,9 +313,9 @@
             this.groupBox4.Controls.Add(this.rdnC3TeeTap);
             this.groupBox4.Controls.Add(this.rdnC3Elbow);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox4.Location = new System.Drawing.Point(3, 114);
+            this.groupBox4.Location = new System.Drawing.Point(3, 62);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(337, 50);
+            this.groupBox4.Size = new System.Drawing.Size(337, 53);
             this.groupBox4.TabIndex = 8;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Fitting at the end of route";
@@ -416,9 +348,9 @@
             this.button1.Enabled = false;
             this.button1.Location = new System.Drawing.Point(346, 3);
             this.button1.Name = "button1";
-            this.tableLayoutPanel1.SetRowSpan(this.button1, 5);
-            this.button1.Size = new System.Drawing.Size(164, 286);
-            this.button1.TabIndex = 9;
+            this.tableLayoutPanel1.SetRowSpan(this.button1, 4);
+            this.button1.Size = new System.Drawing.Size(164, 237);
+            this.button1.TabIndex = 10;
             this.button1.Text = "PREVIEW";
             this.button1.UseVisualStyleBackColor = true;
             // 
@@ -426,12 +358,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(513, 328);
+            this.ClientSize = new System.Drawing.Size(513, 279);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(529, 367);
-            this.MinimumSize = new System.Drawing.Size(529, 367);
+            this.MaximumSize = new System.Drawing.Size(529, 318);
+            this.MinimumSize = new System.Drawing.Size(529, 318);
             this.Name = "SprinklerDownForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SprinklerDown";
@@ -440,10 +372,6 @@
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
@@ -466,9 +394,6 @@
         private System.Windows.Forms.Button btnC3OK;
         private System.Windows.Forms.Button btnC3Run;
         private System.Windows.Forms.TextBox txbC3Length;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Panel panel2;
@@ -483,8 +408,6 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.RadioButton rdnC3TeeTap;
         private System.Windows.Forms.RadioButton rdnC3Elbow;
-        private System.Windows.Forms.RadioButton rdnC3D15;
-        private System.Windows.Forms.RadioButton rdnC3D20;
         private System.Windows.Forms.ComboBox cboC3PipeSize;
         private System.Windows.Forms.Button button1;
     }

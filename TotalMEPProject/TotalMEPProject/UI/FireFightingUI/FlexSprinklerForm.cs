@@ -29,19 +29,9 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         #region Properties
 
-        public bool IsCheckedD15
-        {
-            get => rbC4D15.Checked;
-        }
-
         public bool IsCheckedTee
         {
             get => rdnC4TeeTap.Checked;
-        }
-
-        public bool IsCheckedD20
-        {
-            get => !rbC4D15.Checked;
         }
 
         public bool IsCheckedType1
@@ -202,11 +192,10 @@ namespace TotalMEPProject.UI.FireFightingUI
         private void FlexSprinklerForm_Load(object sender, EventArgs e)
         {
             AddFamilyType();
-            rbC4D15.Checked = true;
+
             rbC4Type1.Checked = true;
             rdnC4TeeTap.Checked = true;
-            AppUtils.ff(rbC4D15);
-            AppUtils.ff(rbC4D20);
+
             AppUtils.ff(rbC4Type1);
             AppUtils.ff(rbC4Type2);
             AppUtils.ff(rbC4Type3);
@@ -227,8 +216,6 @@ namespace TotalMEPProject.UI.FireFightingUI
                 return;
             AppUtils.sa(cboC4PipeType);
             AppUtils.sa(cboC4PipeSize);
-            AppUtils.sa(rbC4D15);
-            AppUtils.sa(rbC4D20);
             AppUtils.sa(rbC4Type1);
             AppUtils.sa(rbC4Type2);
             AppUtils.sa(rbC4Type3);
@@ -242,8 +229,6 @@ namespace TotalMEPProject.UI.FireFightingUI
         private void btnC4OK_Click(object sender, EventArgs e)
         {
             PressCancel();
-            AppUtils.sa(rbC4D15);
-            AppUtils.sa(rbC4D20);
             AppUtils.sa(rbC4Type1);
             AppUtils.sa(rbC4Type2);
             AppUtils.sa(rbC4Type3);

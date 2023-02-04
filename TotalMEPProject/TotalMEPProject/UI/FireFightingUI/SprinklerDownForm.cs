@@ -17,7 +17,6 @@ namespace TotalMEPProject.UI.FireFightingUI
         private Request.RequestHandler m_handler;
 
         private ExternalEvent m_exEvent;
-        public bool isD15 = false;
         public bool isTeeTap = false;
 
         public ElementId FamilyType
@@ -124,9 +123,13 @@ namespace TotalMEPProject.UI.FireFightingUI
         private void SprinklerDownForm_Load(object sender, EventArgs e)
         {
             rdnC3TeeTap.Checked = true;
-            rdnC3D15.Checked = true;
+
             rdnC3Type1.Checked = true;
             AppUtils.ff(txbC3Length, "200");
+
+            AppUtils.ff(rdnC3Type1);
+            AppUtils.ff(rdnC3Type2);
+            AppUtils.ff(rdnC3Type3);
             AddFamilyType();
         }
 
@@ -134,10 +137,12 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             if (Height_ == double.MinValue)
                 return;
-            isD15 = rdnC3D15.Checked;
             isTeeTap = rdnC3TeeTap.Checked;
             AppUtils.sa(cboC3PipeType);
             AppUtils.sa(cboC3PipeSize);
+            AppUtils.sa(rdnC3Type1);
+            AppUtils.sa(rdnC3Type2);
+            AppUtils.sa(rdnC3Type3);
             AppUtils.sa(txbC3Length, txbC3Length.Text.ToString());
             if (rdnC3Type1.Checked)
             {

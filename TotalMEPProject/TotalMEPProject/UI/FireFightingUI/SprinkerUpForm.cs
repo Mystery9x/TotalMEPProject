@@ -22,7 +22,6 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         private ExternalEvent m_exEvent;
 
-        public bool isD15 = false;
         public bool isConnectTee = false;
         public bool isConnectNipple = false;
         public bool isElbow = false;
@@ -192,7 +191,6 @@ namespace TotalMEPProject.UI.FireFightingUI
             if (PipeSize == double.MaxValue)
                 return;
 
-            isD15 = rdnC2SprinklerD15.Checked;
             if (chkC2ConnectTee.Enabled)
                 isConnectTee = chkC2ConnectTee.Checked;
 

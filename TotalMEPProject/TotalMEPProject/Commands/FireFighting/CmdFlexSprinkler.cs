@@ -71,7 +71,7 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_flexSprinklerForm.IsCheckedD15);
+                List<FamilyInstance> sprinklers = sr.SelectSprinklers();
                 if (sprinklers == null || sprinklers.Count == 0)
                     return false;
 
@@ -490,7 +490,7 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_flexSprinklerForm.IsCheckedD15);
+                List<FamilyInstance> sprinklers = sr.SelectSprinklers();
                 if (sprinklers == null || sprinklers.Count == 0)
                     return false;
 
@@ -968,7 +968,7 @@ namespace TotalMEPProject.Commands.FireFighting
             try
             {
                 // Get selected sprinkler
-                List<FamilyInstance> selSprinklers = sr.SelectSprinklers(App.m_flexSprinklerForm.IsCheckedD15);
+                List<FamilyInstance> selSprinklers = sr.SelectSprinklers();
                 if (selSprinklers == null || selSprinklers.Count == 0)
                     return false;
 

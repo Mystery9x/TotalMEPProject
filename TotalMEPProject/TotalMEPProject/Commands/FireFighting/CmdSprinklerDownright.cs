@@ -45,7 +45,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     App.m_SprinklerDownForm.Hide();
                 }
 
-                List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_SprinklerDownForm.isD15);
+                List<FamilyInstance> sprinklers = sr.SelectSprinklers();
                 if (sprinklers == null || sprinklers.Count == 0)
                     return Result.Cancelled;
 
@@ -804,7 +804,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 // Get selected sprinkler
-                List<FamilyInstance> selSprinklers = sr.SelectSprinklers(App.m_SprinklerDownForm.isD15);
+                List<FamilyInstance> selSprinklers = sr.SelectSprinklers();
                 if (selSprinklers == null || selSprinklers.Count == 0)
                     return Result.Cancelled;
 
@@ -1536,7 +1536,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
 
                 // Get selected sprinkler
-                List<FamilyInstance> selSprinklers = sr.SelectSprinklers(App.m_SprinklerDownForm.isD15);
+                List<FamilyInstance> selSprinklers = sr.SelectSprinklers();
                 if (selSprinklers == null || selSprinklers.Count == 0)
                     return Result.Cancelled;
 

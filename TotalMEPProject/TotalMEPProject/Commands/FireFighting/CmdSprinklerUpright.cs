@@ -43,7 +43,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     App.m_SprinkerUpForm.Hide();
                 }
 
-                List<FamilyInstance> sprinklers = sr.SelectSprinklers(App.m_SprinkerUpForm.isD15);
+                List<FamilyInstance> sprinklers = sr.SelectSprinklers();
                 if (sprinklers == null || sprinklers.Count == 0)
                     return Result.Cancelled;
 
@@ -154,12 +154,12 @@ namespace TotalMEPProject.Commands.FireFighting
 
     public class sr
     {
-        public static List<FamilyInstance> SelectSprinklers(bool isD15)
+        public static List<FamilyInstance> SelectSprinklers()
         {
             List<FamilyInstance> list = new List<FamilyInstance>();
             try
             {
-                var pickedObjs = Global.UIDoc.Selection.PickObjects(ObjectType.Element, new SprinklerFilter(isD15), "Pick Sprinklers: ");
+                var pickedObjs = Global.UIDoc.Selection.PickObjects(ObjectType.Element, new SprinklerFilter(), "Pick Sprinklers: ");
 
                 foreach (Reference reference in pickedObjs)
                 {
@@ -527,6 +527,10 @@ namespace TotalMEPProject.Commands.FireFighting
                     var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
 
                     pOn = curveExtend3d_temp.Project(pcenter).XYZPoint;
+
+                    Line l = Line.CreateUnbound(pOn, XYZ.BasisZ);
+
+                    pcenter = l.Project(sprinkle_point).XYZPoint;
 
                     (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
 
@@ -1098,37 +1102,17 @@ namespace TotalMEPProject.Commands.FireFighting
 
     public class SprinklerFilter : ISelectionFilter
     {
-        public bool _isD15 = false;
-
-        public SprinklerFilter(bool isD15)
-        {
-            _isD15 = isD15;
-        }
-
         public bool AllowElement(Element element)
         {
-            if (_isD15)
-            {
-                if (element != null
-                    && element.Category != null
-                    && (BuiltInCategory)element.Category.Id.IntegerValue == BuiltInCategory.OST_Sprinklers
-                    && element.GetTypeId() != null
-                    && Global.UIDoc.Document.GetElement(element.GetTypeId()) != null
-                    && Global.UIDoc.Document.GetElement(element.GetTypeId()).LookupParameter("Diameter") != null
-                    && Global.UIDoc.Document.GetElement(element.GetTypeId()).LookupParameter("Diameter").AsValueString().Contains("15"))
-                    return true;
-            }
-            else
-            {
-                if (element != null
-                                    && element.Category != null
-                                    && (BuiltInCategory)element.Category.Id.IntegerValue == BuiltInCategory.OST_Sprinklers
-                                    && element.GetTypeId() != null
-                                    && Global.UIDoc.Document.GetElement(element.GetTypeId()) != null
-                                    && Global.UIDoc.Document.GetElement(element.GetTypeId()).LookupParameter("Diameter") != null
-                                    && Global.UIDoc.Document.GetElement(element.GetTypeId()).LookupParameter("Diameter").AsValueString().Contains("20"))
-                    return true;
-            }
+            if (element != null
+                && element.Category != null
+                && (BuiltInCategory)element.Category.Id.IntegerValue == BuiltInCategory.OST_Sprinklers)
+                return true;
+
+            if (element != null
+                                && element.Category != null
+                                && (BuiltInCategory)element.Category.Id.IntegerValue == BuiltInCategory.OST_Sprinklers)
+                return true;
 
             return false;
         }
