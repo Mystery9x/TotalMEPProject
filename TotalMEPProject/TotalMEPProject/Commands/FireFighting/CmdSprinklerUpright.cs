@@ -527,10 +527,6 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 pOn = curveExtend3d_temp.Project(pcenter).XYZPoint;
 
-                Line l = Line.CreateUnbound(pOn, XYZ.BasisZ);
-
-                pcenter = l.Project(sprinkle_point).XYZPoint;
-
                 (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
 
                 newPipeZ.LookupParameter("Diameter").Set(dFt);
