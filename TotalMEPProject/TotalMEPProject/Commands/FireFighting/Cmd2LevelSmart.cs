@@ -416,6 +416,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             var inter = curveExpand.Intersect(curveProcessFlatten, out intRetArr);
                             if (inter != SetComparisonResult.Overlap)
                             {
+                                reTrans.RollBack();
                                 continue;
                             }
 
@@ -428,6 +429,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             inter = curveMainPipeExtend3d_temp.Intersect(lineZ, out intRetArr);
                             if (inter != SetComparisonResult.Overlap)
                             {
+                                reTrans.RollBack();
                                 continue;
                             }
 
@@ -437,6 +439,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             inter = lineZ.Intersect(curveBranchPipeExtend3d_temp, out intRetArr);
                             if (inter != SetComparisonResult.Overlap)
                             {
+                                reTrans.RollBack();
                                 continue;
                             }
 
@@ -447,6 +450,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             var inter = curveMainPipeFlatten.Intersect(curveProcessFlatten, out intRetArr);
                             if (inter != SetComparisonResult.Overlap)
                             {
+                                reTrans.RollBack();
                                 continue;
                             }
 
@@ -460,6 +464,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             inter = curveMainPipe.Intersect(lineZ, out intRetArr);
                             if (inter != SetComparisonResult.Overlap)
                             {
+                                reTrans.RollBack();
                                 continue;
                             }
 
@@ -469,6 +474,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             inter = lineZ.Intersect(curveBranchPipeExtend3d_temp, out intRetArr);
                             if (inter != SetComparisonResult.Overlap)
                             {
+                                reTrans.RollBack();
                                 continue;
                             }
 
@@ -543,6 +549,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         }
                         catch (System.Exception ex)
                         {
+                            reTrans.RollBack();
                         }
 
                         try
