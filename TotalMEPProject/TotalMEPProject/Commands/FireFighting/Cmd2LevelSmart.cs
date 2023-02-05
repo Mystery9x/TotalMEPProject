@@ -421,7 +421,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             }
 
                             var p2d = intRetArr.get_Item(0).XYZPoint;
-                            var p3d = new XYZ(p2d.X, p2d.Y, intPnt.Z);
+                            var p3d = new XYZ(p2d.X, p2d.Y, -100);
                             var lineZ = Line.CreateBound(p3d, new XYZ(p2d.X, p2d.Y, p2d.Z + dTempEvaluate));
                             curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
 
@@ -525,10 +525,6 @@ namespace TotalMEPProject.Commands.FireFighting
                                         Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                 }
                             }
-                            else if (GetPreferredJunctionType(temp_processPipe_1) == PreferredJunctionType.Tap)
-                            {
-                                CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
-                            }
                             else
                             {
                                 if (temp_processPipe_2 != null)
@@ -542,7 +538,12 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         //double diameter = (double)GetParameterValueByName(validMainPipe, "Diameter");
                                         //verticalPipe.LookupParameter("Diameter").Set(diameter);
-                                        Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                        if (!CheckPipeIsEnd(temp_processPipe_1, c3.Origin))
+                                            Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                        else if (GetPreferredJunctionType(temp_processPipe_1) == PreferredJunctionType.Tap)
+                                        {
+                                            CreateTap(temp_processPipe_1 as MEPCurve, verticalPipe as MEPCurve);
+                                        }
                                     }
                                 }
                             }
