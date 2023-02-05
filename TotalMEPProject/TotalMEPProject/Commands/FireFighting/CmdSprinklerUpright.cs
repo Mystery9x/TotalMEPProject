@@ -406,6 +406,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
+                    //pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
@@ -437,7 +438,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
-
+                    //pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
