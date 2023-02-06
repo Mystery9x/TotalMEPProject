@@ -84,7 +84,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         {
                             Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
                             tran.Start();
-                            sr.cc(tran, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
+                            sr.cc(tran, sprinklers, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
 
                             tran.Commit();
                         }
@@ -322,7 +322,7 @@ namespace TotalMEPProject.Commands.FireFighting
             c1 = Common.GetConnectorClosestTo(pipe, p1);
         }
 
-        public static bool cc(Transaction tran, FamilyInstance instance, List<ElementId> selectedIds, bool isConnectNipple, bool isConnectTee, FamilySymbol fmlNipple, double pipeSize, ElementId pipeTypeId, bool isUp)
+        public static bool cc(Transaction tran, List<FamilyInstance> lstInstance, FamilyInstance instance, List<ElementId> selectedIds, bool isConnectNipple, bool isConnectTee, FamilySymbol fmlNipple, double pipeSize, ElementId pipeTypeId, bool isUp)
         {
             double d = UnitUtils.ConvertToInternalUnits(70, DisplayUnitType.DUT_MILLIMETERS);
 
@@ -399,6 +399,8 @@ namespace TotalMEPProject.Commands.FireFighting
                 var p02d = Common.ToPoint2D(p0);
                 var p12d = Common.ToPoint2D(p1);
 
+                XYZ vectorMove = new XYZ();
+
                 if (isPipe)
                 {
                     var lineUn = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction);
@@ -406,7 +408,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
-                    //pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
+
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                        pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
@@ -438,7 +442,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
-                    //pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
+
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                        pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
@@ -538,11 +544,13 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 Global.UIDoc.Document.Regenerate();
 
+                FamilyInstance reducer = null;
+
                 try
                 {
                     if (App.m_SprinkerUpForm.isElbow)
                     {
-                        if (CheckPipeIsEnd(pipe, sprinkle_point))
+                        if (CheckPipeIsEnd(pipe, lstInstance, instance, sprinkle_point))
                         {
                             if (isConnectNipple)
                             {
@@ -575,7 +583,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
                                 Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
 
-                                var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                                reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
                             }
                         }
                         else
@@ -587,7 +595,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
                                 Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
 
-                                var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                                reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
 
                                 Connector c1 = Common.GetConnectorClosestTo(pipe, pOn);
 
@@ -646,8 +654,25 @@ namespace TotalMEPProject.Commands.FireFighting
                             Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
                             Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
 
-                            var reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
+                            reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
                         }
+                    }
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                    {
+                        var resultPipe = curve.Project(sprinkle_point);
+
+                        XYZ pointProject = resultPipe.XYZPoint;
+                        XYZ pointProject2d = Common.ToPoint2D(pointProject);
+                        var sprinker2d1 = Common.ToPoint2D(sprinkle_point);
+                        var vector = pointProject2d - sprinker2d1;
+
+                        ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d1));
+
+                        Global.UIDoc.Document.Delete(reducer.Id);
+                        Connector c44 = Common.GetConnectorClosestTo(instance, pcenter);
+                        Connector c55 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
+
+                        var a = Global.UIDoc.Document.Create.NewTransitionFitting(c55, c44);
                     }
 
                     result = true;
@@ -702,11 +727,37 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipes;
         }
 
-        public static bool CheckPipeIsEnd(Pipe pipe, XYZ point)
+        public static bool CheckPipeIsEnd(Pipe pipe, List<FamilyInstance> lstIns, FamilyInstance familyInstance, XYZ point)
         {
+            bool retVal = true;
+            Dictionary<FamilyInstance, double> keyValuePairs = new Dictionary<FamilyInstance, double>();
+
             var con = Common.GetConnectorClosestTo(pipe, point);
 
-            return con.IsConnected;
+            var con2d = Common.ToPoint2D(con.Origin);
+
+            foreach (var item in lstIns)
+            {
+                var lcPoint = item.Location as LocationPoint;
+                if (lcPoint == null)
+                    continue;
+
+                var lcPoint2d = Common.ToPoint2D(lcPoint.Point);
+                var dis = lcPoint2d.DistanceTo(con2d);
+
+                keyValuePairs.Add(item, dis);
+            }
+
+            var min = keyValuePairs.Values.Min();
+
+            var dic = keyValuePairs.FirstOrDefault(x => x.Value == min);
+
+            if (!con.IsConnected && dic.Key.Id == familyInstance.Id)
+            {
+                retVal = false;
+            }
+
+            return retVal;
         }
 
         public static FamilyInstance se(MEPCurve mepCurveSplit1, MEPCurve mepCurveSplit2)

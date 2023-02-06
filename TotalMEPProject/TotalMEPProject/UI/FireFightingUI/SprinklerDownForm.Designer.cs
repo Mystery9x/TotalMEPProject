@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SprinklerDownForm));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.button1 = new System.Windows.Forms.Button();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.btnC3OK = new System.Windows.Forms.Button();
             this.btnC3Run = new System.Windows.Forms.Button();
@@ -51,7 +52,6 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.rdnC3TeeTap = new System.Windows.Forms.RadioButton();
             this.rdnC3Elbow = new System.Windows.Forms.RadioButton();
-            this.button1 = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -86,6 +86,18 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(513, 279);
             this.tableLayoutPanel1.TabIndex = 0;
+            // 
+            // button1
+            // 
+            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(346, 3);
+            this.button1.Name = "button1";
+            this.tableLayoutPanel1.SetRowSpan(this.button1, 4);
+            this.button1.Size = new System.Drawing.Size(164, 237);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "PREVIEW";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel6
             // 
@@ -341,18 +353,6 @@
             this.rdnC3Elbow.TabStop = true;
             this.rdnC3Elbow.Text = "Elbow";
             this.rdnC3Elbow.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(346, 3);
-            this.button1.Name = "button1";
-            this.tableLayoutPanel1.SetRowSpan(this.button1, 4);
-            this.button1.Size = new System.Drawing.Size(164, 237);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "PREVIEW";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // SprinklerDownForm
             // 

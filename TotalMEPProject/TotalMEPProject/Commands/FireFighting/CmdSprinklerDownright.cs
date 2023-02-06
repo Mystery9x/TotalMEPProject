@@ -158,7 +158,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         //Global.m_uiDoc.Selection.SetElementIds(collector.ToElementIds());
 
                         bool split = false;
-                        var pipe = pp(pipeList.ToList(), sprinkle_point, out split);
+                        var pipe = ProcessPipes(pipeList.ToList(), sprinkle_point, out split);
 
                         var curve = (pipe.Location as LocationCurve).Curve;
 
@@ -333,7 +333,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                                     {
-                                        if (CheckPipeIsEnd(pipe1, sprinkle_point))
+                                        if (CheckPipeIsEnd1(pipe1, sprinklers, instance, sprinkle_point))
                                             CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
                                         else
                                             Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
@@ -495,6 +495,54 @@ namespace TotalMEPProject.Commands.FireFighting
             return pipes;
         }
 
+        private static Pipe ProcessPipes(List<Element> pipes, XYZ sprinkle_point, out bool bSplit)
+        {
+            bSplit = false;
+
+            if (pipes.Count == 0)
+                return null;
+
+            Pipe pipeNear = null;
+
+            Dictionary<Pipe, double> keyValuePairs = new Dictionary<Pipe, double>();
+
+            foreach (Element pipe in pipes)
+            {
+                if (pipe as Pipe == null)
+
+                    continue;
+                var curve = (pipe.Location as LocationCurve).Curve;
+
+                if (curve is Line == false)
+                    continue;
+
+                var d = (curve as Line).Direction;
+
+                if (Common.IsParallel(d, XYZ.BasisZ, 0))
+                    continue;
+
+                var project = curve.Project(sprinkle_point);
+                if (project == null)
+                    continue;
+
+                var p = project.XYZPoint;
+
+                if (p.DistanceTo(curve.GetEndPoint(0)) != 0 && p.DistanceTo(curve.GetEndPoint(1)) != 0)
+                    bSplit = true;
+
+                var disFml = Common.ToPoint2D(p).DistanceTo(Common.ToPoint2D(sprinkle_point));
+
+                keyValuePairs.Add(pipe as Pipe, disFml);
+            }
+
+            var min = keyValuePairs.Min(x => x.Value);
+
+            var pairs = keyValuePairs.FirstOrDefault(x => x.Value == min);
+            if (pairs.Key != null)
+                pipeNear = pairs.Key;
+            return pipeNear;
+        }
+
         private static Pipe pp(List<Element> pippes, XYZ sprinkle_point, out bool bSplit)
         {
             bSplit = false;
@@ -552,7 +600,7 @@ namespace TotalMEPProject.Commands.FireFighting
             var p1 = curve.GetEndPoint(1);
 
             //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
-            double kc_mm = 600 /*1000*/;
+            double kc_mm = 400 /*1000*/;
             double km_ft = Common.mmToFT * kc_mm;
 
             var p02d = new XYZ(p0.X, p0.Y, 0);
@@ -914,7 +962,8 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             XYZ pointProject = resultPipe.XYZPoint;
                             XYZ pointProject2d = Common.ToPoint2D(pointProject);
-
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                                pointProject2d = new XYZ(pointProject2d.X + 0.01, pointProject2d.Y, pointProject2d.Z);
                             var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                             if (!Common.IsEqual(distancePoint2d, 0))
                             {
@@ -1095,12 +1144,12 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                                         {
-                                            if (CheckPipeIsEnd(temp_processPipe_1, locSprinkler))
+                                            if (CheckPipeIsEnd1(temp_processPipe_1, selSprinklers, sprinkler, locSprinkler))
                                                 CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
-                                            //else
-                                            //{
-                                            //    Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
-                                            //}
+                                            else
+                                            {
+                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                            }
                                         }
                                         else
                                         {
@@ -1127,6 +1176,17 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                            {
+                                var resultPipe1 = curve.Project(locSprinkler);
+
+                                XYZ pointProject1 = resultPipe.XYZPoint;
+                                XYZ pointProject2d1 = Common.ToPoint2D(pointProject1);
+                                var sprinker2d1 = Common.ToPoint2D(locSprinkler);
+                                var vector = pointProject2d - sprinker2d1;
+
+                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, sprinkler.Id, vector.Normalize() * pointProject2d1.DistanceTo(sprinker2d1));
+                            }
                             ////  Generate vertical pipe 2
                             //var line_v2 = Line.CreateBound(hor_line.GetEndPoint(1), locSprinkler);
 
@@ -1501,6 +1561,39 @@ namespace TotalMEPProject.Commands.FireFighting
             return con.IsConnected;
         }
 
+        public static bool CheckPipeIsEnd1(Pipe pipe, List<FamilyInstance> lstIns, FamilyInstance familyInstance, XYZ point)
+        {
+            bool retVal = true;
+            Dictionary<FamilyInstance, double> keyValuePairs = new Dictionary<FamilyInstance, double>();
+
+            var con = Common.GetConnectorClosestTo(pipe, point);
+
+            var con2d = Common.ToPoint2D(con.Origin);
+
+            foreach (var item in lstIns)
+            {
+                var lcPoint = item.Location as LocationPoint;
+                if (lcPoint == null)
+                    continue;
+
+                var lcPoint2d = Common.ToPoint2D(lcPoint.Point);
+                var dis = lcPoint2d.DistanceTo(con2d);
+
+                keyValuePairs.Add(item, dis);
+            }
+
+            var min = keyValuePairs.Values.Min();
+
+            var dic = keyValuePairs.FirstOrDefault(x => x.Value == min);
+
+            if (!con.IsConnected && dic.Key.Id == familyInstance.Id)
+            {
+                retVal = false;
+            }
+
+            return retVal;
+        }
+
         public static Pipe ConnectTee(Pipe pipe, Pipe newPipeZ)
         {
             Pipe pipe1 = null;
@@ -1767,6 +1860,7 @@ namespace TotalMEPProject.Commands.FireFighting
                              Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
 
                             var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
                             var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(ft_v, false));
                             (horizontal_pipe.Location as LocationCurve).Curve = hor_line;
                             horizontal_pipe.LookupParameter("Diameter").Set(dPipeSizeFt);
@@ -1803,12 +1897,12 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                                         {
-                                            if (CheckPipeIsEnd(temp_processPipe_1, locSprinkler))
-                                                CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
-                                            else
-                                            {
-                                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
-                                            }
+                                            //if (CheckPipeIsEnd(temp_processPipe_1, locSprinkler))
+                                            CreateTap(temp_processPipe_1 as MEPCurve, horizontal_pipe as MEPCurve);
+                                            //else
+                                            //{
+                                            //    Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                            //}
                                         }
                                         else
                                         {
