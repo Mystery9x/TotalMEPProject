@@ -130,7 +130,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
-                            var connect = instance.MEPModel.ConnectorManager.Lookup(1);
+                            var connect = Common.ToList(instance.MEPModel.ConnectorManager.Connectors).FirstOrDefault();
 
                             if (connect.IsConnected == true)
                             {
@@ -550,7 +550,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
-                            var connect = instance.MEPModel.ConnectorManager.Lookup(1);
+                            var connect = Common.ToList(instance.MEPModel.ConnectorManager.Connectors).FirstOrDefault();
 
                             if (connect.IsConnected == true)
                             {
@@ -1030,7 +1030,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                     continue;
                                 }
 
-                                Connector cntOfIns_1 = sprinkler.MEPModel.ConnectorManager.Lookup(1);
+                                Connector cntOfIns_1 = Common.ToList(sprinkler.MEPModel.ConnectorManager.Connectors).FirstOrDefault();
 
                                 if (cntOfIns_1.IsConnected == true)
                                 {
