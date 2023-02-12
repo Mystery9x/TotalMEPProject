@@ -295,13 +295,17 @@ namespace TotalMEPProject.Commands.FireFighting
                         var line_v1 = Line.CreateUnbound(p, XYZ.BasisZ * ft_h * 2);
 
                         XYZ tmpPoint = line_v1.Evaluate(ft_h, false);
+
                         p = curve.Project(tmpPoint).XYZPoint;
-                        line_v1 = Line.CreateBound(p, tmpPoint);
+
+                        if (!CheckPipeIsEnd1(pipe1, sprinklers, instance, sprinkle_point))
+                            p = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction).Project(tmpPoint).XYZPoint;
+
+                        line_v1 = Line.CreateBound(p, new XYZ(p.X, p.Y, p.Z + ft_h));
                         (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                         pipe_v1.LookupParameter("Diameter").Set(dFt);
 
-                        ////Connect
                         try
                         {
                             var c1 = Common.GetConnectorClosestTo(pipe1, p);
@@ -353,7 +357,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 }
                                 else
                                 {
-                                    Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                                    var fml = Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
                                 }
                             }
                         }

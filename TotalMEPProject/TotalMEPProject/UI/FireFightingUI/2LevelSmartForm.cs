@@ -151,8 +151,8 @@ namespace TotalMEPProject.UI.FireFightingUI
         {
             rBC1ElevationDifference.Enabled = true;
             rBC1SameElevation.Enabled = true;
-            rBC1TeeOrTap.Enabled = true;
-            rBC1ElbowConnect.Enabled = true;
+            rBC1TeeOrTap.Text = "Tee/Tap";
+            rBC1ElbowConnect.Text = "Elbow";
             cboC1FamilyType.Enabled = true;
             cboC1PipeSize.Enabled = true;
             ckbC1ElbowConnection.Enabled = true;
@@ -162,8 +162,8 @@ namespace TotalMEPProject.UI.FireFightingUI
 
             if (rBC1SameElevation.Checked == true)
             {
-                rBC1TeeOrTap.Enabled = false;
-                rBC1ElbowConnect.Enabled = false;
+                rBC1TeeOrTap.Text = "One Side";
+                rBC1ElbowConnect.Text = "Both Size";
                 cboC1FamilyType.Enabled = false;
                 cboC1PipeSize.Enabled = false;
                 ckbC1ElbowConnection.Enabled = false;

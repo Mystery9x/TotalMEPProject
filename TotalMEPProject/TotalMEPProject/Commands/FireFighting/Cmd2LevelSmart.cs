@@ -1919,6 +1919,13 @@ namespace TotalMEPProject.Commands.FireFighting
             {
                 var pipe1 = pair.Pipe1;
                 var pipe2 = pair.Pipe2;
+
+                if (App.m_2LevelSmartForm.DialogResultData.IsCheckedTeeTap)
+                {
+                    if (pipe1 != null && pipe2 != null)
+                        continue;
+                }
+
                 SourcePipesDataSameElevation sourcePipesData = new SourcePipesDataSameElevation(MainPipeIds,
                                                                                                 pipe1,
                                                                                                 pipe2,
@@ -2594,10 +2601,16 @@ namespace TotalMEPProject.Commands.FireFighting
                         if (SecondPipe == null)
                         {
                             var temp_pipe1 = FirstPipe;
-                            var temp_pipe2_id = PlumbingUtils.BreakCurve(Global.UIDoc.Document, temp_pipe1.Id, m_sub1Ints_pnt);
-                            var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
+
                             FirstPipe = temp_pipe1;
-                            SecondPipe = temp_pipe2;
+
+                            if (!App.m_2LevelSmartForm.DialogResultData.IsCheckedTeeTap)
+                            {
+                                var temp_pipe2_id = PlumbingUtils.BreakCurve(Global.UIDoc.Document, temp_pipe1.Id, m_sub1Ints_pnt);
+                                var temp_pipe2 = Global.UIDoc.Document.GetElement(temp_pipe2_id) as Pipe;
+                                SecondPipe = temp_pipe2;
+                            }
+
                             if (SecondPipe != null)
                             {
                                 HandlerDivide(MainPipe, FirstPipe, true, out m_intsMain1_pnt, out m_sub1_pnt0, out m_sub1_pnt1, out m_sub1Ints_pnt);
@@ -2680,19 +2693,28 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     if (GetPreferredJunctionType(MainPipe) == PreferredJunctionType.Tee)
                     {
-                        if (MainPipe as Pipe != null && FirstPipe as Pipe != null && m_intsMain1_pnt != null)
+                        if (App.m_2LevelSmartForm.DialogResultData.IsCheckedTeeTap)
                         {
-                            Pipe main2 = null;
+                            if (MainPipe as Pipe != null && FirstPipe as Pipe != null && m_intsMain1_pnt != null)
+                            {
+                                Pipe main2 = null;
 
-                            m_bottomTee = CreateTeeFitting(MainPipe as Pipe, FirstPipe as Pipe, m_intsMain1_pnt, out main2);
-                            MainPipes.Add(main2.Id);
+                                m_bottomTee = CreateTeeFitting(MainPipe as Pipe, FirstPipe as Pipe, m_intsMain1_pnt, out main2);
+                                MainPipes.Add(main2.Id);
+                            }
+
+                            if (MainPipe as Pipe != null && SecondPipe as Pipe != null && m_intsMain1_pnt != null)
+                            {
+                                Pipe main2 = null;
+
+                                m_bottomTee = CreateTeeFitting(MainPipe as Pipe, SecondPipe as Pipe, m_intsMain1_pnt, out main2);
+                                MainPipes.Add(main2.Id);
+                            }
                         }
-
-                        if (MainPipe as Pipe != null && SecondPipe as Pipe != null && m_intsMain1_pnt != null)
+                        else
                         {
                             Pipe main2 = null;
-
-                            m_bottomTee = CreateTeeFitting(MainPipe as Pipe, SecondPipe as Pipe, m_intsMain1_pnt, out main2);
+                            CreateCrossFitting(MainPipe, FirstPipe, SecondPipe, m_intsMain1_pnt, out main2);
                             MainPipes.Add(main2.Id);
                         }
                     }
@@ -3033,6 +3055,63 @@ namespace TotalMEPProject.Commands.FireFighting
                     reSubTrans.Start();
 
                     var fitting = Global.UIDoc.Document.Create.NewTeeFitting(c3, c4, c5);
+
+                    retVal = fitting;
+
+                    reSubTrans.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    reSubTrans.RollBack();
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Create Tee Fitting
+        /// </summary>
+        /// <param name="pipeMain"></param>
+        /// <param name="pipeCurrent"></param>
+        /// <param name="splitPoint"></param>
+        /// <param name="main2"></param>
+        /// <returns></returns>
+        private FamilyInstance CreateCrossFitting(Pipe pipeMain, Pipe pipe1, Pipe pipe2, XYZ splitPoint, out Pipe main2)
+        {
+            var curve = (pipeMain.Location as LocationCurve).Curve;
+
+            var p0 = curve.GetEndPoint(0);
+            var p1 = curve.GetEndPoint(1);
+
+            var pipeTempMain1 = pipeMain;
+
+            var line1 = Line.CreateBound(p0, splitPoint);
+            (pipeTempMain1.Location as LocationCurve).Curve = line1;
+
+            var newPlace = new XYZ(0, 0, 0);
+            var elemIds = ElementTransformUtils.CopyElement(
+               Global.UIDoc.Document, pipeTempMain1.Id, newPlace);
+
+            main2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+            var line2 = Line.CreateBound(splitPoint, p1);
+            (main2.Location as LocationCurve).Curve = line2;
+
+            //Connect
+            var c3 = GetConnectorClosestTo(pipeTempMain1, splitPoint);
+            var c4 = GetConnectorClosestTo(main2, splitPoint);
+            var c5 = GetConnectorClosestTo(pipe1, splitPoint);
+            var c6 = GetConnectorClosestTo(pipe2, splitPoint);
+            FamilyInstance retVal = null;
+
+            using (SubTransaction reSubTrans = new SubTransaction(Global.UIDoc.Document))
+            {
+                try
+                {
+                    reSubTrans.Start();
+
+                    var fitting = Global.UIDoc.Document.Create.NewCrossFitting(c3, c4, c5, c6);
 
                     retVal = fitting;
 
