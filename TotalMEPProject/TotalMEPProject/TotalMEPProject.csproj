@@ -142,6 +142,7 @@
     <Compile Include="Commands\FireFighting\CmdFlexSprinkler.cs" />
     <Compile Include="Commands\FireFighting\CmdSprinklerDownright.cs" />
     <Compile Include="Commands\FireFighting\CmdSprinklerUpright.cs" />
+    <Compile Include="Commands\FireFighting\CmdTwoLevelSmart.cs" />
     <Compile Include="Commands\Modify\CmdBlockCADToFamily.cs" />
     <Compile Include="Commands\Modify\CmdFittingRotation.cs" />
     <Compile Include="Commands\Modify\CmdFlipSelection.cs" />
