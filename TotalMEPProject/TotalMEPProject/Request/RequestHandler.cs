@@ -72,7 +72,7 @@ namespace TotalMEPProject.Request
 
                 case RequestId.TwoLevelSmart_OK:
                     {
-                        Cmd2LevelSmart.Process();
+                        CmdTwoLevelSmart.Process();
                     }
                     break;
 
