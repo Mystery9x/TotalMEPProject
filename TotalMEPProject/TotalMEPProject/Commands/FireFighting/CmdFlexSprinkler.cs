@@ -309,6 +309,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             XYZ tmpPoint = line_v1.Evaluate(ft_h, false);
                             p = curve.Project(tmpPoint).XYZPoint;
+                            if (!CheckPipeIsEnd1(pipe1, sprinklers, instance, sprinkle_point))
+                                p = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction).Project(tmpPoint).XYZPoint;
+
                             line_v1 = Line.CreateBound(p, tmpPoint);
 
                             (pipe_v1.Location as LocationCurve).Curve = line_v1;
@@ -484,6 +487,39 @@ namespace TotalMEPProject.Commands.FireFighting
             catch (Exception)
             { }
             return false;
+        }
+
+        public static bool CheckPipeIsEnd1(Pipe pipe, List<FamilyInstance> lstIns, FamilyInstance familyInstance, XYZ point)
+        {
+            bool retVal = true;
+            Dictionary<FamilyInstance, double> keyValuePairs = new Dictionary<FamilyInstance, double>();
+
+            var con = Common.GetConnectorClosestTo(pipe, point);
+
+            var con2d = Common.ToPoint2D(con.Origin);
+
+            foreach (var item in lstIns)
+            {
+                var lcPoint = item.Location as LocationPoint;
+                if (lcPoint == null)
+                    continue;
+
+                var lcPoint2d = Common.ToPoint2D(lcPoint.Point);
+                var dis = lcPoint2d.DistanceTo(con2d);
+
+                keyValuePairs.Add(item, dis);
+            }
+
+            var min = keyValuePairs.Values.Min();
+
+            var dic = keyValuePairs.FirstOrDefault(x => x.Value == min);
+
+            if (!con.IsConnected && dic.Key.Id == familyInstance.Id)
+            {
+                retVal = false;
+            }
+
+            return retVal;
         }
 
         public static bool ProcessType2()

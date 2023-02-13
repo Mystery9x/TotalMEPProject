@@ -80,16 +80,19 @@ namespace TotalMEPProject.Commands.FireFighting
                     foreach (FamilyInstance instance in sprinklers)
                     {
                         double dPercent = 0.0;
+
+                        Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
+                        tran.Start();
                         try
                         {
-                            Transaction tran = new Transaction(Global.UIDoc.Document, "CreateConnector");
-                            tran.Start();
                             sr.cc(tran, sprinklers, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
 
                             tran.Commit();
                         }
                         catch (Exception)
-                        { }
+                        {
+                            tran.RollBack();
+                        }
 
                         // If click cancel button when exporting
                         if (progressBar.IsCancel)
@@ -408,10 +411,10 @@ namespace TotalMEPProject.Commands.FireFighting
 
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
-
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
-                        pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
+                        pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
+
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
                         if (d < distancePoint2d)
@@ -438,13 +441,14 @@ namespace TotalMEPProject.Commands.FireFighting
                 }
                 else
                 {
-                    var resultPipe = curve.Project(sprinkle_point);
+                    var lineUn = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction);
+                    var resultPipe = lineUn.Project(sprinkle_point);
 
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
-                        pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
+                    //if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                    //    pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
@@ -657,7 +661,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
                         }
                     }
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
                     {
                         var resultPipe = curve.Project(sprinkle_point);
 
