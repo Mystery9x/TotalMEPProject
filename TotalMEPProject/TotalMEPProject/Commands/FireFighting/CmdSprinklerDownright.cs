@@ -313,7 +313,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             if (App.m_SprinklerDownForm.isTeeTap)
                             {
-                                if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
+                                if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee && split)
                                 {
                                     CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
                                 }
@@ -962,11 +962,11 @@ namespace TotalMEPProject.Commands.FireFighting
                             var p02d = Common.ToPoint2D(p0);
                             var p12d = Common.ToPoint2D(p1);
 
-                            var resultPipe = curve.Project(locSprinkler);
+                            var resultPipe = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction).Project(locSprinkler);
 
                             XYZ pointProject = resultPipe.XYZPoint;
                             XYZ pointProject2d = Common.ToPoint2D(pointProject);
-                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
                                 pointProject2d = new XYZ(pointProject2d.X + 0.01, pointProject2d.Y, pointProject2d.Z);
                             var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                             if (!Common.IsEqual(distancePoint2d, 0))
@@ -977,6 +977,14 @@ namespace TotalMEPProject.Commands.FireFighting
                                 Global.UIDoc.Document.Regenerate();
 
                                 locSprinkler = (sprinkler.Location as LocationPoint).Point;
+                            }
+                            else
+                            {
+                                Line line = Line.CreateBound(p0, pointProject);
+                                (processPipe.Location as LocationCurve).Curve = line;
+
+                                p0 = line.GetEndPoint(0);
+                                p1 = line.GetEndPoint(1);
                             }
 
                             // Process main pipe
@@ -1180,7 +1188,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
-                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
                             {
                                 var resultPipe1 = curve.Project(locSprinkler);
 
