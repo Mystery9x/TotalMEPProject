@@ -1913,7 +1913,6 @@ namespace TotalMEPProject.Commands.FireFighting
         private void InitializeSameElevation()
         {
             double diamterPipe = ResultData.PipeSize * Common.mmToFT;
-            PipeType pipeType = Global.UIDoc.Document.GetElement(ResultData.PipeTypeId) as PipeType;
 
             foreach (PairPipes pair in PairBranchPipes)
             {
@@ -1925,6 +1924,8 @@ namespace TotalMEPProject.Commands.FireFighting
                     if (pipe1 != null && pipe2 != null)
                         continue;
                 }
+
+                PipeType pipeType = Global.UIDoc.Document.GetElement(pipe1.GetTypeId()) as PipeType;
 
                 SourcePipesDataSameElevation sourcePipesData = new SourcePipesDataSameElevation(MainPipeIds,
                                                                                                 pipe1,

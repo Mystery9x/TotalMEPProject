@@ -301,7 +301,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         if (!CheckPipeIsEnd1(pipe1, sprinklers, instance, sprinkle_point))
                             p = Line.CreateUnbound((curve as Line).Origin, (curve as Line).Direction).Project(tmpPoint).XYZPoint;
 
-                        line_v1 = Line.CreateBound(p, new XYZ(p.X, p.Y, p.Z + ft_h));
+                        line_v1 = Line.CreateBound(p, tmpPoint);
                         (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                         pipe_v1.LookupParameter("Diameter").Set(dFt);
@@ -898,6 +898,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             double dPercent = 0.0;
                             // Location sprinkler
                             XYZ locSprinkler = (sprinkler.Location as LocationPoint).Point;
+                            XYZ locSprinkler1 = (sprinkler.Location as LocationPoint).Point;
 
                             // Check valid connect
                             ConnectorSet cntSetOfIns = sprinkler.MEPModel.ConnectorManager.Connectors;
@@ -966,8 +967,9 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             XYZ pointProject = resultPipe.XYZPoint;
                             XYZ pointProject2d = Common.ToPoint2D(pointProject);
+
                             if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
-                                pointProject2d = new XYZ(pointProject2d.X + 0.01, pointProject2d.Y, pointProject2d.Z);
+                                pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                             var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                             if (!Common.IsEqual(distancePoint2d, 0))
                             {
@@ -1188,17 +1190,6 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
-                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
-                            {
-                                var resultPipe1 = curve.Project(locSprinkler);
-
-                                XYZ pointProject1 = resultPipe.XYZPoint;
-                                XYZ pointProject2d1 = Common.ToPoint2D(pointProject1);
-                                var sprinker2d1 = Common.ToPoint2D(locSprinkler);
-                                var vector = pointProject2d - sprinker2d1;
-
-                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, sprinkler.Id, vector.Normalize() * pointProject2d1.DistanceTo(sprinker2d1));
-                            }
                             ////  Generate vertical pipe 2
                             //var line_v2 = Line.CreateBound(hor_line.GetEndPoint(1), locSprinkler);
 
@@ -1213,15 +1204,17 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             //pipe_v2.LookupParameter("Diameter").Set(dPipeSizeFt);
                             //Connect horizontal pipe with vertical pipe 2
-
+                            FamilyInstance fml;
                             // Connect vertical pipe 2 with sprinkler
                             try
                             {
                                 var c1 = Common.GetConnectorClosestTo(horizontal_pipe, locSprinkler);
                                 var c2 = Common.GetConnectorClosestTo(sprinkler, locSprinkler);
 
-                                var fml = Global.UIDoc.Document.Create.NewTransitionFitting(c1, c2);
+                                fml = Global.UIDoc.Document.Create.NewTransitionFitting(c1, c2);
 
+                                (horizontal_pipe.Location as LocationCurve).Curve = line_Extend;
+                                Global.UIDoc.Document.Regenerate();
                                 //(pipe_v2.Location as LocationCurve).Curve = Line.CreateBound(line_v2.GetEndPoint(0), tmpPnt);
 
                                 //Global.UIDoc.Document.Regenerate();
@@ -1238,6 +1231,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                 reTrans.RollBack();
                                 continue;
                             }
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                                ElementTransformUtils.MoveElement(Global.UIDoc.Document, sprinkler.Id, locSprinkler1 - locSprinkler);
 
                             // If click cancel button when exporting
                             if (progressBar.IsCancel)
@@ -1272,6 +1267,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 {
                     App.m_SprinklerDownForm.Show(App.hWndRevit);
                 }
+
                 DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
             }
 

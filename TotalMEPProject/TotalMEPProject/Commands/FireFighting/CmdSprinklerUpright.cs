@@ -412,7 +412,8 @@ namespace TotalMEPProject.Commands.FireFighting
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_SprinkerUpForm.isElbow
+                        && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                         pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
 
                     if (!Common.IsEqual(distancePoint2d, 0))
@@ -447,8 +448,9 @@ namespace TotalMEPProject.Commands.FireFighting
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                    //if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
-                    //    pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_SprinkerUpForm.isElbow
+                    && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
+                        pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                     if (!Common.IsEqual(distancePoint2d, 0))
                     {
@@ -661,13 +663,14 @@ namespace TotalMEPProject.Commands.FireFighting
                             reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
                         }
                     }
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_SprinkerUpForm.isElbow
+                            && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                     {
-                        var resultPipe = curve.Project(sprinkle_point);
+                        var resultPipe = curve.Project(sprinkle_pointClone);
 
                         XYZ pointProject = resultPipe.XYZPoint;
                         XYZ pointProject2d = Common.ToPoint2D(pointProject);
-                        var sprinker2d1 = Common.ToPoint2D(sprinkle_point);
+                        var sprinker2d1 = Common.ToPoint2D(sprinkle_pointClone);
                         var vector = pointProject2d - sprinker2d1;
 
                         ElementTransformUtils.MoveElement(Global.UIDoc.Document, instance.Id, vector.Normalize() * pointProject2d.DistanceTo(sprinker2d1));
