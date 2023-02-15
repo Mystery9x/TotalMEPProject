@@ -306,6 +306,49 @@ namespace TotalMEPProject.Commands.FireFighting
 
                         pipe_v1.LookupParameter("Diameter").Set(dFt);
 
+                        ////Hor
+                        var v_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).Normalize();
+
+                        var ft_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).GetLength();
+
+                        var line_Extend = Line.CreateUnbound(line_v1.GetEndPoint(1), ft_v * v_v * 2);
+
+                        newPlace = new XYZ(0, 0, 0);
+                        elemIds = ElementTransformUtils.CopyElement(
+                         Global.UIDoc.Document, pipe1.Id, newPlace);
+
+                        var pipe_hor = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+                        var line_hor = Line.CreateBound(line_v1.GetEndPoint(1), line_Extend.Evaluate(ft_v, false));
+
+                        (pipe_hor.Location as LocationCurve).Curve = line_hor;
+
+                        pipe_hor.LookupParameter("Diameter").Set(dFt);
+
+                        if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0
+                            && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX)
+                            && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
+                        {
+                            XYZ tmpVector = line_hor.GetEndPoint(1) - tmpPoint;
+                            tmpPoint = tmpPoint + tmpVector.Normalize() * 0.001;
+                            line_v1 = Line.CreateBound(p, tmpPoint);
+                            (pipe_v1.Location as LocationCurve).Curve = line_v1;
+                        }
+
+                        //Vertical 2
+                        var line_v2 = Line.CreateBound(line_hor.GetEndPoint(1), sprinkle_point);
+
+                        newPlace = new XYZ(0, 0, 0);
+                        elemIds = ElementTransformUtils.CopyElement(
+                         Global.UIDoc.Document, pipe1.Id, newPlace);
+
+                        var pipe_v2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+                        //var center = line_v2.Evaluate((line_v2.GetEndParameter(0) + line_v2.GetEndParameter(1)) / 2, false);
+                        XYZ tmpPnt = line_hor.GetEndPoint(1) + XYZ.BasisZ.Negate() * ((line_v2.GetEndParameter(0) + line_v2.GetEndParameter(1)) / 2);
+
+                        (pipe_v2.Location as LocationCurve).Curve = Line.CreateBound(line_v2.GetEndPoint(0), tmpPnt);
+
+                        pipe_v2.LookupParameter("Diameter").Set(dFt);
+
                         try
                         {
                             var c1 = Common.GetConnectorClosestTo(pipe1, p);
@@ -367,38 +410,6 @@ namespace TotalMEPProject.Commands.FireFighting
                             continue;
                         }
 
-                        ////Hor
-                        var v_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).Normalize();
-
-                        var ft_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).GetLength();
-
-                        var line_Extend = Line.CreateUnbound(line_v1.GetEndPoint(1), ft_v * v_v * 2);
-
-                        newPlace = new XYZ(0, 0, 0);
-                        elemIds = ElementTransformUtils.CopyElement(
-                         Global.UIDoc.Document, pipe1.Id, newPlace);
-
-                        var pipe_hor = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                        var line_hor = Line.CreateBound(line_v1.GetEndPoint(1), line_Extend.Evaluate(ft_v, false));
-
-                        (pipe_hor.Location as LocationCurve).Curve = line_hor;
-
-                        pipe_hor.LookupParameter("Diameter").Set(dFt);
-
-                        //Vertical 2
-                        var line_v2 = Line.CreateBound(line_hor.GetEndPoint(1), sprinkle_point);
-
-                        newPlace = new XYZ(0, 0, 0);
-                        elemIds = ElementTransformUtils.CopyElement(
-                         Global.UIDoc.Document, pipe1.Id, newPlace);
-
-                        var pipe_v2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                        //var center = line_v2.Evaluate((line_v2.GetEndParameter(0) + line_v2.GetEndParameter(1)) / 2, false);
-                        XYZ tmpPnt = line_hor.GetEndPoint(1) + XYZ.BasisZ.Negate() * ((line_v2.GetEndParameter(0) + line_v2.GetEndParameter(1)) / 2);
-
-                        (pipe_v2.Location as LocationCurve).Curve = Line.CreateBound(line_v2.GetEndPoint(0), tmpPnt);
-
-                        pipe_v2.LookupParameter("Diameter").Set(dFt);
                         try
                         {
                             var c1 = Common.GetConnectorClosestTo(pipe_v1, line_v1.GetEndPoint(1));
@@ -421,6 +432,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         catch (System.Exception ex)
                         {
                         }
+
                         try
                         {
                             var c1 = Common.GetConnectorClosestTo(pipe_v2, tmpPnt);
