@@ -2514,17 +2514,17 @@ namespace TotalMEPProject.Commands.FireFighting
                         return;
                     }
 
-                    if (HandleVerticalPipe() == false)
-                    {
-                        reTrans.RollBack();
-                        return;
-                    }
+                    //if (HandleVerticalPipe() == false)
+                    //{
+                    //    reTrans.RollBack();
+                    //    return;
+                    //}
 
-                    if (HandlerBottom() == false)
-                    {
-                        reTrans.RollBack();
-                        return;
-                    }
+                    //if (HandlerBottom() == false)
+                    //{
+                    //    reTrans.RollBack();
+                    //    return;
+                    //}
 
                     if (HandlerTop() == false)
                     {
@@ -2813,11 +2813,6 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                // Process with sub pipes
-
-                Connector cntBottom_topTee = GetConnectorClosestTo(VerticalPipe, m_sub1Ints_pnt);
-                double diameter_10 = 10 * Common.mmToFT;
-
                 // If Diameter vertical pipe = Diameter main pipe
                 if (FirstPipe != null)
                 {
