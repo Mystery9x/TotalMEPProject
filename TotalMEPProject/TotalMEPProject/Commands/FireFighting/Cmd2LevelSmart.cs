@@ -362,7 +362,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             var p2d = intRetArr.get_Item(0).XYZPoint;
                             var p3d = new XYZ(p2d.X, p2d.Y, -100);
-                            var lineZ = Line.CreateBound(p3d, new XYZ(p2d.X, p2d.Y, p2d.Z + dTempEvaluate));
+                            var lineZ = Line.CreateUnbound(p3d, XYZ.BasisZ);
                             curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
 
                             intRetArr = new IntersectionResultArray();
@@ -398,7 +398,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             var p3d = new XYZ(p2d.X, p2d.Y, intPnt.Z);
 
-                            var lineZ = Line.CreateBound(p3d, new XYZ(p3d.X, p3d.Y, p3d.Z + dTempEvaluate));
+                            var lineZ = Line.CreateUnbound(p3d, XYZ.BasisZ);
 
                             intRetArr = new IntersectionResultArray();
                             inter = curveMainPipe.Intersect(lineZ, out intRetArr);
@@ -583,7 +583,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 var p2d = intRetArr.get_Item(0).XYZPoint;
                                 var p3d = new XYZ(p2d.X, p2d.Y, intPnt.Z);
-                                var lineZ = Line.CreateBound(p3d, new XYZ(p2d.X, p2d.Y, p2d.Z + dTempEvaluate));
+                                var lineZ = Line.CreateUnbound(p3d, XYZ.BasisZ);
                                 curveMainPipeExtend3d_temp = Line.CreateUnbound(curveMainPipe.GetEndPoint(index), (curveMainPipe as Line).Direction * 100);
 
                                 intRetArr = new IntersectionResultArray();
@@ -616,7 +616,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 var p3d = new XYZ(p2d.X, p2d.Y, intPnt.Z);
 
-                                var lineZ = Line.CreateBound(p3d, new XYZ(p3d.X, p3d.Y, p3d.Z + dTempEvaluate));
+                                var lineZ = Line.CreateUnbound(p3d, XYZ.BasisZ);
 
                                 intRetArr = new IntersectionResultArray();
                                 inter = curveMainPipe.Intersect(lineZ, out intRetArr);

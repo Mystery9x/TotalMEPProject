@@ -143,14 +143,14 @@ namespace TotalMEPProject.Commands.FireFighting
             {
                 var curve_sub = inforPipe1.CurveSourcePipe;
 
-                var expand = inforPipe1.CurveSourcePipe_Extend;
+                var expand = inforPipe1.CurveSourcePipe_Extend_Round;
 
                 foreach (InforPie inforPipe2 in inforPipes)
                 {
                     if (inforPipe1.SourcePipe.Id == inforPipe2.SourcePipe.Id)
                         continue;
 
-                    var curve_sub2 = inforPipe2.CurveSourcePipe_Extend;
+                    var curve_sub2 = inforPipe2.CurveSourcePipe_Extend_Round;
                     IntersectionResultArray arr = new IntersectionResultArray();
                     var result = curve_sub2.Intersect(expand, out arr);
 
@@ -2136,8 +2136,8 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0) + (SourcePipe_Cont_1.Origin - SourcePipe_Cont_2.Origin).Normalize() * 1000 * Common.mmToFT;
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1);
 
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), Math.Round(newStartPoint.Z, 7));
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), Math.Round(newEndPoint.Z, 7));
+                        //newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), Math.Round(newStartPoint.Z, 7));
+                        //newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), Math.Round(newEndPoint.Z, 7));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && !SourcePipe_Cont_2.IsConnected)
@@ -2145,8 +2145,47 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0);
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1) + (SourcePipe_Cont_2.Origin - SourcePipe_Cont_1.Origin).Normalize() * 1000 * Common.mmToFT;
 
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), Math.Round(newEndPoint.Z, 7));
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), Math.Round(newStartPoint.Z, 7));
+                        //newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), Math.Round(newEndPoint.Z, 7));
+                        //newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), Math.Round(newStartPoint.Z, 7));
+                        return Line.CreateBound(newStartPoint, newEndPoint);
+                    }
+                    else if (SourcePipe_Cont_1.IsConnected && SourcePipe_Cont_2.IsConnected)
+                    {
+                        return CurveSourcePipe;
+                    }
+                    else
+                    {
+                        XYZ newStartPoint = CurveSourcePipe.Evaluate(CurveSourcePipe.GetEndParameter(0) - 1000 * Common.mmToFT, false);
+                        XYZ newEndPoint = CurveSourcePipe.Evaluate(CurveSourcePipe.GetEndParameter(1) + 1000 * Common.mmToFT, false);
+                        return Line.CreateBound(newStartPoint, newEndPoint);
+                    }
+                }
+                return null;
+            }
+        }
+
+        public Line CurveSourcePipe_Extend_Round
+        {
+            get
+            {
+                if (SourcePipe != null && SourcePipe.IsValidObject && SourcePipe_Cont_1 != null && SourcePipe_Cont_2 != null)
+                {
+                    if (!SourcePipe_Cont_1.IsConnected && SourcePipe_Cont_2.IsConnected)
+                    {
+                        XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0) + (SourcePipe_Cont_1.Origin - SourcePipe_Cont_2.Origin).Normalize() * 1000 * Common.mmToFT;
+                        XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1);
+
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), TruncateDouble(newStartPoint.Z));
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), TruncateDouble(newEndPoint.Z));
+                        return Line.CreateBound(newStartPoint, newEndPoint);
+                    }
+                    else if (SourcePipe_Cont_1.IsConnected && !SourcePipe_Cont_2.IsConnected)
+                    {
+                        XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0);
+                        XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1) + (SourcePipe_Cont_2.Origin - SourcePipe_Cont_1.Origin).Normalize() * 1000 * Common.mmToFT;
+
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), TruncateDouble(newEndPoint.Z));
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), TruncateDouble(newStartPoint.Z));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && SourcePipe_Cont_2.IsConnected)
@@ -2218,6 +2257,11 @@ namespace TotalMEPProject.Commands.FireFighting
         public InforPie(Pipe sourcePipe)
         {
             SourcePipe = sourcePipe;
+        }
+
+        public double TruncateDouble(double number)
+        {
+            return Math.Truncate(number * 10000) / 10000;
         }
     }
 
