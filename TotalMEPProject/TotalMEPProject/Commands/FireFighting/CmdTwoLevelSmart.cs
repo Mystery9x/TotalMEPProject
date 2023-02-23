@@ -378,6 +378,14 @@ namespace TotalMEPProject.Commands.FireFighting
                                     sourceMain.Branches.Add(duoBranchPipe);
                                     sourceMain.Branches_Special.Add(duoBranchPipe);
                                 }
+                                else if (RealityIntersect(flatten_mainCurve_Extend, duoBranchs.FlattenValidCurve, out XYZ flattenIntPnt2))
+                                {
+                                    DuoBranchPipe duoBranchPipe = new DuoBranchPipe(duoBranchs.FirstPipe, duoBranchs.SecondPipe)
+                                    {
+                                        FlattenIntersectPoint = flattenIntPnt2
+                                    };
+                                    sourceMain.Branches_Special.Add(duoBranchPipe);
+                                }
                             }
                         }
                         catch (Exception)
