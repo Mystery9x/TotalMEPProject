@@ -1796,6 +1796,39 @@ namespace TotalMEPProject.Ultis
               : GetConnectorClosestTo(cm.Connectors, p);
         }
 
+        public static Connector GetConnectorClosestTo1(
+      Element e,
+      XYZ p)
+        {
+            ConnectorManager cm = GetConnectorManager(e);
+
+            return null == cm
+              ? null
+              : GetConnectorClosestTo1(cm.Connectors, p);
+        }
+
+        private static Connector GetConnectorClosestTo1(
+      ConnectorSet connectors,
+      XYZ p)
+        {
+            Connector targetConnector = null;
+            double minDist = double.MaxValue;
+
+            foreach (Connector c in connectors)
+            {
+                if (c.IsConnected)
+                    continue;
+                double d = c.Origin.DistanceTo(p);
+
+                if (d < minDist)
+                {
+                    targetConnector = c;
+                    minDist = d;
+                }
+            }
+            return targetConnector;
+        }
+
         private static Connector GetConnectorClosestTo(
       ConnectorSet connectors,
       XYZ p)

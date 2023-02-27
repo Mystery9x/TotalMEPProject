@@ -603,7 +603,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
 
-                                Connector c1 = Common.GetConnectorClosestTo(pipe, pOn);
+                                Connector c1 = Common.GetConnectorClosestTo1(pipe, pOn);
 
                                 Connector c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
 
@@ -739,7 +739,7 @@ namespace TotalMEPProject.Commands.FireFighting
             bool retVal = true;
             Dictionary<FamilyInstance, double> keyValuePairs = new Dictionary<FamilyInstance, double>();
 
-            var con = Common.GetConnectorClosestTo(pipe, point);
+            var con = Common.GetConnectorClosestTo1(pipe, point);
 
             var con2d = Common.ToPoint2D(con.Origin);
 

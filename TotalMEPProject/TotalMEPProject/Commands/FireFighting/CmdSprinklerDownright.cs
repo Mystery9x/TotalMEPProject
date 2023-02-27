@@ -980,7 +980,8 @@ namespace TotalMEPProject.Commands.FireFighting
                             XYZ pointProject = resultPipe.XYZPoint;
                             XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap)
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap
+                                 && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                                 pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                             var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
                             if (!Common.IsEqual(distancePoint2d, 0))
@@ -992,14 +993,14 @@ namespace TotalMEPProject.Commands.FireFighting
 
                                 locSprinkler = (sprinkler.Location as LocationPoint).Point;
                             }
-                            else
-                            {
-                                Line line = Line.CreateBound(p0, pointProject);
-                                (processPipe.Location as LocationCurve).Curve = line;
+                            //else
+                            //{
+                            //    Line line = Line.CreateBound(pointProject, p0);
+                            //    (processPipe.Location as LocationCurve).Curve = line;
 
-                                p0 = line.GetEndPoint(0);
-                                p1 = line.GetEndPoint(1);
-                            }
+                            //    p0 = line.GetEndPoint(0);
+                            //    p1 = line.GetEndPoint(1);
+                            //}
 
                             // Process main pipe
                             Curve curveProcessPipe = (processPipe.Location as LocationCurve).Curve;
@@ -1126,16 +1127,20 @@ namespace TotalMEPProject.Commands.FireFighting
                             // Generate Pipe Horizontal
                             var v_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).Normalize();
                             var ft_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).GetLength();
-                            finalIntPnt = curveProcessPipe.Project(locSprinkler).XYZPoint;
+                            Line curveProcessPipeUnb = Line.CreateUnbound(curveProcessPipe.GetEndPoint(0), (curveProcessPipe as Line).Direction);
+                            finalIntPnt = curveProcessPipeUnb.Project(locSprinkler).XYZPoint;
+
                             var line_Extend = Line.CreateBound(finalIntPnt, locSprinkler);
 
                             newPlace = new XYZ(0, 0, 0);
-                            elemIds = ElementTransformUtils.CopyElement(
-                             Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
 
-                            var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                            //var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(ft_v, false));
-                            (horizontal_pipe.Location as LocationCurve).Curve = line_Extend;
+                            Pipe horizontal_pipe = Pipe.Create(Global.UIDoc.Document, temp_processPipe_1.MEPSystem.GetTypeId(), temp_processPipe_1.GetTypeId(), temp_processPipe_1.ReferenceLevel.Id, finalIntPnt, locSprinkler);
+                            //elemIds = ElementTransformUtils.CopyElement(
+                            // Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
+
+                            //var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+                            ////var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(ft_v, false));
+                            //(horizontal_pipe.Location as LocationCurve).Curve = line_Extend;
                             horizontal_pipe.LookupParameter("Diameter").Set(dPipeSizeFt);
 
                             // Connect horizontal pipe with main pipe
@@ -1202,19 +1207,6 @@ namespace TotalMEPProject.Commands.FireFighting
                                 continue;
                             }
 
-                            ////  Generate vertical pipe 2
-                            //var line_v2 = Line.CreateBound(hor_line.GetEndPoint(1), locSprinkler);
-
-                            //newPlace = new XYZ(0, 0, 0);
-                            //elemIds = ElementTransformUtils.CopyElement(
-                            // Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
-
-                            //var pipe_v2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                            //XYZ tmpPnt = hor_line.GetEndPoint(1) + XYZ.BasisZ.Negate() * ((line_v2.GetEndParameter(0) + line_v2.GetEndParameter(1)) / 2);
-
-                            //(pipe_v2.Location as LocationCurve).Curve = Line.CreateBound(line_v2.GetEndPoint(0), tmpPnt);
-
-                            //pipe_v2.LookupParameter("Diameter").Set(dPipeSizeFt);
                             //Connect horizontal pipe with vertical pipe 2
                             FamilyInstance fml;
                             // Connect vertical pipe 2 with sprinkler
@@ -1243,7 +1235,8 @@ namespace TotalMEPProject.Commands.FireFighting
                                 reTrans.RollBack();
                                 continue;
                             }
-                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0)
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0
+                                 && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                                 ElementTransformUtils.MoveElement(Global.UIDoc.Document, sprinkler.Id, locSprinkler1 - locSprinkler);
 
                             // If click cancel button when exporting
@@ -1667,7 +1660,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 try
                 {
-                    double invalidRadius_mm = 500;
+                    double invalidRadius_mm = 700;
                     double invalidRadius_ft = Common.mmToFT * invalidRadius_mm;
 
                     // Status cancel export : default = false
