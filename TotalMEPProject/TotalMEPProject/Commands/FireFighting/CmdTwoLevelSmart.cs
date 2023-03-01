@@ -314,6 +314,144 @@ namespace TotalMEPProject.Commands.FireFighting
             return Result.Cancelled;
         }
 
+        private static bool ProcessSameElevation(List<InforPie> inforMainPipes, List<DuoBranchPipe> pairPies, TwoLevelSmartDialogData dialogResultData)
+        {
+            try
+            {
+                List<InforPie> process_InforMains = new List<InforPie>(inforMainPipes);
+                List<DuoBranchPipe> process_duoBranchPipes = new List<DuoBranchPipe>(pairPies);
+
+                List<SourceMainPipe> sourceMainPipes = new List<SourceMainPipe>();
+
+                foreach (var inforMain in process_InforMains)
+                {
+                    var flatten_mainCurve = inforMain.CurveSourcePipe_Flatten;
+                    var flatten_mainCurve_Extend = inforMain.CuvreSourcePipe_FlattenExtend;
+                    SourceMainPipe sourceMain = new SourceMainPipe(inforMain);
+
+                    foreach (var duoBranchs in process_duoBranchPipes)
+                    {
+                        try
+                        {
+                            if (duoBranchs.SecondPipe != null)
+                            {
+                                if (RealityIntersect(flatten_mainCurve, duoBranchs.FlattenValidCurve, out XYZ flattenIntPnt1))
+                                {
+                                    DuoBranchPipe duoBranchPipe = new DuoBranchPipe(duoBranchs.FirstPipe, duoBranchs.SecondPipe)
+                                    {
+                                        FlattenIntersectPoint = flattenIntPnt1
+                                    };
+
+                                    sourceMain.Branches.Add(duoBranchPipe);
+                                }
+
+                                if (RealityIntersect(flatten_mainCurve_Extend, duoBranchs.FlattenValidCurve, out XYZ flattenIntPnt2))
+                                {
+                                    DuoBranchPipe duoBranchPipe = new DuoBranchPipe(duoBranchs.FirstPipe, duoBranchs.SecondPipe)
+                                    {
+                                        FlattenIntersectPoint = flattenIntPnt2
+                                    };
+                                    sourceMain.Branches_Special.Add(duoBranchPipe);
+                                }
+                            }
+                            else
+                            {
+                                if (RealityIntersect(flatten_mainCurve, duoBranchs.FlattenValidCurve, out XYZ flattenIntPnt1))
+                                {
+                                    DuoBranchPipe duoBranchPipe = new DuoBranchPipe(duoBranchs.FirstPipe, duoBranchs.SecondPipe)
+                                    {
+                                        FlattenIntersectPoint = flattenIntPnt1
+                                    };
+
+                                    sourceMain.Branches.Add(duoBranchPipe);
+                                    sourceMain.Branches_Special.Add(duoBranchPipe);
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        continue;
+
+                        //using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "ZZZ"))
+                        //{
+                        //    reTrans.Start();
+                        //    Global.UIDoc.Document.Create.NewDetailCurve(Global.UIDoc.ActiveView, duoBranchs.FlattenValidCurve);
+                        //    Global.UIDoc.Document.Create.NewDetailCurve(Global.UIDoc.ActiveView, flatten_mainCurve_Extend);
+                        //    reTrans.Commit();
+                        //}
+                    }
+                    if (dialogResultData.FlagAddElbowLastBranch)
+                        sourceMain.Initialize();
+                    sourceMainPipes.Add(sourceMain);
+                }
+
+                foreach (var sourceMain in sourceMainPipes)
+                {
+                    using (Transaction reTrans = new Transaction(Global.UIDoc.Document, "STEP_1_TWO_LEVEL_SMART"))
+                    {
+                        reTrans.Start();
+                        FailureHandlingOptions fhOpts = reTrans.GetFailureHandlingOptions();
+                        List<DuoBranchPipe> allVerticalPipes = new List<DuoBranchPipe>();
+                        List<DuoBranchPipe> norVerticalPipes = new List<DuoBranchPipe>();
+
+                        // Create elbow of 2 end of the line
+                        if (sourceMain.IntDuoBranch_1 != null)
+                        {
+                            if (sourceMain.IntDuoBranch_1.FirstPipe.SourcePipe != null)
+                            {
+                            }
+                        }
+
+                        if (sourceMain.IntDuoBranch_2 != null)
+                        {
+                        }
+
+                        // Create vertical pipe
+                        foreach (var duoBrandPipe in sourceMain.Branches_Special)
+                        {
+                            Pipe verticalPipe = CreateVerticalPipeWithTap(sourceMain.MainPipe, duoBrandPipe, dialogResultData.PipeSize * Common.mmToFT);
+                            if (verticalPipe != null)
+                            {
+                                DuoBranchPipe duoBranchPipe = duoBrandPipe.Clone() as DuoBranchPipe;
+                                duoBranchPipe.VerticalPipe = new InforPie(verticalPipe);
+                                allVerticalPipes.Add(duoBranchPipe);
+                                norVerticalPipes.Add(duoBranchPipe);
+                            }
+                        }
+                        Global.UIDoc.Document.Regenerate();
+
+                        foreach (var verPipe in norVerticalPipes)
+                        {
+                            if (!CreateTap(sourceMain.MainPipe.SourcePipe as MEPCurve, verPipe.VerticalPipe.SourcePipe as MEPCurve))
+                            {
+                                allVerticalPipes.Remove(allVerticalPipes.Where(item => item.VerticalPipe.SourcePipe.Id == verPipe.VerticalPipe.SourcePipe.Id).FirstOrDefault());
+                                Global.UIDoc.Document.Delete(verPipe.VerticalPipe.SourcePipe.Id);
+                            }
+                        }
+
+                        Global.UIDoc.Document.Regenerate();
+
+                        //Create Top Tee
+                        foreach (var duoBranch in allVerticalPipes)
+                        {
+                            CreateTopTee(duoBranch, dialogResultData);
+                        }
+
+                        //System.Windows.Forms.MessageBox.Show(sourceMain.MainPipe.SourcePipe.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsValueString());
+
+                        GetInfoWarning supWarning = new GetInfoWarning(true);
+                        fhOpts.SetFailuresPreprocessor(supWarning);
+                        reTrans.SetFailureHandlingOptions(fhOpts);
+                        reTrans.Commit();
+                    }
+                }
+            }
+            catch (Exception)
+            { }
+            return false;
+        }
+
         /// <summary>
         ///
         /// </summary>

@@ -149,68 +149,6 @@ namespace TotalMEPProject.Commands.FireFighting
 
             return false;
         }
-
-        /// <summary>
-        /// Process
-        /// </summary>
-        /// <returns></returns>
-        public static Result Process()
-        {
-            try
-            {
-                if (App.m_2LevelSmartForm != null && App.m_2LevelSmartForm.IsDisposed == false)
-                {
-                    App.m_2LevelSmartForm.Hide();
-                }
-
-                m_mainPipeIds.Clear();
-
-                // Select main pipes
-                List<Pipe> mainPipes = Cmd2LevelSmart.SelectPipes();
-                if (mainPipes == null || mainPipes.Count <= 0)
-                    return Result.Cancelled;
-
-                // Select branch pipes
-                List<Pipe> branchPipes = Cmd2LevelSmart.SelectPipes();
-                if (branchPipes == null || branchPipes.Count <= 0)
-                    return Result.Cancelled;
-
-                // Filter branch pipes
-                branchPipes = branchPipes.Where(item => (mainPipes.Find(item_1 => item_1.Id == item.Id) == null)).Select(item => item).ToList();
-
-                // Pair pipe
-                List<PairPipes> pairPies = Cmd2LevelSmart.PairPipe(branchPipes);
-                if (pairPies == null || pairPies.Count() <= 0)
-                    return Result.Cancelled;
-
-                // Get ElementId main pipes
-                List<ElementId> mainPipeIds = mainPipes.Where(item => item.Id != ElementId.InvalidElementId).Select(item => item.Id).ToList();
-                m_mainPipeIds.AddRange(mainPipeIds);
-
-                TransactionGroup reTransGrp = new TransactionGroup(Global.UIDoc.Document, "TWO_LEVEL_SMART_COMMAND");
-                try
-                {
-                    reTransGrp.Start();
-                    HandleProcessTwoLevelSmartCommand handleProcess = new HandleProcessTwoLevelSmartCommand(m_mainPipeIds, pairPies, App.m_2LevelSmartForm.DialogResultData);
-                    reTransGrp.Assimilate();
-                }
-                catch (Exception)
-                {
-                    reTransGrp.RollBack();
-                }
-            }
-            catch (Exception)
-            { }
-            finally
-            {
-                if (App.m_2LevelSmartForm != null && App.m_2LevelSmartForm.IsDisposed == false)
-                {
-                    App.m_2LevelSmartForm.Show(App.hWndRevit);
-                }
-                DisplayService.SetFocus(new HandleRef(null, App.m_2LevelSmartForm.Handle));
-            }
-            return Result.Cancelled;
-        }
     }
 
     public class PairPipes

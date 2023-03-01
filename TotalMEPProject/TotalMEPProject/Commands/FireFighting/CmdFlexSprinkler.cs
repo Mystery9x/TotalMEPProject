@@ -790,7 +790,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             line_v1 = Line.CreateBound(p, line_v1.Evaluate(ft_h, false));
 
                             XYZ tmpPoint = line_v1.Evaluate(ft_h, false);
-                            p = curve.Project(tmpPoint).XYZPoint;
+                            p = Line.CreateUnbound(curve.GetEndPoint(0), (curve as Line).Direction).Project(tmpPoint).XYZPoint;
                             line_v1 = Line.CreateBound(p, tmpPoint);
 
                             (pipe_v1.Location as LocationCurve).Curve = line_v1;
@@ -831,7 +831,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                                         {
-                                            if (CheckPipeIsEnd(pipe1, sprinkle_point))
+                                            if (CheckPipeIsEnd1(pipe1, sprinklers, instance, sprinkle_point))
                                                 CreateTap(pipe1 as MEPCurve, pipe_v1 as MEPCurve);
                                             else
                                                 Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
