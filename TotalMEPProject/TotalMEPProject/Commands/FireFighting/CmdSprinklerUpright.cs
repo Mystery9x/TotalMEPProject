@@ -431,14 +431,14 @@ namespace TotalMEPProject.Commands.FireFighting
                             sprinkle_point = (instance.Location as LocationPoint).Point;
                         }
                     }
-                    else
-                    {
-                        Line line = Line.CreateBound(p0, pointProject);
-                        (pipe.Location as LocationCurve).Curve = line;
+                    //else
+                    //{
+                    //    Line line = Line.CreateBound(p0, pointProject);
+                    //    (pipe.Location as LocationCurve).Curve = line;
 
-                        p0 = line.GetEndPoint(0);
-                        p1 = line.GetEndPoint(1);
-                    }
+                    //    p0 = line.GetEndPoint(0);
+                    //    p1 = line.GetEndPoint(1);
+                    //}
                 }
                 else
                 {
@@ -712,12 +712,12 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 var distance = conOrigin2D.DistanceTo(sprinklerPoint2D);
 
-                if (con.IsConnected)
-                {
-                    double d = UnitUtils.ConvertToInternalUnits(30, DisplayUnitType.DUT_MILLIMETERS);
-                    if (distance > d)
-                        continue;
-                }
+                //if (con.IsConnected)
+                //{
+                //    double d = UnitUtils.ConvertToInternalUnits(30, DisplayUnitType.DUT_MILLIMETERS);
+                //    if (distance > d)
+                //        continue;
+                //}
                 keyValuePairs.Add(pipePick, distance);
             }
 
@@ -739,7 +739,7 @@ namespace TotalMEPProject.Commands.FireFighting
             bool retVal = true;
             Dictionary<FamilyInstance, double> keyValuePairs = new Dictionary<FamilyInstance, double>();
 
-            var con = Common.GetConnectorClosestTo1(pipe, point);
+            var con = Common.GetConnectorClosestTo(pipe, point);
 
             var con2d = Common.ToPoint2D(con.Origin);
 
