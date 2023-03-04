@@ -2313,8 +2313,8 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0) + (SourcePipe_Cont_1.Origin - SourcePipe_Cont_2.Origin).Normalize() * 1000 * Common.mmToFT;
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1);
 
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), TruncateDouble(newStartPoint.Z));
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), TruncateDouble(newEndPoint.Z));
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), TruncateDouble(newStartPoint.Z));
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), TruncateDouble(newEndPoint.Z));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && !SourcePipe_Cont_2.IsConnected)
@@ -2322,8 +2322,8 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0);
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1) + (SourcePipe_Cont_2.Origin - SourcePipe_Cont_1.Origin).Normalize() * 1000 * Common.mmToFT;
 
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 7), Math.Round(newEndPoint.Y, 7), TruncateDouble(newEndPoint.Z));
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 7), Math.Round(newStartPoint.Y, 7), TruncateDouble(newStartPoint.Z));
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), TruncateDouble(newEndPoint.Z));
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), TruncateDouble(newStartPoint.Z));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && SourcePipe_Cont_2.IsConnected)
