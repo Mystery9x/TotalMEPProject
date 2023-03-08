@@ -384,10 +384,38 @@ namespace TotalMEPProject.Commands.FireFighting
                         //    continue;
                         //}
                         var verticalPipe = Common.Clone(branchPipe) as Pipe;
-                        verticalPipe.PipeType = pipeType;
+                        verticalPipe.PipeType = Global.UIDoc.Document.GetElement(validMainPipe.GetTypeId()) as PipeType;
                         (verticalPipe.Location as LocationCurve).Curve = Line.CreateBound(finalIntPntMainPipe, finalIntPntBranchPipe);
+
                         try
                         {
+                            var c1 = Common.GetConnectorClosestTo(branchPipe, finalIntPntBranchPipe);
+                            var c3 = Common.GetConnectorClosestTo(verticalPipe, finalIntPntBranchPipe);
+
+                            try
+                            {
+                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                        }
+
+                        try
+                        {
+                            if ((double)Common.GetValueParameterByBuilt(validMainPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0
+                       && !Common.IsParallel((curveMainPipe as Line).Direction, XYZ.BasisX)
+                       && !Common.IsParallel((curveMainPipe as Line).Direction, XYZ.BasisY))
+                            {
+                                XYZ tmpVector = curveMainPipe.GetEndPoint(0) - finalIntPntMainPipe;
+                                finalIntPntBranchPipe = finalIntPntBranchPipe + tmpVector.Normalize() * 0.001;
+
+                                (verticalPipe.Location as LocationCurve).Curve = Line.CreateBound(finalIntPntMainPipe, finalIntPntBranchPipe); ;
+                            }
+
                             var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPntMainPipe);
                             var c3 = Common.GetConnectorClosestTo(verticalPipe, finalIntPntMainPipe);
 
@@ -429,23 +457,6 @@ namespace TotalMEPProject.Commands.FireFighting
                         catch (System.Exception ex)
                         {
                             reTrans.RollBack();
-                        }
-
-                        try
-                        {
-                            var c1 = Common.GetConnectorClosestTo(branchPipe, finalIntPntBranchPipe);
-                            var c3 = Common.GetConnectorClosestTo(verticalPipe, finalIntPntBranchPipe);
-
-                            try
-                            {
-                                Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
-                            }
-                            catch
-                            {
-                            }
-                        }
-                        catch (System.Exception ex)
-                        {
                         }
 
                         reTrans.Commit();

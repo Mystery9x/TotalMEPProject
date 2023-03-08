@@ -1255,6 +1255,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 (horizontal_pipe.Location as LocationCurve).Curve = hor_line;
                                 horizontal_pipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
 
+                                Global.UIDoc.Document.Regenerate();
                                 // Connect horizontal pipe with main pipe
                                 try
                                 {

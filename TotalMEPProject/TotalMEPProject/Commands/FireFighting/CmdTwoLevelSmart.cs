@@ -1141,7 +1141,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 intArr = new IntersectionResultArray();
                 Line lineUn = null;
-                if (duoBranchPipe.SecondPipe.CurveSourcePipe == null)
+                if (duoBranchPipe.SecondPipe == null)
                     lineUn = Line.CreateUnbound(duoBranchPipe.FirstPipe.CurveSourcePipe.Origin, duoBranchPipe.FirstPipe.CurveSourcePipe.Direction);
                 else
                     lineUn = Line.CreateUnbound(duoBranchPipe.SecondPipe.CurveSourcePipe.Origin, duoBranchPipe.SecondPipe.CurveSourcePipe.Direction);
@@ -1158,6 +1158,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     var verticalPipe = Common.Clone(mainPipe.SourcePipe) as Pipe;
                     verticalPipe.LookupParameter("Diameter").Set(diameter);
                     (verticalPipe.Location as LocationCurve).Curve = Line.CreateBound(intMainPipe, intBranchPipe);
+
                     retVal = verticalPipe;
 
                     reSubTrans.Commit();
