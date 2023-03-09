@@ -1628,17 +1628,54 @@ namespace TotalMEPProject.Commands.FireFighting
             var p1 = curve.GetEndPoint(1);
 
             pipe1 = pipeOrigin;
+            pipe2 = null;
 
-            //Split
-            (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, splitPoint);
+            #region Temp
 
-            var newPlace = new XYZ(0, 0, 0);
-            var elemIds = ElementTransformUtils.CopyElement(
-              Global.UIDoc.Document, pipeOrigin.Id, newPlace);
+            Pipe tempPipe_1 = pipeOrigin;
+            Pipe tempPipe_2 = null;
 
-            pipe2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+            var tempPipe2Id = PlumbingUtils.BreakCurve(Global.UIDoc.Document, tempPipe_1.Id, splitPoint);
+            if (tempPipe2Id != ElementId.InvalidElementId)
+            {
+                tempPipe_2 = Global.UIDoc.Document.GetElement(tempPipe2Id) as Pipe;
+                Line curveTempPipe_2 = tempPipe_2.GetCurve() as Line;
 
-            (pipe2.Location as LocationCurve).Curve = Line.CreateBound(splitPoint, p1);
+                //if ((Common.IsEqual(curveTempPipe_2.GetEndPoint(0), splitPoint) && Common.Equals(curveTempPipe_2.GetEndPoint(1), p1))
+                //    || (Common.IsEqual(curveTempPipe_2.GetEndPoint(1), splitPoint) && Common.Equals(curveTempPipe_2.GetEndPoint(0), p1)))
+                //{
+                //    pipe1 = tempPipe_1;
+                //    pipe2 = tempPipe_2;
+                //}
+                //else
+                //{
+                //    pipe1 = tempPipe_2;
+                //    pipe2 = tempPipe_1;
+                //}
+                if (tempPipe_1.Id == pipeOrigin.Id)
+                {
+                    pipe1 = tempPipe_1;
+                    pipe2 = tempPipe_2;
+                }
+                else
+                {
+                    pipe2 = tempPipe_1;
+                    pipe1 = tempPipe_2;
+                }
+            }
+
+            #endregion Temp
+
+            ////Split
+            //(pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, splitPoint);
+
+            //var newPlace = new XYZ(0, 0, 0);
+            //var elemIds = ElementTransformUtils.CopyElement(
+            //  Global.UIDoc.Document, pipeOrigin.Id, newPlace);
+
+            //pipe2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
+
+            //(pipe2.Location as LocationCurve).Curve = Line.CreateBound(splitPoint, p1);
 
             //Find
             double ft = 0.001;
