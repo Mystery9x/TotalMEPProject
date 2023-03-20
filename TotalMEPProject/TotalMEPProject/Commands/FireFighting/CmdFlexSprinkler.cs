@@ -25,7 +25,7 @@ namespace TotalMEPProject.Commands.FireFighting
             Global.AppCreation = commandData.Application.Application.Create;
 
             //Show form
-            if (App.ShowFlexSprinklerForm() == false)
+            if (App.ShowC234Form() == false)
                 return Result.Cancelled;
 
             return Result.Succeeded;
@@ -35,20 +35,20 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                if (App.m_flexSprinklerForm != null && App.m_flexSprinklerForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_flexSprinklerForm.Hide();
+                    App.m_C234Form.Hide();
                 }
 
-                if (App.m_flexSprinklerForm.IsCheckedType1)
+                if (App.m_C234Form.IsCheckedType1)
                 {
                     ProcessType1();
                 }
-                else if (App.m_flexSprinklerForm.IsCheckedType2)
+                else if (App.m_C234Form.IsCheckedType2)
                 {
                     ProcessType2();
                 }
-                else if (App.m_flexSprinklerForm.IsCheckedType3)
+                else if (App.m_C234Form.IsCheckedType3)
                 {
                     ProcessType3();
                 }
@@ -58,11 +58,11 @@ namespace TotalMEPProject.Commands.FireFighting
             { }
             finally
             {
-                if (App.m_flexSprinklerForm != null && App.m_flexSprinklerForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_flexSprinklerForm.Show(App.hWndRevit);
+                    App.m_C234Form.Show(App.hWndRevit);
                 }
-                DisplayService.SetFocus(new HandleRef(null, App.m_flexSprinklerForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_C234Form.Handle));
             }
             return Result.Cancelled;
         }
@@ -83,9 +83,9 @@ namespace TotalMEPProject.Commands.FireFighting
                                where p.Id != ElementId.InvalidElementId
                                select p.Id).ToList();
 
-                var height = App.m_flexSprinklerForm.VerticalPipeLengthL2;
+                var height = App.m_C234Form.VerticalPipeLengthL2;
 
-                double radius = 500/*400*/; //mm : sua thanh 500 theo yeu cau cua a Cuong
+                double radius = App.m_C234Form.MainPipeSprinklerDistance/*400*/; //mm : sua thanh 500 theo yeu cau cua a Cuong
                 var ft = Common.mmToFT * radius;
 
                 // Status cancel export : default = false
@@ -293,7 +293,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             //Set d = 25
 
-                            double dFt = App.m_flexSprinklerForm.PipeSize * Common.mmToFT;
+                            double dFt = App.m_C234Form.PipeSizeC4 * Common.mmToFT;
 
                             var ft_h = Common.mmToFT * height;
 
@@ -318,14 +318,14 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             pipe_v1.LookupParameter("Diameter").Set(dFt);
 
-                            var pipeType = Global.UIDoc.Document.GetElement(App.m_flexSprinklerForm.FamilyType) as PipeType;
+                            var pipeType = Global.UIDoc.Document.GetElement(App.m_C234Form.FamilyType) as PipeType;
                             if (pipeType != null)
                                 pipe_v1.PipeType = pipeType;
 
                             //Hor
                             var v_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).Normalize();
 
-                            var ft_v = App.m_flexSprinklerForm.HorizontalPipeLengthL * Common.mmToFT;
+                            var ft_v = App.m_C234Form.HorizontalPipeLengthL * Common.mmToFT;
 
                             var line_Extend = Line.CreateUnbound(line_v1.GetEndPoint(1), ft_v * v_v * 2);
 
@@ -360,7 +360,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var c1 = Common.GetConnectorClosestTo(pipe1, p);
                                 var c3 = Common.GetConnectorClosestTo(pipe_v1, p);
 
-                                if (App.m_flexSprinklerForm.IsCheckedTee)
+                                if (App.m_C234Form.IsCheckedTee)
                                 {
                                     if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                                     {
@@ -549,9 +549,9 @@ namespace TotalMEPProject.Commands.FireFighting
                                where p.Id != ElementId.InvalidElementId
                                select p.Id).ToList();
 
-                var height = App.m_flexSprinklerForm.VerticalPipeLengthL2;
+                var height = App.m_C234Form.VerticalPipeLengthL2;
 
-                double radius = 500/*400*/; //mm : sua thanh 500 theo yeu cau cua a Cuong
+                double radius = App.m_C234Form.MainPipeSprinklerDistance/*400*/; //mm : sua thanh 500 theo yeu cau cua a Cuong
                 var ft = Common.mmToFT * radius;
 
                 // Status cancel export : default = false
@@ -775,7 +775,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             //Set d = 25
 
-                            var dFt = App.m_flexSprinklerForm.PipeSize * Common.mmToFT;
+                            var dFt = App.m_C234Form.PipeSizeC4 * Common.mmToFT;
 
                             var ft_h = Common.mmToFT * height;
 
@@ -796,7 +796,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                             pipe_v1.LookupParameter("Diameter").Set(dFt);
-                            var pipeType = Global.UIDoc.Document.GetElement(App.m_flexSprinklerForm.FamilyType) as PipeType;
+                            var pipeType = Global.UIDoc.Document.GetElement(App.m_C234Form.FamilyType) as PipeType;
                             if (pipeType != null)
                                 pipe_v1.PipeType = pipeType;
                             //Connect
@@ -805,7 +805,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var c1 = Common.GetConnectorClosestTo(pipe1, p);
                                 var c3 = Common.GetConnectorClosestTo(pipe_v1, p);
 
-                                if (App.m_flexSprinklerForm.IsCheckedTee)
+                                if (App.m_C234Form.IsCheckedTee)
                                 {
                                     if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
                                     {
@@ -864,7 +864,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             //Hor
                             var v_v = (new XYZ(sprinkle_point.X, sprinkle_point.Y, 0) - new XYZ(p.X, p.Y, 0)).Normalize();
 
-                            var ft_v = App.m_flexSprinklerForm.HorizontalPipeLengthL * Common.mmToFT;
+                            var ft_v = App.m_C234Form.HorizontalPipeLengthL * Common.mmToFT;
 
                             var line_Extend = Line.CreateUnbound(line_v1.GetEndPoint(1), ft_v * v_v * 2);
 
@@ -895,14 +895,14 @@ namespace TotalMEPProject.Commands.FireFighting
                             //Vertical 2
 
                             XYZ directionTemp = (sprinkle_point - line_hor.GetEndPoint(1)).Normalize();
-                            var line_v2 = Line.CreateBound(line_hor.GetEndPoint(1), line_hor.GetEndPoint(1) + XYZ.BasisZ.Negate() * App.m_flexSprinklerForm.ExtendPipeLengthL1 * Common.mmToFT);
+                            var line_v2 = Line.CreateBound(line_hor.GetEndPoint(1), line_hor.GetEndPoint(1) + XYZ.BasisZ.Negate() * App.m_C234Form.ExtendPipeLengthL1 * Common.mmToFT);
 
                             newPlace = new XYZ(0, 0, 0);
                             elemIds = ElementTransformUtils.CopyElement(
                              Global.UIDoc.Document, pipe1.Id, newPlace);
 
                             var pipe_v2 = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                            var center = line_hor.GetEndPoint(1) + directionTemp * App.m_flexSprinklerForm.ExtendPipeLengthL1 * Common.mmToFT;
+                            var center = line_hor.GetEndPoint(1) + directionTemp * App.m_C234Form.ExtendPipeLengthL1 * Common.mmToFT;
 
                             (pipe_v2.Location as LocationCurve).Curve = line_v2;
 
@@ -1031,7 +1031,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 try
                 {
-                    double invalidRadius_mm = 500;
+                    double invalidRadius_mm = App.m_C234Form.MainPipeSprinklerDistance;
                     double invalidRadius_ft = Common.mmToFT * invalidRadius_mm;
 
                     // Status cancel export : default = false
@@ -1253,9 +1253,9 @@ namespace TotalMEPProject.Commands.FireFighting
                                      Global.UIDoc.Document, temp_processPipe_1.Id, newPlace);
 
                                     var horizontal_pipe = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-                                    var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(App.m_flexSprinklerForm.HorizontalPipeLengthL * Common.mmToFT, false));
+                                    var hor_line = Line.CreateBound(finalIntPnt, line_Extend.Evaluate(App.m_C234Form.HorizontalPipeLengthL * Common.mmToFT, false));
                                     (horizontal_pipe.Location as LocationCurve).Curve = hor_line;
-                                    horizontal_pipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
+                                    horizontal_pipe.LookupParameter("Diameter").Set(App.m_C234Form.PipeSizeC4 * Common.mmToFT);
 
                                     Global.UIDoc.Document.Regenerate();
                                     // Connect horizontal pipe with main pipe
@@ -1263,7 +1263,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                     {
                                         var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPnt);
                                         var c3 = Common.GetConnectorClosestTo(horizontal_pipe, finalIntPnt);
-                                        if (App.m_flexSprinklerForm.IsCheckedTee)
+                                        if (App.m_C234Form.IsCheckedTee)
                                         {
                                             if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                                             {
@@ -1343,7 +1343,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                             var flexPipe = Global.UIDoc.Document.Create.NewFlexPipe(pnts, flexPipeType);
 
                                             //Set the diameter of flex.
-                                            flexPipe.LookupParameter("Diameter").Set(App.m_flexSprinklerForm.PipeSize * Common.mmToFT);
+                                            flexPipe.LookupParameter("Diameter").Set(App.m_C234Form.PipeSizeC4 * Common.mmToFT);
                                             flexPipe.StartTangent = c1.CoordinateSystem.BasisZ; //Set Tangent to Conn Direction.
                                             flexPipe.EndTangent = c2.CoordinateSystem.BasisZ.Negate();
 
@@ -1566,7 +1566,7 @@ namespace TotalMEPProject.Commands.FireFighting
             var p1 = curve.GetEndPoint(1);
 
             //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
-            double kc_mm = 400 /*1000*/;
+            double kc_mm = App.m_C234Form.EndPointSprinklerDistance /*1000*/;
             double km_ft = Common.mmToFT * kc_mm;
 
             var p02d = new XYZ(p0.X, p0.Y, 0);
@@ -1580,7 +1580,7 @@ namespace TotalMEPProject.Commands.FireFighting
             int far = -1;
             if (d1 < km_ft)
             {
-                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_flexSprinklerForm.IsCheckedTee)
+                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_C234Form.IsCheckedTee)
                 {
                     isDauOng = true;
                     far = 1;
@@ -1588,7 +1588,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             else if (d2 < km_ft)
             {
-                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_flexSprinklerForm.IsCheckedTee)
+                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_C234Form.IsCheckedTee)
                 {
                     isDauOng = true;
                     far = 0;

@@ -31,9 +31,7 @@ namespace TotalMEPProject
         public static _2LevelSmartForm m_2LevelSmartForm = null;
         public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
-        public static SprinkerUpForm m_SprinkerUpForm = null;
-        public static SprinklerDownForm m_SprinklerDownForm = null;
-        public static FlexSprinklerForm m_flexSprinklerForm = null;
+        public static C234Form m_C234Form = null;
 
         public static HolySplitUpdown _HolyUpdown = null;
         public static bool isApply = true;
@@ -257,25 +255,10 @@ namespace TotalMEPProject
             AddImages(levelSmartData, iconFolder, "2level Smart-01.png", "2level Smart-01.png");
             fireFightingPanel.AddItem(levelSmartData);
 
-            ////Create button
-            SplitButtonData groupSprinklerData = new SplitButtonData("Sprinkler", "Sprinkler\nConnection");
-            SplitButton groupSprinkler = fireFightingPanel.AddItem(groupSprinklerData) as SplitButton;
-            AddImagesPullDown(groupSprinkler, iconFolder, "Sprinkler Connection-01.png", "Sprinkler Connection-01.png");
-
             //Create button
-            PushButtonData sprinklerUprightData = new PushButtonData("btnSprinklerUpright", "Sprinkler\nUpright", assemblyPath, Define.CmdSprinklerUprightClassName);
-            AddImages(sprinklerUprightData, iconFolder, "Sprinkler Upright-01.png", "Sprinkler Upright-01.png");
-            groupSprinkler.AddPushButton(sprinklerUprightData);
-
-            //Create button
-            PushButtonData sprinklerDownrightData = new PushButtonData("btnSprinklerDownright", "Sprinkler\nDownright", assemblyPath, Define.CmdSprinklerDownrightClassName);
-            AddImages(sprinklerDownrightData, iconFolder, "Sprinkler Down Right.png", "Sprinkler Down Right.png");
-            groupSprinkler.AddPushButton(sprinklerDownrightData);
-
-            //Create button
-            PushButtonData flexSprinkerData = new PushButtonData("btnFlexSprinker", "Flex Sprinker", assemblyPath, Define.CmdFlexSprinklerClassName);
-            AddImages(flexSprinkerData, iconFolder, "Flex Sprinkler-01.png", "Flex Sprinkler-01.png");
-            groupSprinkler.AddPushButton(flexSprinkerData);
+            PushButtonData autoSprinklerData = new PushButtonData("btnAutoSprinkler", "Auto Sprinkler", assemblyPath, Define.CmdC234);
+            AddImages(autoSprinklerData, iconFolder, "Sprinkler Upright-01.png", "Sprinkler Upright-01.png");
+            fireFightingPanel.AddItem(autoSprinklerData);
         }
 
         /// <summary>
@@ -729,7 +712,7 @@ namespace TotalMEPProject
             }
         }
 
-        public static bool ShowSprinklerUpForm()
+        public static bool ShowC234Form()
         {
             try
             {
@@ -743,100 +726,22 @@ namespace TotalMEPProject
 
                 bool isShow = false;
 
-                if (m_SprinkerUpForm == null || m_SprinkerUpForm.IsDisposed)
+                if (m_C234Form == null || m_C234Form.IsDisposed)
                 {
                     RequestHandler handler = new RequestHandler();
 
                     ExternalEvent exEvent = ExternalEvent.Create(handler);
 
-                    m_SprinkerUpForm = new SprinkerUpForm(exEvent, handler);
+                    m_C234Form = new C234Form(exEvent, handler);
 
-                    m_SprinkerUpForm.Show(hWndRevit);
+                    m_C234Form.Show(hWndRevit);
                 }
                 else
                 {
                     isShow = true;
                 }
 
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinkerUpForm.Handle));
-
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public static bool ShowSprinklerDownForm()
-        {
-            try
-            {
-                if (null == hWndRevit)
-                {
-                    Process process = Process.GetCurrentProcess();
-
-                    IntPtr h = process.MainWindowHandle;
-                    hWndRevit = new WindowHandle(h);
-                }
-
-                bool isShow = false;
-
-                if (m_SprinklerDownForm == null || m_SprinklerDownForm.IsDisposed)
-                {
-                    RequestHandler handler = new RequestHandler();
-
-                    ExternalEvent exEvent = ExternalEvent.Create(handler);
-
-                    m_SprinklerDownForm = new SprinklerDownForm(exEvent, handler);
-
-                    m_SprinklerDownForm.Show(hWndRevit);
-                }
-                else
-                {
-                    isShow = true;
-                }
-
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
-
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public static bool ShowFlexSprinklerForm()
-        {
-            try
-            {
-                if (null == hWndRevit)
-                {
-                    Process process = Process.GetCurrentProcess();
-
-                    IntPtr h = process.MainWindowHandle;
-                    hWndRevit = new WindowHandle(h);
-                }
-
-                bool isShow = false;
-
-                if (m_flexSprinklerForm == null || m_flexSprinklerForm.IsDisposed)
-                {
-                    RequestHandler handler = new RequestHandler();
-
-                    ExternalEvent exEvent = ExternalEvent.Create(handler);
-
-                    m_flexSprinklerForm = new FlexSprinklerForm(exEvent, handler);
-
-                    m_flexSprinklerForm.Show(hWndRevit);
-                }
-                else
-                {
-                    isShow = true;
-                }
-
-                DisplayService.SetFocus(new HandleRef(null, App.m_flexSprinklerForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_C234Form.Handle));
 
                 return true;
             }

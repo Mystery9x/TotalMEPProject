@@ -139,6 +139,7 @@
     <Compile Include="Commands\Duct\CmdSplitDuct.cs" />
     <Compile Include="Commands\Duct\CmdTapFlip.cs" />
     <Compile Include="Commands\FireFighting\Cmd2LevelSmart.cs" />
+    <Compile Include="Commands\FireFighting\CmdC234.cs" />
     <Compile Include="Commands\FireFighting\CmdFlexSprinkler.cs" />
     <Compile Include="Commands\FireFighting\CmdSprinklerDownright.cs" />
     <Compile Include="Commands\FireFighting\CmdSprinklerUpright.cs" />
@@ -188,12 +189,6 @@
     <Compile Include="UI\FireFightingUI\C234Form.Designer.cs">
       <DependentUpon>C234Form.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\FireFightingUI\FlexSprinklerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\FireFightingUI\FlexSprinklerForm.Designer.cs">
-      <DependentUpon>FlexSprinklerForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\TotalMEPUI\FastVerticalForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -205,18 +200,6 @@
     </Compile>
     <Compile Include="UI\FireFightingUI\2LevelSmartForm.Designer.cs">
       <DependentUpon>2LevelSmartForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\FireFightingUI\SprinkerUpForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\FireFightingUI\SprinkerUpForm.Designer.cs">
-      <DependentUpon>SprinkerUpForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\FireFightingUI\SprinklerDownForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\FireFightingUI\SprinklerDownForm.Designer.cs">
-      <DependentUpon>SprinklerDownForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\BeginUI\FrmLogin.cs">
       <SubType>Form</SubType>
@@ -264,20 +247,11 @@
     <EmbeddedResource Include="UI\FireFightingUI\C234Form.resx">
       <DependentUpon>C234Form.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\FireFightingUI\FlexSprinklerForm.resx">
-      <DependentUpon>FlexSprinklerForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\TotalMEPUI\FastVerticalForm.resx">
       <DependentUpon>FastVerticalForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FireFightingUI\2LevelSmartForm.resx">
       <DependentUpon>2LevelSmartForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\FireFightingUI\SprinkerUpForm.resx">
-      <DependentUpon>SprinkerUpForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\FireFightingUI\SprinklerDownForm.resx">
-      <DependentUpon>SprinklerDownForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\BeginUI\FrmLogin.resx">
       <DependentUpon>FrmLogin.cs</DependentUpon>

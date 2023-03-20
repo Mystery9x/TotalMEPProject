@@ -28,7 +28,7 @@ namespace TotalMEPProject.Commands.FireFighting
             Global.AppCreation = commandData.Application.Application.Create;
 
             //Show form
-            if (App.ShowSprinklerUpForm() == false)
+            if (App.ShowC234Form() == false)
                 return Result.Cancelled;
 
             return Result.Succeeded;
@@ -38,9 +38,9 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                if (App.m_SprinkerUpForm != null && App.m_SprinkerUpForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinkerUpForm.Hide();
+                    App.m_C234Form.Hide();
                 }
 
                 List<FamilyInstance> sprinklers = sr.SelectSprinklers();
@@ -85,7 +85,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         tran.Start();
                         try
                         {
-                            sr.cc(tran, sprinklers, instance, pipeIds, App.m_SprinkerUpForm.isConnectNipple, App.m_SprinkerUpForm.isConnectTee, App.m_SprinkerUpForm.fmlNipple, App.m_SprinkerUpForm.PipeSize, App.m_SprinkerUpForm.FamilyType, true);
+                            sr.cc(tran, sprinklers, instance, pipeIds, App.m_C234Form.isConnectNipple, App.m_C234Form.isConnectTee, App.m_C234Form.fmlNipple, App.m_C234Form.PipeSizeC2, App.m_C234Form.FamilyType, true);
 
                             tran.Commit();
                         }
@@ -122,11 +122,11 @@ namespace TotalMEPProject.Commands.FireFighting
             { }
             finally
             {
-                if (App.m_SprinkerUpForm != null && App.m_SprinkerUpForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinkerUpForm.Show(App.hWndRevit);
+                    App.m_C234Form.Show(App.hWndRevit);
                 }
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinkerUpForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_C234Form.Handle));
             }
             return Result.Cancelled;
         }
@@ -351,7 +351,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 pipes = pipes.Where(item => selectedIds.Contains(item.Id)).ToList();
             }
 
-            double radius = 100; //mm
+            double radius = App.m_C234Form.MainPipeSprinklerDistance; //mm
             var ft = Common.mmToFT * radius;
 
             var solid = Common.CreateCylindricalVolume(sprinkle_point, ft * 5, ft, !isUp);
@@ -412,7 +412,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_SprinkerUpForm.isElbow
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_C234Form.isElbow
                         && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                         pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
 
@@ -448,7 +448,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     XYZ pointProject = resultPipe.XYZPoint;
                     XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_SprinkerUpForm.isElbow
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_C234Form.isElbow
                     && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                         pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                     var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
@@ -459,7 +459,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             var con = Common.GetConnectorClosestTo(pipe, sprinkle_point);
                             if (con.IsConnected)
                                 return result;
-                            else if (!con.IsConnected && !App.m_SprinkerUpForm.isElbow)
+                            else if (!con.IsConnected && !App.m_C234Form.isElbow)
                                 return result;
                         }
                         else
@@ -554,7 +554,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 try
                 {
-                    if (App.m_SprinkerUpForm.isElbow)
+                    if (App.m_C234Form.isElbow)
                     {
                         if (CheckPipeIsEnd(pipe, lstInstance, instance, sprinkle_point))
                         {
@@ -663,7 +663,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             reducer = Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
                         }
                     }
-                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_SprinkerUpForm.isElbow
+                    if ((double)Common.GetValueParameterByBuilt(pipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && !App.m_C234Form.isElbow
                             && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                     {
                         var resultPipe = curve.Project(sprinkle_pointClone);

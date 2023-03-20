@@ -28,7 +28,7 @@ namespace TotalMEPProject.Commands.FireFighting
             Global.AppCreation = commandData.Application.Application.Create;
 
             //Show form
-            if (App.ShowSprinklerDownForm() == false)
+            if (App.ShowC234Form() == false)
                 return Result.Cancelled;
 
             return Result.Succeeded;
@@ -40,9 +40,9 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                if (App.m_SprinklerDownForm != null && App.m_SprinklerDownForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinklerDownForm.Hide();
+                    App.m_C234Form.Hide();
                 }
 
                 List<FamilyInstance> sprinklers = sr.SelectSprinklers();
@@ -57,9 +57,9 @@ namespace TotalMEPProject.Commands.FireFighting
                                where p.Id != ElementId.InvalidElementId
                                select p.Id).ToList();
 
-                var height = App.m_SprinklerDownForm.Height_;
+                var height = App.m_C234Form.Height_;
 
-                double radius = 500/*400*/; //mm : sua thanh 500 theo yeu cau cua a Cuong
+                double radius = App.m_C234Form.MainPipeSprinklerDistance/*400*/; //mm : sua thanh 500 theo yeu cau cua a Cuong
                 var ft = Common.mmToFT * radius;
 
                 // Status cancel export : default = false
@@ -284,7 +284,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             //Set d = 25
                             Line tempLine = (pipe1.Location as LocationCurve).Curve as Line;
 
-                            var dFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
+                            var dFt = Common.mmToFT * App.m_C234Form.PipeSizeC3;
 
                             var ft_h = Common.mmToFT * height;
 
@@ -356,7 +356,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var c1 = Common.GetConnectorClosestTo(pipe1, p);
                                 var c3 = Common.GetConnectorClosestTo(pipe_v1, p);
 
-                                if (App.m_SprinklerDownForm.isTeeTap)
+                                if (App.m_C234Form.isTeeTap)
                                 {
                                     if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee && split)
                                     {
@@ -486,11 +486,11 @@ namespace TotalMEPProject.Commands.FireFighting
             { }
             finally
             {
-                if (App.m_SprinklerDownForm != null && App.m_SprinklerDownForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinklerDownForm.Show(App.hWndRevit);
+                    App.m_C234Form.Show(App.hWndRevit);
                 }
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_C234Form.Handle));
             }
 
             return Result.Succeeded;
@@ -624,7 +624,7 @@ namespace TotalMEPProject.Commands.FireFighting
             var p1 = curve.GetEndPoint(1);
 
             //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
-            double kc_mm = 400 /*1000*/;
+            double kc_mm = App.m_C234Form.EndPointSprinklerDistance /*1000*/;
             double km_ft = Common.mmToFT * kc_mm;
 
             var p02d = new XYZ(p0.X, p0.Y, 0);
@@ -638,7 +638,7 @@ namespace TotalMEPProject.Commands.FireFighting
             int far = -1;
             if (d1 < km_ft)
             {
-                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_SprinklerDownForm.isTeeTap)
+                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_C234Form.isTeeTap)
                 {
                     isDauOng = true;
                     far = 1;
@@ -646,7 +646,7 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             else if (d2 < km_ft)
             {
-                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_SprinklerDownForm.isTeeTap)
+                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn) && !App.m_C234Form.isTeeTap)
                 {
                     isDauOng = true;
                     far = 0;
@@ -870,9 +870,9 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                if (App.m_SprinklerDownForm != null && App.m_SprinklerDownForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinklerDownForm.Hide();
+                    App.m_C234Form.Hide();
                 }
 
                 // Get selected sprinkler
@@ -892,7 +892,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 try
                 {
-                    double invalidRadius_mm = 500;
+                    double invalidRadius_mm = App.m_C234Form.MainPipeSprinklerDistance;
                     double invalidRadius_ft = Common.mmToFT * invalidRadius_mm;
 
                     // Status cancel export : default = false
@@ -988,7 +988,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             XYZ pointProject = resultPipe.XYZPoint;
                             XYZ pointProject2d = Common.ToPoint2D(pointProject);
 
-                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_SprinklerDownForm.isTeeTap
+                            if ((double)Common.GetValueParameterByBuilt(processPipe, BuiltInParameter.RBS_PIPE_SLOPE) == 0 && App.m_C234Form.isTeeTap
                                  && !Common.IsParallel((curve as Line).Direction, XYZ.BasisX) && !Common.IsParallel((curve as Line).Direction, XYZ.BasisY))
                                 pointProject2d = new XYZ(pointProject2d.X + 0.001, pointProject2d.Y, pointProject2d.Z);
                             var distancePoint2d = pointProject2d.DistanceTo(sprinker2d);
@@ -1130,7 +1130,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             }
 
                             //Set pipe size
-                            var dPipeSizeFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
+                            var dPipeSizeFt = Common.mmToFT * App.m_C234Form.PipeSizeC3;
 
                             // Generate Pipe Horizontal
                             var v_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).Normalize();
@@ -1157,7 +1157,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPnt);
                                 var c3 = Common.GetConnectorClosestTo(horizontal_pipe, finalIntPnt);
 
-                                if (App.m_SprinklerDownForm.isTeeTap)
+                                if (App.m_C234Form.isTeeTap)
                                 {
                                     if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                                     {
@@ -1276,265 +1276,15 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             finally
             {
-                if (App.m_SprinklerDownForm != null && App.m_SprinklerDownForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinklerDownForm.Show(App.hWndRevit);
+                    App.m_C234Form.Show(App.hWndRevit);
                 }
 
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_C234Form.Handle));
             }
 
             return Result.Succeeded;
-        }
-
-        public static bool cc(FamilyInstance instance, List<ElementId> selectedIds, ElementId pipeTypeId, double pipeSize, bool isUp)
-        {
-            try
-            {
-                bool result = false;
-
-                XYZ direction = isUp ? -XYZ.BasisZ : XYZ.BasisZ;
-
-                ////Set d = 25
-                //double d25 = 25;
-                var dFt = Common.mmToFT * pipeSize;
-
-                var sprinkle_point = (instance.Location as LocationPoint).Point;
-
-                XYZ newPlace = new XYZ(0, 0, 0);
-                ICollection<ElementId> elemIds = null;
-
-                double radius = 100; //mm
-                var ft = Common.mmToFT * radius;
-
-                var solid = Common.CreateCylindricalVolume(sprinkle_point, ft * 5, ft, !isUp);
-                if (solid == null)
-                    return result;
-
-                //Find intersection
-                FilteredElementCollector collector = new FilteredElementCollector(Global.UIDoc.Document, selectedIds);
-                collector.OfClass(typeof(Pipe));
-                collector.WherePasses(new ElementIntersectsSolidFilter(solid));
-
-                var pipes = collector.ToList();
-                foreach (Pipe pipe in pipes)
-                {
-                    var curve = (pipe.Location as LocationCurve).Curve;
-
-                    //Create plane
-                    var p0 = curve.GetEndPoint(0);
-                    var p1 = curve.GetEndPoint(1);
-
-                    //var plane = Plane.CreateByThreePoints(p0, p1, new XYZ(p1.X, p1.Y, p1.Z + 1));
-
-                    //var sprinkle_point_1 = plane.ProjectOnto(sprinkle_point);
-                    //if (sprinkle_point_1 == null)
-                    //{
-                    //    sprinkle_point_1 = sprinkle_point;//Chung to sprinkle_point nam giua pipe
-                    //}
-
-                    var proj = curve.Project(sprinkle_point);
-                    var sprinkle_point_1 = proj.XYZPoint;
-
-                    var lineZ = Line.CreateBound(sprinkle_point_1, new XYZ(sprinkle_point_1.X, sprinkle_point_1.Y, sprinkle_point_1.Z + 1000 * (isUp ? -1 : 1)));
-
-                    XYZ pOn = null;
-                    IntersectionResultArray array = new IntersectionResultArray();
-                    var inter = lineZ.Intersect(curve, out array);
-                    if (inter != SetComparisonResult.Overlap)
-                    {
-                        continue;
-                    }
-                    else
-                        pOn = array.get_Item(0).XYZPoint;
-
-                    //Move sprinkler ////////////////////////////////////////////////////////////////////////
-                    sprinkle_point = new XYZ(pOn.X, pOn.Y, sprinkle_point.Z);
-                    (instance.Location as LocationPoint).Point = sprinkle_point;
-                    //////////////////////////////////////////////////////////////////////////
-
-                    //Calculate point on curve
-
-                    Pipe pipe1 = pipe;
-                    Pipe pipe2 = null;
-                    bool flagCreateTee = true;
-                    bool flagDauOng_CaseTap = false;
-                    if (GetPreferredJunctionType(pipe) != PreferredJunctionType.Tee)
-                    {
-                        flagCreateTee = false;
-                    }
-
-                    ProcessStartSidePipe(pipe, out pipe2, pOn, flagCreateTee, out flagDauOng_CaseTap);
-                    if (pipe2 != null)
-                    {
-                        selectedIds.Add(pipe2.Id);
-                    }
-
-                    //Create pipe Z
-                    newPlace = new XYZ(0, 0, 0);
-                    elemIds = ElementTransformUtils.CopyElement(
-                      Global.UIDoc.Document, pipe.Id, newPlace);
-
-                    var newPipeZ = Global.UIDoc.Document.GetElement(elemIds.ToList()[0]) as Pipe;
-
-                    var lineTemp = Line.CreateBound(pOn, sprinkle_point);
-                    var pcenter = lineTemp.Evaluate((lineTemp.GetEndParameter(0) + lineTemp.GetEndParameter(1)) / 2, false);
-
-                    (newPipeZ.Location as LocationCurve).Curve = Line.CreateBound(pOn, pcenter);
-
-                    newPipeZ.LookupParameter("Diameter").Set(dFt);
-
-                    Global.UIDoc.Document.Regenerate();
-
-                    try
-                    {
-                        var c1 = Common.GetConnectorClosestTo(pipe1, pOn);
-                        var c3 = Common.GetConnectorClosestTo(newPipeZ, pOn);
-
-                        if (GetPreferredJunctionType(pipe1) != PreferredJunctionType.Tee)
-                        {
-                            if (App.m_SprinklerDownForm.isTeeTap)
-                                CreateTap(pipe1 as MEPCurve, newPipeZ as MEPCurve);
-                            else
-                            {
-                                if (CheckPipeIsEnd(pipe1, newPipeZ.GetCurve().GetEndPoint(0)))
-                                    CreateTap(pipe1 as MEPCurve, newPipeZ as MEPCurve);
-                                else
-                                    Global.UIDoc.Document.Create.NewElbowFitting(c1, c3);
-                            }
-                        }
-                        else
-                        {
-                            Connector c2 = Common.GetConnectorClosestTo(pipe2, pOn);
-
-                            try
-                            {
-                                Global.UIDoc.Document.Create.NewTeeFitting(c1, c2, c3);
-
-                                result = true;
-                            }
-                            catch (System.Exception ex)
-                            {
-                            }
-
-                            //Add them Pipe sau khi cat
-                            selectedIds.Add(pipe2.Id);
-                        }
-                    }
-                    catch (System.Exception ex)
-                    {
-                    }
-
-                    try
-                    {
-                        Connector c4 = Common.GetConnectorClosestTo(instance, pcenter);
-                        Connector c5 = Common.GetConnectorClosestTo(newPipeZ, sprinkle_point);
-
-                        Global.UIDoc.Document.Create.NewTransitionFitting(c5, c4);
-
-                        result = true;
-                    }
-                    catch (System.Exception ex)
-                    {
-                    }
-                }
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public static void ProcessStartSidePipe(Pipe pipe, out Pipe pipe2, XYZ pOn, bool flagSplit, out bool isDauOngChinh)
-        {
-            isDauOngChinh = false;
-            var curve = (pipe.Location as LocationCurve).Curve;
-
-            //Create plane
-            var p0 = curve.GetEndPoint(0);
-            var p1 = curve.GetEndPoint(1);
-
-            //Check co phai dau cuu hoa o gan dau cua ong ko : check trong pham vi 1m - 400mm
-            double kc_mm = 400 /*1000*/;
-
-            if ((double)GetParameterValueByName(pipe, "Diameter") / Common.mmToFT >= 90)
-                kc_mm = 1100;
-            else if ((double)GetParameterValueByName(pipe, "Diameter") / Common.mmToFT >= 50)
-                kc_mm = 600;
-
-            double km_ft = Common.mmToFT * kc_mm;
-
-            var p02d = new XYZ(p0.X, p0.Y, 0);
-            var p12d = new XYZ(p1.X, p1.Y, 0);
-            var pOn2d = new XYZ(pOn.X, pOn.Y, 0);
-
-            var d1 = p02d.DistanceTo(pOn2d);
-            var d2 = p12d.DistanceTo(pOn2d);
-
-            bool isDauOng = false;
-            int far = -1;
-            if (d1 < km_ft)
-            {
-                if (IsIntersect(p0) == false && !CheckPipeIsEnd(pipe, pOn))
-                {
-                    isDauOng = true;
-                    far = 1;
-                }
-            }
-            else if (d2 < km_ft)
-            {
-                if (IsIntersect(p1) == false && !CheckPipeIsEnd(pipe, pOn))
-                {
-                    isDauOng = true;
-                    far = 0;
-                }
-            }
-
-            Pipe pipe1 = pipe;
-            pipe2 = null;
-
-            if (flagSplit == true)
-            {
-                if (isDauOng == false)
-                {
-                    SplitPipe(pipe, pOn, out pipe1, out pipe2);
-                }
-                else if (far != -1)
-                {
-                    if (far == 1)
-                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(pOn, p1);
-                    else
-                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, pOn);
-                }
-            }
-            else
-            {
-                if (isDauOng == false)
-                { }
-                else if (far != -1)
-                {
-                    isDauOngChinh = true;
-                    if (far == 1)
-                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(pOn, p1);
-                    else
-                        (pipe1.Location as LocationCurve).Curve = Line.CreateBound(p0, pOn);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Get builtin parameter value based on its storage type
-        /// </summary>
-        public static dynamic GetBuiltInParameterValue(Element elem, BuiltInParameter paramId)
-        {
-            if (elem != null)
-            {
-                Parameter parameter = elem.get_Parameter(paramId);
-                return GetParameterValue(parameter);
-            }
-            return null;
         }
 
         /// <summary>
@@ -1646,9 +1396,9 @@ namespace TotalMEPProject.Commands.FireFighting
         {
             try
             {
-                if (App.m_SprinklerDownForm != null && App.m_SprinklerDownForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinklerDownForm.Hide();
+                    App.m_C234Form.Hide();
                 }
 
                 // Get selected sprinkler
@@ -1668,7 +1418,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                 try
                 {
-                    double invalidRadius_mm = 700;
+                    double invalidRadius_mm = App.m_C234Form.MainPipeSprinklerDistance;
                     double invalidRadius_ft = Common.mmToFT * invalidRadius_mm;
 
                     // Status cancel export : default = false
@@ -1871,7 +1621,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 }
 
                                 //Set pipe size
-                                var dPipeSizeFt = Common.mmToFT * App.m_SprinklerDownForm.PipeSize;
+                                var dPipeSizeFt = Common.mmToFT * App.m_C234Form.PipeSizeC3;
 
                                 // Generate Pipe Horizontal
                                 var v_v = (new XYZ(locSprinkler.X, locSprinkler.Y, 0) - new XYZ(finalIntPnt.X, finalIntPnt.Y, 0)).Normalize();
@@ -1894,7 +1644,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                     var c1 = Common.GetConnectorClosestTo(temp_processPipe_1, finalIntPnt);
                                     var c3 = Common.GetConnectorClosestTo(horizontal_pipe, finalIntPnt);
 
-                                    if (App.m_SprinklerDownForm.isTeeTap)
+                                    if (App.m_C234Form.isTeeTap)
                                     {
                                         if (GetPreferredJunctionType(temp_processPipe_1) != PreferredJunctionType.Tee && isSplit == true)
                                         {
@@ -2039,11 +1789,11 @@ namespace TotalMEPProject.Commands.FireFighting
             }
             finally
             {
-                if (App.m_SprinklerDownForm != null && App.m_SprinklerDownForm.IsDisposed == false)
+                if (App.m_C234Form != null && App.m_C234Form.IsDisposed == false)
                 {
-                    App.m_SprinklerDownForm.Show(App.hWndRevit);
+                    App.m_C234Form.Show(App.hWndRevit);
                 }
-                DisplayService.SetFocus(new HandleRef(null, App.m_SprinklerDownForm.Handle));
+                DisplayService.SetFocus(new HandleRef(null, App.m_C234Form.Handle));
             }
 
             return Result.Succeeded;

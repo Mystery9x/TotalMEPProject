@@ -23,6 +23,7 @@
         public const string CmdSplitDuctClassName = "TotalMEPProject.Commands.Duct.CmdSplitDuct";
         public const string CmdTapFlipClassName = "TotalMEPProject.Commands.Duct.CmdTapFlip";
         public const string Cmd2LevelSmartClassName = "TotalMEPProject.Commands.FireFighting.Cmd2LevelSmart";
+        public const string CmdC234 = "TotalMEPProject.Commands.FireFighting.CmdC234";
         public const string CmdFlexSprinklerClassName = "TotalMEPProject.Commands.FireFighting.CmdFlexSprinkler";
         public const string CmdSprinklerDownrightClassName = "TotalMEPProject.Commands.FireFighting.CmdSprinklerDownright";
         public const string CmdSprinklerUprightClassName = "TotalMEPProject.Commands.FireFighting.CmdSprinklerUpright";

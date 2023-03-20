@@ -177,6 +177,34 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         #endregion Variable & Properties C4
 
+        public double MainPipeSprinklerDistance
+        {
+            get
+            {
+                double dHeight = 0;
+
+                if (double.TryParse(txbMainPipeDistance.Text.Trim(), out dHeight) == true)
+                {
+                    return dHeight;
+                }
+                return double.MinValue;
+            }
+        }
+
+        public double EndPointSprinklerDistance
+        {
+            get
+            {
+                double dHeight = 0;
+
+                if (double.TryParse(txbEndPointDistance.Text.Trim(), out dHeight) == true)
+                {
+                    return dHeight;
+                }
+                return double.MinValue;
+            }
+        }
+
         public C234Form(ExternalEvent exEvent, Request.RequestHandler handler)
         {
             InitializeComponent();
@@ -575,6 +603,9 @@ namespace TotalMEPProject.UI.FireFightingUI
             chkC2ConnectTee.Checked = false;
             chkC2Nipple.Enabled = false;
             cboC2Nipple.Enabled = false;
+            AppUtils.ff(cboC2PipeType);
+            AppUtils.ff(cboC2PypeSize);
+            AppUtils.ff(cboC2Nipple);
 
             //C3
             rdnC3TeeTap.Checked = true;
@@ -613,6 +644,46 @@ namespace TotalMEPProject.UI.FireFightingUI
             AppUtils.sa(cboC4PipeType);
             AppUtils.sa(cboC4PipeSize);
             this.Close();
+        }
+
+        private void txbMainPipeDistance_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            NumberCheck(sender, e);
+        }
+
+        public static void NumberCheck(object sender, KeyPressEventArgs e, bool allowNegativeValue = false) // < 0
+        {
+            if (allowNegativeValue == false)
+            {
+                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+                {
+                    e.Handled = true;
+                }
+
+                // only allow one decimal point
+                if ((e.KeyChar == '.') && ((sender as System.Windows.Forms.TextBox).Text.IndexOf('.') > -1))
+                {
+                    e.Handled = true;
+                }
+            }
+            else
+            {
+                if (!char.IsControl(e.KeyChar) && (!char.IsDigit(e.KeyChar)) && (e.KeyChar != '.') && (e.KeyChar != '-'))
+                    e.Handled = true;
+
+                // only allow one decimal point
+                if (e.KeyChar == '.' && (sender as System.Windows.Forms.TextBox).Text.IndexOf('.') > -1)
+                    e.Handled = true;
+
+                // only allow minus sign at the beginning
+                if (e.KeyChar == '-' && (sender as System.Windows.Forms.TextBox).Text.IndexOf('-') > -1)
+                    e.Handled = true;
+            }
+        }
+
+        private void txbEndPointDistance_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            NumberCheck(sender, e);
         }
     }
 }
