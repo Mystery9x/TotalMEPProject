@@ -318,7 +318,7 @@ namespace TotalMEPProject.Commands.FireFighting
 
                             pipe_v1.LookupParameter("Diameter").Set(dFt);
 
-                            var pipeType = Global.UIDoc.Document.GetElement(App.m_C234Form.FamilyType) as PipeType;
+                            var pipeType = Global.UIDoc.Document.GetElement(App.m_C234Form.FamilyTypeC4) as PipeType;
                             if (pipeType != null)
                                 pipe_v1.PipeType = pipeType;
 
@@ -796,7 +796,7 @@ namespace TotalMEPProject.Commands.FireFighting
                             (pipe_v1.Location as LocationCurve).Curve = line_v1;
 
                             pipe_v1.LookupParameter("Diameter").Set(dFt);
-                            var pipeType = Global.UIDoc.Document.GetElement(App.m_C234Form.FamilyType) as PipeType;
+                            var pipeType = Global.UIDoc.Document.GetElement(App.m_C234Form.FamilyTypeC4) as PipeType;
                             if (pipeType != null)
                                 pipe_v1.PipeType = pipeType;
                             //Connect

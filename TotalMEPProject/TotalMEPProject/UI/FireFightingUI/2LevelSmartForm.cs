@@ -163,7 +163,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             if (rBC1SameElevation.Checked == true)
             {
                 rBC1TeeOrTap.Text = "One Side";
-                rBC1ElbowConnect.Text = "Both Size";
+                rBC1ElbowConnect.Text = "Both Side";
                 cboC1FamilyType.Enabled = false;
                 cboC1PipeSize.Enabled = false;
                 ckbC1ElbowConnection.Enabled = false;

@@ -33,6 +33,14 @@ namespace TotalMEPProject.UI.FireFightingUI
 
         public FamilySymbol fmlNipple = null;
 
+        public ElementId FamilyTypeC2
+        {
+            get
+            {
+                return (cboC2PipeType.SelectedItem as ObjectItem).ObjectId;
+            }
+        }
+
         public double PipeSizeC2
         {
             get
@@ -109,7 +117,7 @@ namespace TotalMEPProject.UI.FireFightingUI
             get => rbC4Type3.Checked;
         }
 
-        public ElementId FamilyType
+        public ElementId FamilyTypeC4
         {
             get
             {

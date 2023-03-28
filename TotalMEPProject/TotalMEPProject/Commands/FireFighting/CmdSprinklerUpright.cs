@@ -85,7 +85,7 @@ namespace TotalMEPProject.Commands.FireFighting
                         tran.Start();
                         try
                         {
-                            sr.cc(tran, sprinklers, instance, pipeIds, App.m_C234Form.isConnectNipple, App.m_C234Form.isConnectTee, App.m_C234Form.fmlNipple, App.m_C234Form.PipeSizeC2, App.m_C234Form.FamilyType, true);
+                            sr.cc(tran, sprinklers, instance, pipeIds, App.m_C234Form.isConnectNipple, App.m_C234Form.isConnectTee, App.m_C234Form.fmlNipple, App.m_C234Form.PipeSizeC2, App.m_C234Form.FamilyTypeC2, true);
 
                             tran.Commit();
                         }
