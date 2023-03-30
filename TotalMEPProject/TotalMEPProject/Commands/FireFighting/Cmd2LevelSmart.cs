@@ -724,6 +724,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     //Tao mot ong mồi
                                     pipe_moi_1 = Common.Clone(verticalPipe) as Pipe;
+                                    Common.DisconnectFrom(pipe_moi_1);
                                     pipe_moi_1.LookupParameter("Diameter").Set(diamterPipe);
 
                                     var line = Line.CreateBound(p0_sub1, p1_sub1);
@@ -759,6 +760,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     //Tao mot ong mồi
                                     pipe_moi_2 = Common.Clone(verticalPipe) as Pipe;
+                                    Common.DisconnectFrom(pipe_moi_2);
                                     pipe_moi_2.LookupParameter("Diameter").Set(diamterPipe);
 
                                     var line = Line.CreateBound(p0_sub2, p1_sub2);
@@ -1002,7 +1004,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     //Tao mot ong mồi
                                     pipe_moi_1 = Common.Clone(vertical) as Pipe;
-
+                                    Common.DisconnectFrom(pipe_moi_1);
                                     var line = Line.CreateBound(p0_sub1, p1_sub1);
 
                                     var p1 = p0_sub1;// line.Evaluate(dtemp, false);
@@ -1036,7 +1038,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                 {
                                     //Tao mot ong mồi
                                     pipe_moi_2 = Common.Clone(vertical) as Pipe;
-
+                                    Common.DisconnectFrom(pipe_moi_2);
                                     var line = Line.CreateBound(p0_sub2, p1_sub2);
 
                                     var p1 = p0_sub2;// line.Evaluate(dtemp, false);

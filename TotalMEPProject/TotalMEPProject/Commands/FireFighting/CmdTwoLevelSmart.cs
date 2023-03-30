@@ -150,7 +150,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     if (inforPipe1.SourcePipe.Id == inforPipe2.SourcePipe.Id)
                         continue;
 
-                    var curve_sub2 = inforPipe2.CurveSourcePipe_Extend_Round;
+                    var curve_sub2 = inforPipe2.CurveSourcePipe_Extend;
                     IntersectionResultArray arr = new IntersectionResultArray();
                     var result = curve_sub2.Intersect(expand, out arr);
 
@@ -713,7 +713,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                             {
                                                 //Tao mot ong mồi
                                                 pipe_moi_1 = Common.Clone(vertical) as Pipe;
-
+                                                Common.DisconnectFrom(pipe_moi_1);
                                                 var line = Line.CreateBound(p0_sub1, p1_sub1);
 
                                                 var p1 = p0_sub1;// line.Evaluate(dtemp, false);
@@ -746,6 +746,7 @@ namespace TotalMEPProject.Commands.FireFighting
                                             {
                                                 //Tao mot ong mồi
                                                 pipe_moi_2 = Common.Clone(vertical) as Pipe;
+                                                Common.DisconnectFrom(pipe_moi_2);
                                                 var line = Line.CreateBound(p0_sub2, p1_sub2);
 
                                                 var p1 = p0_sub2;// line.Evaluate(dtemp, false);
@@ -1311,7 +1312,7 @@ namespace TotalMEPProject.Commands.FireFighting
                     {
                         //Tao mot ong mồi
                         pipe_moi_1 = Common.Clone(verticalPipe) as Pipe;
-
+                        Common.DisconnectFrom(pipe_moi_1);
                         var line = Line.CreateBound(p0_sub1, p1_sub1);
 
                         var p1 = p0_sub1;// line.Evaluate(dtemp, false);
@@ -1341,11 +1342,11 @@ namespace TotalMEPProject.Commands.FireFighting
                     Connector c4 = null;
                     Pipe pipe_moi_2 = null;
 
-                    if (CompareDouble(diamterPipe, pipe_1.Diameter) == false)
+                    if (CompareDouble(diamterPipe, pipe_2.Diameter) == false)
                     {
                         //Tao mot ong mồi
                         pipe_moi_2 = Common.Clone(verticalPipe) as Pipe;
-
+                        Common.DisconnectFrom(pipe_moi_2);
                         var line = Line.CreateBound(p0_sub2, p1_sub2);
 
                         var p1 = p0_sub2;// line.Evaluate(dtemp, false);
@@ -2314,8 +2315,8 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0) + (SourcePipe_Cont_1.Origin - SourcePipe_Cont_2.Origin).Normalize() * 1000 * Common.mmToFT;
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1);
 
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), TruncateDouble(newStartPoint.Z));
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), TruncateDouble(newEndPoint.Z));
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), Math.Round(newStartPoint.Z, 2));
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), Math.Round(newEndPoint.Z, 2));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && !SourcePipe_Cont_2.IsConnected)
@@ -2323,8 +2324,8 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0);
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1) + (SourcePipe_Cont_2.Origin - SourcePipe_Cont_1.Origin).Normalize() * 1000 * Common.mmToFT;
 
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), TruncateDouble(newEndPoint.Z));
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), TruncateDouble(newStartPoint.Z));
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), Math.Round(newEndPoint.Z, 2));
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), Math.Round(newStartPoint.Z, 2));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && SourcePipe_Cont_2.IsConnected)

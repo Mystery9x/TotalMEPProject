@@ -660,6 +660,37 @@ namespace TotalMEPProject.Ultis
             return clone;
         }
 
+        public static void DisconnectFrom(Pipe pipe)
+        {
+            if (pipe != null)
+            {
+                Connector con1 = pipe.ConnectorManager.Lookup(0);
+                Connector con2 = pipe.ConnectorManager.Lookup(1);
+
+                if (con1 != null && con1.IsConnected)
+                {
+                    foreach (Connector item in con1.AllRefs)
+                    {
+                        if (item != null && item.IsConnectedTo(con1))
+                        {
+                            con1.DisconnectFrom(item);
+                        }
+                    }
+                }
+
+                if (con2 != null && con2.IsConnected)
+                {
+                    foreach (Connector item in con2.AllRefs)
+                    {
+                        if (item != null && item.IsConnectedTo(con2))
+                        {
+                            con2.DisconnectFrom(item);
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Lấy connector có cao độ cao hơn
         /// </summary>
