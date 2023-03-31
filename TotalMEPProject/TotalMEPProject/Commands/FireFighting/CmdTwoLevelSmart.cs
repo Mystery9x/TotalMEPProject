@@ -143,7 +143,7 @@ namespace TotalMEPProject.Commands.FireFighting
             {
                 var curve_sub = inforPipe1.CurveSourcePipe;
 
-                var expand = inforPipe1.CurveSourcePipe_Extend_Round;
+                var expand = inforPipe1.CurveSourcePipe_Extend;
 
                 foreach (InforPie inforPipe2 in inforPipes)
                 {
@@ -2324,8 +2324,8 @@ namespace TotalMEPProject.Commands.FireFighting
                         XYZ newStartPoint = CurveSourcePipe.GetEndPoint(0);
                         XYZ newEndPoint = CurveSourcePipe.GetEndPoint(1) + (SourcePipe_Cont_2.Origin - SourcePipe_Cont_1.Origin).Normalize() * 1000 * Common.mmToFT;
 
-                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), Math.Round(newEndPoint.Z, 2));
-                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), Math.Round(newStartPoint.Z, 2));
+                        newEndPoint = new XYZ(Math.Round(newEndPoint.X, 2), Math.Round(newEndPoint.Y, 2), Math.Round(newStartPoint.Z, 2));
+                        newStartPoint = new XYZ(Math.Round(newStartPoint.X, 2), Math.Round(newStartPoint.Y, 2), Math.Round(newEndPoint.Z, 2));
                         return Line.CreateBound(newStartPoint, newEndPoint);
                     }
                     else if (SourcePipe_Cont_1.IsConnected && SourcePipe_Cont_2.IsConnected)
