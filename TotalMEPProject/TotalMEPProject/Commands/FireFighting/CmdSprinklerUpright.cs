@@ -351,7 +351,7 @@ namespace TotalMEPProject.Commands.FireFighting
                 pipes = pipes.Where(item => selectedIds.Contains(item.Id)).ToList();
             }
 
-            double radius = App.m_C234Form.MainPipeSprinklerDistance; //mm
+            double radius = 100; ; //mm
             var ft = Common.mmToFT * radius;
 
             var solid = Common.CreateCylindricalVolume(sprinkle_point, ft * 5, ft, !isUp);
