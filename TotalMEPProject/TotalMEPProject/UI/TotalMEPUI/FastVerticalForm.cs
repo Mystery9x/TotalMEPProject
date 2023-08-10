@@ -303,5 +303,19 @@ namespace TotalMEPProject.UI
 
             this.Close();
         }
+
+        private void btnPreview_Click(object sender, EventArgs e)
+        {
+            if (btnPreview.Text == "Preview >>")
+            {
+                this.Size = this.MaximumSize;
+                btnPreview.Text = "Preview <<";
+            }
+            else if (btnPreview.Text == "Preview <<")
+            {
+                this.Size = this.MinimumSize;
+                btnPreview.Text = "Preview >>";
+            }
+        }
     }
 }

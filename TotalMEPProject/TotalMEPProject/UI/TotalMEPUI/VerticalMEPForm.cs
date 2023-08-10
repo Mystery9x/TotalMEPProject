@@ -191,10 +191,12 @@ namespace TotalMEPProject.UI
             InitializeComponent();
             m_handler = handler;
             m_exEvent = exEvent;
-            groupBoxDiameter = new List<Control>() { lblDiameter, cboDiameter };
-            groupBoxSystemType = new List<Control>() { lblSystemType, cboSystemType };
-            groupBoxWidht_Height = new List<Control>() { lblWidth, cboWidth, lblHeight, cboHeight };
-            groupBoxServiceType = new List<Control>() { lblServiceType, txtServiceType };
+            groupBoxDiameter = new List<Control>() { cboDiameter };
+            groupBoxSystemType = new List<Control>() { cboSystemType };
+            groupBoxWidht_Height = new List<Control>() { cboWidth, lblHeight, cboHeight };
+            groupBoxServiceType = new List<Control>() { txtServiceType };
+            lblWidth.Visible = true;
+            lblServiceType.Visible = true;
         }
 
         #endregion Constructor
@@ -403,6 +405,26 @@ namespace TotalMEPProject.UI
             {
                 var control = list[i];
                 control.Visible = showHide;
+                if (showHide && control.Name == "cboDiameter")
+                {
+                    lblWidth.Text = "Diameter";
+                    lblWidth.Visible = true;
+                }
+                else if (!showHide && control.Name == "cboDiameter")
+                {
+                    lblWidth.Visible = true;
+                    lblWidth.Text = "Width";
+                }
+                else if (showHide && control.Name == "lblServiceType")
+                {
+                    lblServiceType.Visible = true;
+                    lblServiceType.Text = "System Type";
+                }
+                else if (!showHide && control.Name == "lblServiceType")
+                {
+                    lblServiceType.Visible = true;
+                    lblServiceType.Text = "Service Type";
+                }
             }
         }
 
