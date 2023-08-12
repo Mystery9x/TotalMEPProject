@@ -99,12 +99,12 @@ namespace TotalMEPProject
             string errMess = string.Empty;
             bool isValidLicense = LicenseUtils.CheckLicense(isHasInternet, ref errMess);
 
-            if (!isValidLicense)
-            {
-                DisableItemRibbonHanger(app);
-                if (errMess != "")
-                    IO.ShowError(errMess, "TotalMEP");
-            }
+            //if (!isValidLicense)
+            //{
+            //    DisableItemRibbonHanger(app);
+            //    if (errMess != "")
+            //        IO.ShowError(errMess, "TotalMEP");
+            //}
         }
 
         public static void DisableItemRibbonHanger(UIControlledApplication app)
@@ -173,10 +173,10 @@ namespace TotalMEPProject
             AddImages(HolyUpdownData, iconFolder, "Holy Updown-02.png", "Holy Updown-02.png");
             totalMEPPanel.AddItem(HolyUpdownData);
 
-            //Create button
-            PushButtonData MEPConnectionData = new PushButtonData("btnMEPConnection", "MEP\nConnection", assemblyPath, Define.CmdMEPConnectionClassName);
-            AddImages(MEPConnectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
-            totalMEPPanel.AddItem(MEPConnectionData);
+            ////Create button
+            //PushButtonData MEPConnectionData = new PushButtonData("btnMEPConnection", "MEP\nConnection", assemblyPath, Define.CmdMEPConnectionClassName);
+            //AddImages(MEPConnectionData, iconFolder, "Vertical Connection-01.png", "Vertical Connection-01.png");
+            //totalMEPPanel.AddItem(MEPConnectionData);
         }
 
         /// <summary>

@@ -81,16 +81,16 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(211, 47);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(74, 13);
+            this.label5.Size = new System.Drawing.Size(79, 13);
             this.label5.TabIndex = 16;
             this.label5.Text = "Offset Bottom";
             // 
             // txtOffsetBottom
             // 
             this.txtOffsetBottom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtOffsetBottom.Location = new System.Drawing.Point(291, 44);
+            this.txtOffsetBottom.Location = new System.Drawing.Point(296, 44);
             this.txtOffsetBottom.Name = "txtOffsetBottom";
-            this.txtOffsetBottom.Size = new System.Drawing.Size(123, 20);
+            this.txtOffsetBottom.Size = new System.Drawing.Size(118, 20);
             this.txtOffsetBottom.TabIndex = 17;
             this.txtOffsetBottom.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtOffsetBottom_KeyPress);
             // 
@@ -100,7 +100,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(3, 47);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(74, 13);
+            this.label6.Size = new System.Drawing.Size(79, 13);
             this.label6.TabIndex = 14;
             this.label6.Text = "Level Bottom";
             // 
@@ -109,9 +109,9 @@
             this.cboLevelBottom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.cboLevelBottom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboLevelBottom.FormattingEnabled = true;
-            this.cboLevelBottom.Location = new System.Drawing.Point(83, 43);
+            this.cboLevelBottom.Location = new System.Drawing.Point(88, 43);
             this.cboLevelBottom.Name = "cboLevelBottom";
-            this.cboLevelBottom.Size = new System.Drawing.Size(122, 21);
+            this.cboLevelBottom.Size = new System.Drawing.Size(117, 21);
             this.cboLevelBottom.TabIndex = 15;
             // 
             // label3
@@ -120,16 +120,16 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(211, 11);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(74, 13);
+            this.label3.Size = new System.Drawing.Size(79, 13);
             this.label3.TabIndex = 16;
             this.label3.Text = "Offset Top";
             // 
             // txtOffsetTop
             // 
             this.txtOffsetTop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtOffsetTop.Location = new System.Drawing.Point(291, 8);
+            this.txtOffsetTop.Location = new System.Drawing.Point(296, 8);
             this.txtOffsetTop.Name = "txtOffsetTop";
-            this.txtOffsetTop.Size = new System.Drawing.Size(123, 20);
+            this.txtOffsetTop.Size = new System.Drawing.Size(118, 20);
             this.txtOffsetTop.TabIndex = 17;
             this.txtOffsetTop.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtOffsetTop_KeyPress);
             // 
@@ -139,7 +139,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(3, 11);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(74, 13);
+            this.label4.Size = new System.Drawing.Size(79, 13);
             this.label4.TabIndex = 14;
             this.label4.Text = "Level Top";
             // 
@@ -148,9 +148,9 @@
             this.cboLevelTop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.cboLevelTop.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboLevelTop.FormattingEnabled = true;
-            this.cboLevelTop.Location = new System.Drawing.Point(83, 7);
+            this.cboLevelTop.Location = new System.Drawing.Point(88, 7);
             this.cboLevelTop.Name = "cboLevelTop";
-            this.cboLevelTop.Size = new System.Drawing.Size(122, 21);
+            this.cboLevelTop.Size = new System.Drawing.Size(117, 21);
             this.cboLevelTop.TabIndex = 15;
             // 
             // tableLayoutPanel3
@@ -203,7 +203,7 @@
             this.panel10.Location = new System.Drawing.Point(208, 0);
             this.panel10.Margin = new System.Windows.Forms.Padding(0);
             this.panel10.Name = "panel10";
-            this.panel10.Size = new System.Drawing.Size(80, 33);
+            this.panel10.Size = new System.Drawing.Size(85, 33);
             this.panel10.TabIndex = 4;
             // 
             // lblServiceType
@@ -223,10 +223,10 @@
             this.panel9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.panel9.Controls.Add(this.cboSystemType);
             this.panel9.Controls.Add(this.txtServiceType);
-            this.panel9.Location = new System.Drawing.Point(288, 1);
+            this.panel9.Location = new System.Drawing.Point(293, 1);
             this.panel9.Margin = new System.Windows.Forms.Padding(0);
             this.panel9.Name = "panel9";
-            this.panel9.Size = new System.Drawing.Size(129, 30);
+            this.panel9.Size = new System.Drawing.Size(124, 30);
             this.panel9.TabIndex = 3;
             // 
             // cboSystemType
@@ -236,14 +236,14 @@
             this.cboSystemType.FormattingEnabled = true;
             this.cboSystemType.Location = new System.Drawing.Point(3, 5);
             this.cboSystemType.Name = "cboSystemType";
-            this.cboSystemType.Size = new System.Drawing.Size(123, 21);
+            this.cboSystemType.Size = new System.Drawing.Size(118, 21);
             this.cboSystemType.TabIndex = 34;
             // 
             // txtServiceType
             // 
             this.txtServiceType.Location = new System.Drawing.Point(3, 5);
             this.txtServiceType.Name = "txtServiceType";
-            this.txtServiceType.Size = new System.Drawing.Size(121, 20);
+            this.txtServiceType.Size = new System.Drawing.Size(118, 20);
             this.txtServiceType.TabIndex = 33;
             // 
             // label7
@@ -253,9 +253,9 @@
             this.label7.Location = new System.Drawing.Point(3, 10);
             this.label7.Name = "label7";
             this.label7.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.label7.Size = new System.Drawing.Size(74, 13);
+            this.label7.Size = new System.Drawing.Size(79, 13);
             this.label7.TabIndex = 31;
-            this.label7.Text = "Family Type";
+            this.label7.Text = "MEP Type";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // cboFamilyType
@@ -263,9 +263,9 @@
             this.cboFamilyType.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.cboFamilyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboFamilyType.FormattingEnabled = true;
-            this.cboFamilyType.Location = new System.Drawing.Point(83, 6);
+            this.cboFamilyType.Location = new System.Drawing.Point(88, 6);
             this.cboFamilyType.Name = "cboFamilyType";
-            this.cboFamilyType.Size = new System.Drawing.Size(122, 21);
+            this.cboFamilyType.Size = new System.Drawing.Size(117, 21);
             this.cboFamilyType.TabIndex = 30;
             this.cboFamilyType.SelectedIndexChanged += new System.EventHandler(this.cboFamilyType_SelectedIndexChanged);
             // 
@@ -274,9 +274,9 @@
             this.cboMEPObjects.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.cboMEPObjects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboMEPObjects.FormattingEnabled = true;
-            this.cboMEPObjects.Location = new System.Drawing.Point(83, 4);
+            this.cboMEPObjects.Location = new System.Drawing.Point(88, 4);
             this.cboMEPObjects.Name = "cboMEPObjects";
-            this.cboMEPObjects.Size = new System.Drawing.Size(329, 21);
+            this.cboMEPObjects.Size = new System.Drawing.Size(326, 21);
             this.cboMEPObjects.TabIndex = 11;
             this.cboMEPObjects.SelectedIndexChanged += new System.EventHandler(this.cboMEPObjects_SelectedIndexChanged);
             // 
@@ -286,9 +286,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(3, 8);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(74, 13);
+            this.label1.Size = new System.Drawing.Size(79, 13);
             this.label1.TabIndex = 10;
-            this.label1.Text = "MEP Type";
+            this.label1.Text = "MEP Category";
             // 
             // lblHeight
             // 
@@ -307,9 +307,9 @@
             this.cboHeight.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.cboHeight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboHeight.FormattingEnabled = true;
-            this.cboHeight.Location = new System.Drawing.Point(291, 39);
+            this.cboHeight.Location = new System.Drawing.Point(296, 39);
             this.cboHeight.Name = "cboHeight";
-            this.cboHeight.Size = new System.Drawing.Size(121, 21);
+            this.cboHeight.Size = new System.Drawing.Size(118, 21);
             this.cboHeight.TabIndex = 30;
             // 
             // panel3
@@ -317,10 +317,10 @@
             this.panel3.Controls.Add(this.cboDiameter);
             this.panel3.Controls.Add(this.cboWidth);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(80, 33);
+            this.panel3.Location = new System.Drawing.Point(85, 33);
             this.panel3.Margin = new System.Windows.Forms.Padding(0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(128, 34);
+            this.panel3.Size = new System.Drawing.Size(123, 34);
             this.panel3.TabIndex = 1;
             // 
             // cboDiameter
@@ -330,7 +330,7 @@
             this.cboDiameter.FormattingEnabled = true;
             this.cboDiameter.Location = new System.Drawing.Point(3, 7);
             this.cboDiameter.Name = "cboDiameter";
-            this.cboDiameter.Size = new System.Drawing.Size(122, 21);
+            this.cboDiameter.Size = new System.Drawing.Size(117, 21);
             this.cboDiameter.TabIndex = 28;
             // 
             // cboWidth
@@ -340,7 +340,7 @@
             this.cboWidth.FormattingEnabled = true;
             this.cboWidth.Location = new System.Drawing.Point(3, 6);
             this.cboWidth.Name = "cboWidth";
-            this.cboWidth.Size = new System.Drawing.Size(122, 21);
+            this.cboWidth.Size = new System.Drawing.Size(117, 21);
             this.cboWidth.TabIndex = 32;
             // 
             // tableLayoutPanel9
@@ -388,7 +388,7 @@
             // tableLayoutPanel11
             // 
             this.tableLayoutPanel11.ColumnCount = 2;
-            this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel11.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel11.Controls.Add(this.cboMEPObjects, 1, 0);
@@ -404,9 +404,9 @@
             // tableLayoutPanel12
             // 
             this.tableLayoutPanel12.ColumnCount = 4;
-            this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel12.Controls.Add(this.lblWidth, 0, 1);
             this.tableLayoutPanel12.Controls.Add(this.panel9, 3, 0);
@@ -433,7 +433,7 @@
             this.lblWidth.Location = new System.Drawing.Point(3, 43);
             this.lblWidth.Name = "lblWidth";
             this.lblWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lblWidth.Size = new System.Drawing.Size(74, 13);
+            this.lblWidth.Size = new System.Drawing.Size(79, 13);
             this.lblWidth.TabIndex = 31;
             this.lblWidth.Text = "Width";
             this.lblWidth.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -451,9 +451,9 @@
             // tableLayoutPanel4
             // 
             this.tableLayoutPanel4.ColumnCount = 4;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.Controls.Add(this.label5, 2, 1);
             this.tableLayoutPanel4.Controls.Add(this.txtOffsetBottom, 3, 1);
