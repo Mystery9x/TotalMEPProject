@@ -2,16 +2,20 @@
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.DB.Visual;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using TotalMEPProject.SelectionFilters;
 
 namespace TotalMEPProject.Ultis
 {
     public static class Common
     {
+        private const double _inch = 1.0 / 12.0;
+        public static double _sixteenth = _inch / 16.0;
         public static double mmToFT = 0.0032808399;
         private const double _eps = 1.0e-9;
 
@@ -46,7 +50,246 @@ namespace TotalMEPProject.Ultis
 
             return false;
         }
+        public static List<Curve> CreateOffsetCurve(Curve curveOrigin, double distance, bool allSide)
+        {
+            if (curveOrigin is Line)
+            {
+                return CalculateOffsetLine(curveOrigin as Line, distance, allSide);
+            }
+            else if (curveOrigin is Arc)
+            {
+                return CalculateOffsetArc(curveOrigin, distance);
+            }
+            return null;
+        }
+        private static XYZ MiddlePoint(Curve curve)
+        {
+            double d1 = curve.GetEndParameter(0);
+            double d2 = curve.GetEndParameter(1);
+            return curve.Evaluate(d1 + ((d2 - d1) / 2.0), false);
+        }
+        public static List<Curve> CalculateOffsetArc(Curve curveOri, double distance)
+        {
+            List<Curve> offsets = new List<Curve>();
 
+            Arc arc = curveOri as Arc;
+            //Middle point in arc
+
+            XYZ midPoint = MiddlePoint(arc);
+
+            XYZ p1 = curveOri.GetEndPoint(0);
+            XYZ p2 = curveOri.GetEndPoint(1);
+
+            //Radius new arc
+
+            double radius1 = arc.Radius - distance;
+            double radius2 = arc.Radius + distance;
+
+            List<double> list_radius = new List<double>();
+            list_radius.Add(radius1);
+            list_radius.Add(radius2);
+            for (int i = 0; i < list_radius.Count; i++)
+            {
+                double radius = list_radius[i];
+                XYZ normal = (arc.Center - midPoint);
+
+                Line line = Line.CreateUnbound(arc.Center, normal);
+                IntersectionResultArray resultArray = null;
+                SetComparisonResult result = arc.Intersect(line, out resultArray);
+                if (result != SetComparisonResult.Overlap)
+                {
+                    return null;
+                }
+                IntersectionResult inter = resultArray.get_Item(0);
+                XYZ pOnArcOri = inter.XYZPoint;
+
+                //Tạo Arc
+                Arc arcNew = Arc.Create(arc.Center, radius, 0, 2 * Math.PI, arc.XDirection, arc.YDirection);
+                XYZ normal0 = (midPoint - arc.Center);//(arc.Center - midPoint);
+                Line lineFromCenterToInters = Line.CreateUnbound(arc.Center, normal0);
+                XYZ normal1 = (p1 - arc.Center);//(arc.Center - p1);
+                Line lineFromCenterToP1 = Line.CreateUnbound(arc.Center, normal1);
+                XYZ normal2 = (p2 - arc.Center);// (arc.Center - p2);
+                Line lineFromCenterToP2 = Line.CreateUnbound(arc.Center, normal2);
+
+                //Find intersection : lineFromCenterToP1
+                result = arcNew.Intersect(lineFromCenterToP1, out resultArray);
+                if (result != SetComparisonResult.Overlap)
+                {
+                    return null;
+                }
+                //---------------------NOTE: NẾU NORMAL = POINT - CENTER POINT ->LẤY POINT INTERSECT TẠI 0
+                //---------------------NOTE: NẾU NORMAL = CENTER POINT - POINT ->LẤY POINT INTERSECT TẠI 1
+
+                XYZ p11 = resultArray.get_Item(0).XYZPoint;
+
+                //Find intersection : lineFromCenterToP1
+                result = arcNew.Intersect(lineFromCenterToP2, out resultArray);
+                if (result != SetComparisonResult.Overlap)
+                {
+                    return null;
+                }
+                XYZ p22 = resultArray.get_Item(0).XYZPoint;
+
+                //Find intersection : lineFromCenterToInters
+                result = arcNew.Intersect(lineFromCenterToInters, out resultArray);
+                if (result != SetComparisonResult.Overlap)
+                {
+                    return null;
+                }
+                XYZ pOnArc = resultArray.get_Item(0).XYZPoint;
+
+                var arc_new = Arc.Create(p11, p22, pOnArc);
+                offsets.Add(arc_new);
+
+                //Common.CreateModelArc(arc_new);
+            }
+
+            return offsets;
+        }
+
+        public static void SetOffset(Element element, double offset)
+        {
+#if RV_2016 || RV_2017 || RV_2018 || RV_2019
+            element.LookupParameter("Offset").Set(offset * Common.mmToFT);
+
+#else
+            element.LookupParameter("Middle Elevation").Set(offset * Common.mmToFT);
+
+#endif
+        }
+
+        public static bool IsTap(MEPCurve mep)
+        {
+            if (mep as Pipe != null)
+            {
+                var pipe = mep as Pipe;
+
+                var pipeType = pipe.PipeType as PipeType;
+
+                if (pipeType.RoutingPreferenceManager.PreferredJunctionType == PreferredJunctionType.Tap)
+                    return true;
+            }
+            else if (mep as Duct != null)
+            {
+                var duct = mep as Duct;
+                var ductType = duct.DuctType as DuctType;
+
+                if (ductType.RoutingPreferenceManager.PreferredJunctionType == PreferredJunctionType.Tap)
+                    return true;
+            }
+            //             else if (mep as CableTray != null)
+            //             {
+            //                 var duct = mep as CableTray;
+            //                 var ductType = duct. as DuctType;
+            //
+            //                 if (ductType.RoutingPreferenceManager.PreferredJunctionType == PreferredJunctionType.Tap)
+            //                     return true;
+            //             }
+            //             else if (mep as Duct != null)
+            //             {
+            //                 var duct = mep as Duct;
+            //                 var ductType = duct.DuctType as DuctType;
+            //
+            //                 if (ductType.RoutingPreferenceManager.PreferredJunctionType == PreferredJunctionType.Tap)
+            //                     return true;
+            //             }
+
+            return false;
+        }
+        public static LinePatternElement CreateLineParttern(Document doc, string name)
+        {
+            try
+            {
+                FilteredElementCollector fec = new FilteredElementCollector(doc).OfClass(typeof(LinePatternElement));
+                var list = fec.ToElements();
+
+                foreach (LinePatternElement linePatternElement in list)
+                {
+                    if (linePatternElement.Name == name)
+                        return linePatternElement;
+                }
+
+                LinePattern LinePattern = new LinePattern(name);
+
+                List<LinePatternSegment> segments = new List<LinePatternSegment>();
+                var linePatternSegment = new LinePatternSegment(LinePatternSegmentType.Dash, 3 * Common.mmToFT);
+                segments.Add(linePatternSegment);
+                linePatternSegment = new LinePatternSegment(LinePatternSegmentType.Space, 3 * Common.mmToFT);
+                segments.Add(linePatternSegment);
+
+                LinePattern.SetSegments(segments);
+
+                return LinePatternElement.Create(Global.UIDoc.Document, LinePattern);
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public static List<Curve> CalculateOffsetLine(Line curveOrigin, double distance, bool allSide)
+        {
+            List<Curve> offsets = new List<Curve>();
+
+            List<double> offset_values = new List<double>();
+            if (allSide == true)
+            {
+                offset_values.Add(distance);
+                offset_values.Add(-distance);
+            }
+            else
+                offset_values.Add(distance);
+
+            foreach (double d in offset_values)
+            {
+                Line line = Line.CreateBound(curveOrigin.GetEndPoint(0), curveOrigin.GetEndPoint(1));
+                XYZ lineDirection = line.Direction;
+                XYZ normal = XYZ.BasisZ.CrossProduct(lineDirection).Normalize();
+
+                XYZ translation = normal.Multiply(d);
+
+                XYZ startPointOffset = line.GetEndPoint(0).Add(translation);
+                XYZ endPointOffset = line.GetEndPoint(1).Add(translation);
+                XYZ midPoint = new XYZ((startPointOffset.X + endPointOffset.X) / 2, (startPointOffset.Y + endPointOffset.Y) / 2, (startPointOffset.Z + endPointOffset.Z) / 2);
+
+                var curveOffset = Line.CreateBound(startPointOffset, endPointOffset);
+                offsets.Add(curveOffset);
+            }
+
+            //Common.CreateModelLine(startPointOffset, endPointOffset);
+            //Common.CreateModelLine(startPointOffset_2, endPointOffset_2);
+
+            return offsets;
+        }
+        public static XYZ GetPipeDirection(MEPCurve mepCurve)
+        {
+            Curve c = mepCurve.GetCurve();
+            XYZ dir = c.GetEndPoint(1) - c.GetEndPoint(0);
+            dir = dir.Normalize();
+            return dir;
+        }
+
+
+        public static int Compare(double a, double b)
+        {
+            return IsEqual(a, b) ? 0 : (a < b ? -1 : 1);
+        }
+        public static int Compare(XYZ p, XYZ q)
+        {
+            int d = Compare(p.X, q.X);
+
+            if (0 == d)
+            {
+                d = Compare(p.Y, q.Y);
+
+                if (0 == d)
+                {
+                    d = Compare(p.Z, q.Z);
+                }
+            }
+            return d;
+        }
         public static bool IsEqual(double first, double second, double tolerance = 10e-5)
         {
             double result = Math.Abs(first - second);

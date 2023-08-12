@@ -12,6 +12,7 @@ using TotalMEPProject.Request;
 using TotalMEPProject.Services;
 using TotalMEPProject.UI;
 using TotalMEPProject.UI.FireFightingUI;
+using TotalMEPProject.UI.TotalMEPUI;
 using TotalMEPProject.Ultis;
 using TotalMEPProject.Ultis.HolyUltis;
 using RibbonPanel = Autodesk.Revit.UI.RibbonPanel;
@@ -32,7 +33,7 @@ namespace TotalMEPProject
         public static FastVerticalForm fastVerticalForm = null;
         public static HolyUpDownForm m_HolyUpDownForm = null;
         public static C234Form m_C234Form = null;
-
+        public static PickLineForm m_PickLineForm = null;
         public static HolySplitUpdown _HolyUpdown = null;
         public static bool isApply = true;
 
@@ -555,6 +556,56 @@ namespace TotalMEPProject
         #endregion Create ribbon
 
         #region Show Dialog
+
+        public static bool ShowCreateMEPForm()
+        {
+            try
+            {
+                if (null == hWndRevit)
+                {
+                    Process process = Process.GetCurrentProcess();
+
+                    IntPtr h = process.MainWindowHandle;
+                    hWndRevit = new WindowHandle(h);
+                }
+
+                bool isShow = false;
+
+                if (m_PickLineForm == null || m_PickLineForm.IsDisposed)
+                {
+                    // A new handler to handle request posting by the dialog
+                    RequestHandler handler = new RequestHandler();
+
+                    // External Event for the dialog to use (to post requests)
+                    ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                    // We give the objects to the new dialog;
+                    // The dialog becomes the owner responsible fore disposing them, eventually.
+                    m_PickLineForm = new PickLineForm(exEvent, handler);
+
+                    m_PickLineForm.Show(hWndRevit);
+                }
+                else
+                {
+                    isShow = true;
+                }
+
+                DisplayService.SetFocus(new HandleRef(null, App.m_PickLineForm.Handle));
+
+                if (isShow == true)
+                {
+                    //Begin pick line
+
+                    //m_PickLineForm.butAccept_Click(null, null);
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                return false;
+            }
+        }
 
         public static bool ShowVerticalMEPForm()
         {
