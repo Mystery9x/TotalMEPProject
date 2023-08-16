@@ -15,9 +15,9 @@ namespace TotalMEPProject.UI
 
         public RunMode m_runMode = RunMode.Apply;
 
-        private Request.Request m_request;
+        private RequestId m_request;
 
-        private Request.RequestHandler m_handler;
+        private RequestHandler m_handler;
 
         private ExternalEvent m_exEvent;
 
@@ -145,13 +145,18 @@ namespace TotalMEPProject.UI
 
         #region Constructor
 
-        public HolyUpDownForm(ExternalEvent exEvent, Request.RequestHandler handler)
+        public HolyUpDownForm(ExternalEvent exEvent, RequestHandler handler)
         {
             InitializeComponent();
 
             m_handler = handler;
             m_exEvent = exEvent;
             txtAngle.Enabled = radCustom.Checked;
+
+            radElbow45.Checked = true;
+            txtDistance.Text = "300";
+            txtUpdownStepValue.Text = "100";
+            txtEblowControlValue.Text = "100";
         }
 
         #endregion Constructor
@@ -162,9 +167,18 @@ namespace TotalMEPProject.UI
         {
             if (Distance == double.MinValue && NotApply == false)
                 return;
-
             m_runMode = RunMode.Apply;
-            MakeRequest(GetRequestId(RunMode.Apply));
+
+            AppUtils.sa(txtDistance);
+            AppUtils.sa(radElbow90);
+            AppUtils.sa(radElbow45);
+            AppUtils.sa(radCustom);
+            AppUtils.sa(radNotApply);
+            AppUtils.sa(txtAngle);
+            AppUtils.sa(txtEblowControlValue);
+            AppUtils.sa(txtUpdownStepValue);
+
+            MakeRequest(GetRequestId(m_runMode));
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -189,7 +203,7 @@ namespace TotalMEPProject.UI
         {
             if (UpStepValue == double.MinValue)
                 return;
-
+            AppUtils.sa(txtUpdownStepValue);
             MakeRequest(RequestId.HolyUpDown_UpStep);
         }
 
@@ -197,7 +211,7 @@ namespace TotalMEPProject.UI
         {
             if (UpStepValue == double.MinValue)
                 return;
-
+            AppUtils.sa(txtUpdownStepValue);
             MakeRequest(RequestId.HolyUpDown_DownStep);
         }
 
@@ -205,7 +219,7 @@ namespace TotalMEPProject.UI
         {
             if (UpElbowStepValue == double.MinValue)
                 return;
-
+            AppUtils.sa(txtEblowControlValue);
             MakeRequest(RequestId.HolyUpDown_UpElbowControl);
         }
 
@@ -213,7 +227,7 @@ namespace TotalMEPProject.UI
         {
             if (UpElbowStepValue == double.MinValue)
                 return;
-
+            AppUtils.sa(txtEblowControlValue);
             MakeRequest(RequestId.HolyUpDown_DownElbowControl);
         }
 
@@ -288,8 +302,7 @@ namespace TotalMEPProject.UI
         {
             if (mode == RunMode.Apply)
             {
-                RequestId id = RequestId.HolyUpDown_PickObjects/*HolyUpDown_Run*/;
-
+                RequestId id = RequestId.HolyUpDown_PickObjects;
                 return id;
             }
             else
@@ -341,11 +354,26 @@ namespace TotalMEPProject.UI
         }
 
         #endregion Method
+
+        private void btnPreview_Click(object sender, EventArgs e)
+        {
+            if (btnPreview.Text == "Preview >>")
+            {
+                this.Size = this.MaximumSize;
+                btnPreview.Text = "Preview <<";
+            }
+            else
+            {
+                this.Size = this.MinimumSize;
+                btnPreview.Text = "Preview >>";
+            }
+        }
     }
 
     public enum RunMode
     {
         Apply = 0,
+        ApplyLeftRight = 1,
         OK,
     }
 }
