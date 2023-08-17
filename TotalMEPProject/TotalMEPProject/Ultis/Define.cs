@@ -5,6 +5,8 @@
         #region Default value
 
         public const double OffsetHangerDefaultValue = 50 / 304.8;
+        public const string ERR_NO_SET_ELBOW_FOR_PIPETYPE = "No set elbow for pipetype";
+        public const string ERR_ANGLE_ELBOW = "Elbow Angle is out of Acceptable Range. Please choose other method";
 
         #endregion Default value
 

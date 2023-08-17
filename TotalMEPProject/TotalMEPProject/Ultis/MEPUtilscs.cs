@@ -1,6 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.UI.Selection;
+using Autodesk.Revit.UI;
 using System;
 using System.Linq;
 
@@ -8,6 +11,35 @@ namespace TotalMEPProject.Ultis
 {
     public class MEPUtilscs
     {
+        public static Pipe PickPipe(UIDocument uidoc, ISelectionFilter selectionFilter, string statusPrompt)
+        {
+            Pipe retval = null;
+            try
+            {
+                if (uidoc == null || uidoc.Document == null)
+                    return retval;
+
+                Reference refEle = null;
+
+                if (selectionFilter == null)
+                    refEle = uidoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element, statusPrompt);
+                else
+                    refEle = uidoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element, selectionFilter, statusPrompt);
+
+                if (refEle != null)
+                {
+                    Element ele = uidoc.Document.GetElement(refEle);
+                    if (ele != null && ele is Pipe pipe)
+                        return pipe;
+                }
+                return retval;
+            }
+            catch (Exception)
+            {
+                return retval;
+            }
+        }
+
         public static Element CE(MEPCurve mep1, MEPCurve mep2, XYZ point)
         {
             var c3 = Common.GetConnectorClosestTo(mep1, point);

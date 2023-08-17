@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
@@ -10,6 +11,35 @@ using TotalMEPProject.Ultis;
 
 namespace TotalMEPProject.SelectionFilters
 {
+    public class PipeSelectionFilter : ISelectionFilter
+    {
+        private List<ElementId> _exceptIds = new List<ElementId>();
+
+        public PipeSelectionFilter(List<ElementId> exceptIds = null)
+        {
+            if (exceptIds != null)
+                _exceptIds = exceptIds;
+        }
+
+        public bool AllowElement(Element elem)
+        {
+            if (elem is Pipe /*|| (elem is FamilyInstance instance && instance.MEPModel != null)*/)
+            {
+                if (!_exceptIds.Contains(elem.Id))
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
+        public bool AllowReference(Reference reference, XYZ position)
+        {
+            return true;
+        }
+    }
+
     public class ElementSelectionFilters : ISelectionFilter
     {
         private Document _doc;

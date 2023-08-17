@@ -172,6 +172,7 @@
     <Compile Include="Commands\TotalMEP\CmdHolyUpdown.cs" />
     <Compile Include="Commands\TotalMEP\CmdMEPConnection.cs" />
     <Compile Include="Commands\TotalMEP\CmdPickLine.cs" />
+    <Compile Include="Commands\TotalMEP\VerticalConnection\CmdVerticalWYE.cs" />
     <Compile Include="Commands\TotalMEP\CmdVerticalMEP.cs" />
     <Compile Include="Commands\Login\CmdLogin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -206,6 +207,12 @@
     </Compile>
     <Compile Include="UI\BeginUI\FrmLogin.Designer.cs">
       <DependentUpon>FrmLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TotalMEPUI\VerticalConnectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\TotalMEPUI\VerticalConnectionForm.Designer.cs">
+      <DependentUpon>VerticalConnectionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\TotalMEPUI\HolyUpDownForm.cs">
       <SubType>Form</SubType>
@@ -267,6 +274,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TotalMEPUI\PickLineForm.resx">
       <DependentUpon>PickLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\TotalMEPUI\VerticalConnectionForm.resx">
+      <DependentUpon>VerticalConnectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TotalMEPUI\VerticalMEPForm.resx">
       <DependentUpon>VerticalMEPForm.cs</DependentUpon>

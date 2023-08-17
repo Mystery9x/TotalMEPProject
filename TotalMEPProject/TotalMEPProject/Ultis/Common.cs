@@ -19,6 +19,163 @@ namespace TotalMEPProject.Ultis
         public static double mmToFT = 0.0032808399;
         private const double _eps = 1.0e-9;
 
+        /// <summary>
+        /// Get Information Connector
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="symbolTee"></param>
+        /// <param name="idConSt"></param>
+        /// <param name="idConEnd"></param>
+        /// <param name="idConTee"></param>
+        /// <returns></returns>
+        public static bool GetInforConnector(Document doc, FamilySymbol symbolTee, out int idConSt, out int idConEnd, out int idConTee)
+        {
+            idConSt = int.MaxValue;
+            idConEnd = int.MaxValue;
+            idConTee = int.MaxValue;
+
+            if (symbolTee != null)
+            {
+                using (SubTransaction tran = new SubTransaction(doc))
+                {
+                    tran.Start();
+                    try
+                    {
+                        FamilyInstance fitting = doc.Create.NewFamilyInstance(XYZ.Zero, symbolTee, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+
+                        GetInformationConectorWye(fitting, null, out Connector conSt, out Connector conEnd, out Connector conTee);
+
+                        if (conSt != null)
+                            idConSt = conSt.Id;
+                        if (conEnd != null)
+                            idConEnd = conEnd.Id;
+                        if (conTee != null)
+                            idConTee = conTee.Id;
+
+                        if (idConSt != int.MaxValue && idConEnd != int.MaxValue && idConTee != int.MaxValue)
+                            return true;
+                    }
+                    catch (Exception) { }
+                    finally
+                    {
+                        tran.RollBack();
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Get information of connector tee
+        /// </summary>
+        /// <param name="fitting"></param>
+        /// <param name="vector"></param>
+        /// <param name="main1"></param>
+        /// <param name="main2"></param>
+        /// <param name="tee"></param>
+        public static void GetInformationConectorWye(FamilyInstance fitting, XYZ vector, out Connector main1, out Connector main2, out Connector tee)
+        {
+            main1 = null;
+            main2 = null;
+            tee = null;
+            if (fitting != null)
+            {
+                //Get fitting info
+
+                GetConnectorMain(fitting, vector, out main1, out main2);
+
+                foreach (Connector c in fitting.MEPModel.ConnectorManager.Connectors)
+                {
+                    if (c.Id != main1.Id && c.Id != main2.Id)
+                    {
+                        tee = c;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get connector main
+        /// </summary>
+        /// <param name="fitting"></param>
+        /// <param name="vector"></param>
+        /// <param name="mainConnect1"></param>
+        /// <param name="mainConnect2"></param>
+        public static void GetConnectorMain(FamilyInstance fitting, XYZ vector, out Connector mainConnect1, out Connector mainConnect2)
+        {
+            mainConnect1 = null;
+            mainConnect2 = null;
+
+            MechanicalFitting mechanicalFitting = fitting.MEPModel as MechanicalFitting;
+            if (mechanicalFitting != null && mechanicalFitting.PartType == PartType.Tee && vector == null && fitting.MEPModel.ConnectorManager.Connectors.Size == 3)
+            {
+                //Main : hướng connector của 2 connector fai song song voi nhau (nguoc chieu nhau)
+
+                foreach (Connector c1 in fitting.MEPModel.ConnectorManager.Connectors)
+                {
+                    foreach (Connector c2 in fitting.MEPModel.ConnectorManager.Connectors)
+                    {
+                        if (c1.Id == c2.Id)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            var z1 = c1.CoordinateSystem.BasisZ;
+                            var z2 = c2.CoordinateSystem.BasisZ;
+
+                            if (IsParallel(z1, z2, 0.0001) == true)
+                            {
+                                mainConnect1 = c1;
+                                mainConnect2 = c2;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (mainConnect1 != null && mainConnect2 != null)
+                        break;
+                }
+            }
+            else
+            {
+                foreach (Connector con in fitting.MEPModel.ConnectorManager.Connectors)
+                {
+                    if (vector != null)
+                    {
+                        if (IsParallel(vector, con.CoordinateSystem.BasisZ, 0.0001) == false)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (mainConnect1 == null)
+                        mainConnect1 = con;
+                    else
+                    {
+                        mainConnect2 = con;
+                        break;
+                    }
+                }
+            }
+
+            if (mainConnect1 != null && mainConnect2 != null)
+            {
+                //Connect nao gan location of fitting thi do la 1
+
+                var p = (fitting.Location as LocationPoint).Point;
+                if (mainConnect1.Origin.DistanceTo(p) > mainConnect2.Origin.DistanceTo(p))
+                {
+                    Connector temp = mainConnect1;
+                    mainConnect1 = mainConnect2;
+
+                    mainConnect2 = temp;
+                }
+            }
+        }
+
         public static bool IsLessThan(double first, double second, double tolerance = 10e-5)
         {
             if (!IsEqual(first, second, tolerance))
@@ -50,6 +207,7 @@ namespace TotalMEPProject.Ultis
 
             return false;
         }
+
         public static List<Curve> CreateOffsetCurve(Curve curveOrigin, double distance, bool allSide)
         {
             if (curveOrigin is Line)
@@ -62,12 +220,14 @@ namespace TotalMEPProject.Ultis
             }
             return null;
         }
+
         private static XYZ MiddlePoint(Curve curve)
         {
             double d1 = curve.GetEndParameter(0);
             double d2 = curve.GetEndParameter(1);
             return curve.Evaluate(d1 + ((d2 - d1) / 2.0), false);
         }
+
         public static List<Curve> CalculateOffsetArc(Curve curveOri, double distance)
         {
             List<Curve> offsets = new List<Curve>();
@@ -197,6 +357,7 @@ namespace TotalMEPProject.Ultis
 
             return false;
         }
+
         public static LinePatternElement CreateLineParttern(Document doc, string name)
         {
             try
@@ -262,6 +423,7 @@ namespace TotalMEPProject.Ultis
 
             return offsets;
         }
+
         public static XYZ GetPipeDirection(MEPCurve mepCurve)
         {
             Curve c = mepCurve.GetCurve();
@@ -270,11 +432,11 @@ namespace TotalMEPProject.Ultis
             return dir;
         }
 
-
         public static int Compare(double a, double b)
         {
             return IsEqual(a, b) ? 0 : (a < b ? -1 : 1);
         }
+
         public static int Compare(XYZ p, XYZ q)
         {
             int d = Compare(p.X, q.X);
@@ -290,6 +452,7 @@ namespace TotalMEPProject.Ultis
             }
             return d;
         }
+
         public static bool IsEqual(double first, double second, double tolerance = 10e-5)
         {
             double result = Math.Abs(first - second);
